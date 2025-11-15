@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import ru.vladislavkomkov.models.Game;
 import ru.vladislavkomkov.models.Player;
 
-public class GamePlayerTestCase {
+public abstract class GamePlayerTestCase {
     protected Player player;
     protected Game game;
     

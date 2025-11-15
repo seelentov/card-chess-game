@@ -109,4 +109,12 @@ public class Fight {
         int playerDmg = player.getLevel();
         return playerDmg + unitsDmg;
     }
+    
+    public Player getPlayer1(){
+        return player1;
+    }
+    
+    public Player getPlayer2(){
+        return player2;
+    }
 }

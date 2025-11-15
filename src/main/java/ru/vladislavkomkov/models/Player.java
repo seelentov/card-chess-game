@@ -78,6 +78,14 @@ public class Player {
         hand[indexCard] = null;
     }
 
+    public void buyCard(Game game, int index){
+        if(tavern.size() > index){
+            Card card = tavern.get(index);
+            money-=3;
+            card.get().onHandled(game, this);
+        }
+    }
+    
     int getFreeTableIndexFromRight(){
         return getFreeIndexFromRight(table);
     }
@@ -186,12 +194,6 @@ public class Player {
 
     public boolean isAlive(){
         return health > 0;
-    }
-
-    public void byuCard(int index){
-        Card card = tavern.get(index);
-        card.handled(null, this);
-        tavern.remove(index);
     }
 
     public void calcTavern(){

@@ -18,11 +18,7 @@ public abstract class Card {
     }
 
     public void play(Game game, Player player, int index){
-    
-    }
-
-    public void handled(Game game, Player player){
-        this.get().onHandled(game,player);
+        this.get().onPlayed(game,player,index);
     }
 
     public Entity get(){

@@ -33,9 +33,19 @@ public abstract class Unit extends Entity {
     }
     
     public void onStartTurn(Game game, Player player) {
+    
     }
     
     public void onEndTurn(Game game, Player player) {
+    
+    }
+    
+    public void onStartFight(Game game, Player player, Player player2) {
+    
+    }
+    
+    public void onEndFight(Game game, Player player, Player player2) {
+    
     }
     
     public void onPlayed(Game game, Player player, int index) {

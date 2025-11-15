@@ -6,6 +6,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+import ru.vladislavkomkov.service.RandService;
+
 public class Game implements AutoCloseable {
     final int PLAYERS_COUNT = 8;
     final int FIGHTS_COUNT = 4;
@@ -28,9 +30,27 @@ public class Game implements AutoCloseable {
         calcFights();
 
         for(Player player: players.values()){
+            processStartTurn(player);
             player.resetMoney();
             player.calcTavern();
+            processEndTurn(player);
         }
+    }
+    
+    public void processStartTurn(Player player){
+        player.doForAll(unit -> unit.onStartTurn(this, player));
+    }
+    
+    private void processEndTurn(Player player) {
+        player.doForAll(unit -> unit.onEndTurn(this, player));
+    }
+    
+    public void processStartFight(Player player,Player player2){
+        player.doForAll(unit -> unit.onStartFight(this, player,player2));
+    }
+    
+    private void processEndFight(Player player,Player player2) {
+        player.doForAll(unit -> unit.onEndFight(this, player,player2));
     }
 
     public void doFight(){
@@ -40,11 +60,21 @@ public class Game implements AutoCloseable {
 
         for(Fight fight: fights){
             fightFutures.add(CompletableFuture.supplyAsync(()->{
+                boolean isPlayerFirst = RandService.getRand(1) == 0;
+                
+                Player player = isPlayerFirst ? fight.getPlayer1() : fight.getPlayer2();
+                Player player2 = isPlayerFirst ? fight.getPlayer2() : fight.getPlayer1();
+                
+                processStartFight(player, player2);
+                
                 while(true){
                     if (fight.doTurn()){
                         break;
                     }
                 }
+                
+                processStartFight(player, player2);
+                
                 return null;
             }, executor));
         }

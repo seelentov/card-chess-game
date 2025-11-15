@@ -11,7 +11,6 @@ import ru.vladislavkomkov.models.card.UnitCard;
 import ru.vladislavkomkov.models.spell.impl.TavernCoin;
 import ru.vladislavkomkov.models.unit.Unit;
 import ru.vladislavkomkov.models.unit.impl.Alleycat;
-import ru.vladislavkomkov.models.unit.impl.Alleycat;
 import ru.vladislavkomkov.models.unit.impl.Cat;
 
 import java.util.Arrays;
@@ -86,6 +85,13 @@ public class PlayerTest extends GamePlayerTestCase {
         }
     }
 
+    @Test
+    void testBuyCard(){
+        player.getTavern().add(Card.of(new Alleycat()));
+        player.buyCard(game, 0);
+        assertEquals(new Alleycat().getName(), player.cloneHand()[0].get().getName());
+    }
+    
     @Test
     void testPlaySpellCard(){
         assertEquals(3, player.getMoney());
