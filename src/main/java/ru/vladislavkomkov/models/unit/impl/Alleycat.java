@@ -4,21 +4,23 @@ import ru.vladislavkomkov.models.Game;
 import ru.vladislavkomkov.models.Player;
 import ru.vladislavkomkov.models.unit.Type;
 import ru.vladislavkomkov.models.unit.Unit;
-import ru.vladislavkomkov.models.unit.actions.OnPlayedAction;
 
 public class Alleycat extends Unit {
-    protected String description = "Summon a 1/1 Cat";
-    protected Integer level = 1;
-    protected boolean isTavern = true;
+    public Alleycat(){
+        description = "Summon a 1/1 Cat";
+        level = 1;
+        isTavern = true;
+        
+        attack = 1;
+        
+        maxHealth = 1;
+        actualHealth = 1;
+        
+        type = Type.BEAST;
+    }
 
-    protected int attack = 1;
-    protected int maxHealth = 1;
-    protected int actualHealth = 1;
-
-    protected Type type = Type.BEAST;
-
-    protected OnPlayedAction onPlayed = (Game game, Player player, int index) -> {
-        super.onPlayed.process(game,player,index);
+    public void onPlayed(Game game, Player player, int index) {
+        super.onPlayed(game,player,index);
         player.addToTable(new Cat(), -1);
-    };
+    }
 }

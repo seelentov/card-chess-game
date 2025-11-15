@@ -8,45 +8,21 @@ import ru.vladislavkomkov.models.unit.Unit;
 
 public abstract class Card {
     public static Card of(Entity entity){
-        if(entity instanceof Unit){
-            return of(entity);
-        } else if (entity instanceof Spell){
-            return of(entity);
+        if(entity instanceof Unit unit){
+            return new UnitCard(unit);
+        } else if (entity instanceof Spell spell){
+            return new SpellCard(spell);
         } else {
             throw new IllegalArgumentException();
         }
     }
 
-    public static Card of(Unit unit){
-        return new UnitCard(unit);
-    }
-
-    public static Card of(Spell spell){
-        return new SpellCard(spell);
-    }
-
     public void play(Game game, Player player, int index){
-        if (this instanceof SpellCard){
-            Spell spell = ((SpellCard) this).getSpell();
-            spell.onPlayed.process(game,player,index);
-        } else if (this instanceof UnitCard){
-            Unit unit = ((UnitCard) this).getUnit();
-            unit.onPlayed.process(game,player,index);
-        } else {
-            throw new IllegalArgumentException("Wrong instance of card");
-        }
+    
     }
 
     public void handled(Game game, Player player){
-        if (this instanceof SpellCard){
-            Spell spell = ((SpellCard) this).getSpell();
-            spell.onHandled.process(game,player);
-        } else if (this instanceof UnitCard){
-            Unit unit = ((UnitCard) this).getUnit();
-            unit.onHandled.process(game,player);
-        } else {
-            throw new IllegalArgumentException("Wrong instance of card");
-        }
+        this.get().onHandled(game,player);
     }
 
     public Entity get(){

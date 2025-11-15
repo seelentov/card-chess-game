@@ -1,0 +1,21 @@
+package ru.vladislavkomkov.models.spell;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
+
+import ru.vladislavkomkov.GamePlayerTestCase;
+
+public abstract class SpellTest extends GamePlayerTestCase {
+    @Test
+    protected abstract void testOnPlayed();
+    
+    @Test
+    protected abstract void testOnHanded();
+    
+    protected void onHanded(Spell spell){
+        assertNull(player.cloneHand()[0]);
+        spell.onHandled(game, player);
+        assertEquals(spell.getName(), player.cloneHand()[0].get().getName());
+    }
+}

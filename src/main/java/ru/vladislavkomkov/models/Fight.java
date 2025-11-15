@@ -55,10 +55,10 @@ public class Fight {
         Player turnPlayer1 = isPlayer1Turn ? player1 : player2;
         Player turnPlayer2 = isPlayer1Turn ? player2 : player1;
 
-        attacked.onAttacked.process(game, turnPlayer2, turnPlayer1, attacker);
+        attacked.onAttacked(game, turnPlayer2, turnPlayer1, attacker);
 
         if (attacked.isDead()){
-            attacked.onDead.process(game,turnPlayer2,turnPlayer1,attacker);
+            attacked.onDead(game,turnPlayer2,turnPlayer1,attacker);
             if (attacked.isDead()){
                 if (isPlayer1Turn)
                     player2Units.removeIf(o -> o == attacked);
@@ -67,10 +67,10 @@ public class Fight {
             }
         }
 
-        attacker.onAttack.process(game, turnPlayer1, turnPlayer2, attacked);
+        attacker.onAttack(game, turnPlayer1, turnPlayer2, attacked);
 
         if (attacker.isDead()){
-            attacker.onDead.process(game,turnPlayer2,turnPlayer1,attacked);
+            attacker.onDead(game,turnPlayer2,turnPlayer1,attacked);
             if (attacker.isDead()){
                 if (isPlayer1Turn)
                     player1Units.removeIf(o -> o == attacker);

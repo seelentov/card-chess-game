@@ -1,5 +1,11 @@
 package ru.vladislavkomkov.models;
 
+import ru.vladislavkomkov.models.actions.OnAttackAction;
+import ru.vladislavkomkov.models.actions.OnAttackedAction;
+import ru.vladislavkomkov.models.actions.OnDeadAction;
+import ru.vladislavkomkov.models.actions.OnHandledAction;
+import ru.vladislavkomkov.models.actions.OnPlayedAction;
+import ru.vladislavkomkov.models.actions.OnSellAction;
 import ru.vladislavkomkov.models.card.Card;
 import ru.vladislavkomkov.models.card.SpellCard;
 import ru.vladislavkomkov.models.card.UnitCard;
@@ -11,10 +17,42 @@ import ru.vladislavkomkov.service.UnitService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class Player {
+    public static class Listener{
+        public Listener(){}
+        public Map<Integer, OnPlayedAction> onPlayedListeners = new HashMap<>();
+        public Map<Integer, OnHandledAction> onHandledListeners = new HashMap<>();
+        
+        public Map<Integer, OnAttackAction> onAttackListeners = new HashMap<>();
+        public Map<Integer, OnAttackedAction> onAttackedListeners = new HashMap<>();
+        
+        public Map<Integer, OnDeadAction> onDeadListeners = new HashMap<>();
+        
+        public Map<Integer, OnSellAction> onSellListeners = new HashMap<>();
+        
+        public void removeListener(int i){
+            onPlayedListeners.remove(i);
+            onHandledListeners.remove(i);
+            onAttackListeners.remove(i);
+            onAttackedListeners.remove(i);
+            onDeadListeners.remove(i);
+            onSellListeners.remove(i);
+        }
+        
+        public void removeListener(Unit unit){
+            removeListener(unit.getID());
+        }
+    }
+    
+    public static class Statistic{
+        public Statistic(){}
+    }
+    
     static final int TABLE_LIMIT = 7;
     static final int HAND_LIMIT = 10;
 
@@ -28,7 +66,10 @@ public class Player {
     int maxMoney = 3;
 
     int level;
-
+    
+    public Listener listener = new Listener();
+    public Statistic statistic = new Statistic();
+    
     public void playCard(Game game, int indexCard, int indexPos){
         if (indexCard < 0 || indexCard >= hand.length){
             throw new IndexOutOfBoundsException("Index " + indexCard + " not existed in hand with length " + hand.length);
@@ -54,17 +95,41 @@ public class Player {
 
         return -1;
     }
-
+    
     public void addToTable(Unit unit, int index){
         if(index < table.length && index >= 0 && table[index] == null){
             table[index] = unit;
             return;
         }
-
+        
         int placeIndex = getFreeTableIndexFromRight();
         if (placeIndex != -1){
             table[placeIndex] = unit;
         }
+    }
+    
+    public void removeFromTable(Unit unit){
+        int index = findTableIndex(unit);
+        
+        if(index != -1){
+            removeFromTable(index);
+        }
+    }
+    
+    public void removeFromTable(int index){
+        if(index < table.length && index >= 0 && table[index] != null){
+            table[index] = null;
+        }
+    }
+    
+    public int findTableIndex(Unit unit){
+        for (int i = 0; i < table.length; i++) {
+            if(table[i] != null && table[i].getID() == unit.getID()){
+               return i;
+            }
+        }
+        
+        return -1;
     }
 
     public void addToHand(Card card){

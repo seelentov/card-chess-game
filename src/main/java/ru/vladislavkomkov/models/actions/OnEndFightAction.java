@@ -1,4 +1,4 @@
-package ru.vladislavkomkov.models.unit.actions;
+package ru.vladislavkomkov.models.actions;
 
 public interface OnEndFightAction extends InGameAction{
 }
