@@ -1,6 +1,6 @@
 package ru.vladislavkomkov.models.card;
 
-import ru.vladislavkomkov.models.spell.Spell;
+import ru.vladislavkomkov.models.entity.spell.Spell;
 
 public class SpellCard extends Card{
     final Spell spell;

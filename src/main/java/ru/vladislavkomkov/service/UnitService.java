@@ -1,7 +1,7 @@
 package ru.vladislavkomkov.service;
 
 import ru.vladislavkomkov.consts.Units;
-import ru.vladislavkomkov.models.unit.Unit;
+import ru.vladislavkomkov.models.entity.unit.Unit;
 
 import java.util.List;
 

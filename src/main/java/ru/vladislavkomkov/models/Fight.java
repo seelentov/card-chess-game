@@ -1,7 +1,7 @@
 package ru.vladislavkomkov.models;
 
 import ru.vladislavkomkov.models.player.Player;
-import ru.vladislavkomkov.models.unit.Unit;
+import ru.vladislavkomkov.models.entity.unit.Unit;
 import ru.vladislavkomkov.service.RandService;
 
 import java.util.List;

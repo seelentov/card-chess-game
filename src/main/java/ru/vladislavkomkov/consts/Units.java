@@ -1,9 +1,9 @@
 package ru.vladislavkomkov.consts;
 
-import ru.vladislavkomkov.models.unit.Unit;
-import ru.vladislavkomkov.models.unit.impl.mech.fourth.AccordoTron;
-import ru.vladislavkomkov.models.unit.impl.beast.first.Alleycat;
-import ru.vladislavkomkov.models.unit.impl.trash.beast.first.Cat;
+import ru.vladislavkomkov.models.entity.unit.Unit;
+import ru.vladislavkomkov.models.entity.unit.impl.mech.fourth.AccordoTron;
+import ru.vladislavkomkov.models.entity.unit.impl.beast.first.Alleycat;
+import ru.vladislavkomkov.models.entity.unit.impl.trash.beast.first.Cat;
 
 import java.util.ArrayList;
 import java.util.List;

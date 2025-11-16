@@ -1,26 +1,18 @@
 package ru.vladislavkomkov.models.player;
 
 import ru.vladislavkomkov.models.Game;
-import ru.vladislavkomkov.models.actions.OnAttackAction;
-import ru.vladislavkomkov.models.actions.OnAttackedAction;
-import ru.vladislavkomkov.models.actions.OnDeadAction;
-import ru.vladislavkomkov.models.actions.OnHandledAction;
-import ru.vladislavkomkov.models.actions.OnPlayedAction;
-import ru.vladislavkomkov.models.actions.OnSellAction;
 import ru.vladislavkomkov.models.card.Card;
 import ru.vladislavkomkov.models.card.SpellCard;
 import ru.vladislavkomkov.models.card.UnitCard;
-import ru.vladislavkomkov.models.spell.Spell;
-import ru.vladislavkomkov.models.unit.Unit;
+import ru.vladislavkomkov.models.entity.spell.Spell;
+import ru.vladislavkomkov.models.entity.unit.Unit;
 import ru.vladislavkomkov.service.RandService;
 import ru.vladislavkomkov.service.SpellService;
 import ru.vladislavkomkov.service.UnitService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 public class Player {

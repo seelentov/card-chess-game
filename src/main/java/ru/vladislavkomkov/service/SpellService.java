@@ -1,8 +1,7 @@
 package ru.vladislavkomkov.service;
 
 import ru.vladislavkomkov.consts.Spells;
-import ru.vladislavkomkov.models.spell.Spell;
-import ru.vladislavkomkov.models.unit.Unit;
+import ru.vladislavkomkov.models.entity.spell.Spell;
 
 import java.util.List;
 

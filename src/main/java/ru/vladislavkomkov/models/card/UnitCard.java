@@ -1,6 +1,6 @@
 package ru.vladislavkomkov.models.card;
 
-import ru.vladislavkomkov.models.unit.Unit;
+import ru.vladislavkomkov.models.entity.unit.Unit;
 
 public class UnitCard extends Card{
     final Unit unit;

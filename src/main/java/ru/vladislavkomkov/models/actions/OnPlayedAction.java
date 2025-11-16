@@ -1,6 +1,6 @@
 package ru.vladislavkomkov.models.actions;
 
-import ru.vladislavkomkov.models.Entity;
+import ru.vladislavkomkov.models.entity.Entity;
 import ru.vladislavkomkov.models.Game;
 import ru.vladislavkomkov.models.player.Player;
 
