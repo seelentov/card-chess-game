@@ -1,5 +1,8 @@
 package ru.vladislavkomkov.models.unit;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import ru.vladislavkomkov.models.Entity;
 import ru.vladislavkomkov.models.Game;
 import ru.vladislavkomkov.models.player.Player;
@@ -7,7 +10,7 @@ import ru.vladislavkomkov.models.player.Player;
 public abstract class Unit extends Entity implements Cloneable {
     protected int attack = 0;
     protected int maxHealth = 1;
-    protected Type type = Type.NONE;
+    protected List<Type> type = new ArrayList<>();
     
     protected boolean isBubbled = false;
     protected boolean isTaunt = false;

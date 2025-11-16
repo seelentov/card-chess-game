@@ -1,8 +1,8 @@
-package ru.vladislavkomkov.models.unit.impl;
+package ru.vladislavkomkov.models.unit.impl.mech.fourth;
 
 import ru.vladislavkomkov.models.Game;
 import ru.vladislavkomkov.models.player.Player;
-import ru.vladislavkomkov.models.unit.Mech;
+import ru.vladislavkomkov.models.unit.impl.mech.Mech;
 
 public class AccordoTron extends Mech {
     public AccordoTron(){

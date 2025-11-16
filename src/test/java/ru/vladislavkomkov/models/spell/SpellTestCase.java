@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import ru.vladislavkomkov.GamePlayerTestCase;
 
-public abstract class SpellTest extends GamePlayerTestCase {
+public abstract class SpellTestCase extends GamePlayerTestCase {
     protected abstract void testOnPlayed();
     
     protected abstract void testOnHanded();

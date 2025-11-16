@@ -42,7 +42,7 @@ public class Game implements AutoCloseable {
         player.doForAll(unit -> unit.onStartTurn(this, player));
     }
     
-    private void processEndTurn(Player player) {
+    public void processEndTurn(Player player) {
         player.doForAll(unit -> unit.onEndTurn(this, player));
     }
     
@@ -50,7 +50,7 @@ public class Game implements AutoCloseable {
         player.doForAll(unit -> unit.onStartFight(this, player,player2));
     }
     
-    private void processEndFight(Player player,Player player2) {
+    public void processEndFight(Player player,Player player2) {
         player.doForAll(unit -> unit.onEndFight(this, player,player2));
     }
 

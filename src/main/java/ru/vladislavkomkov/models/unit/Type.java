@@ -2,8 +2,7 @@ package ru.vladislavkomkov.models.unit;
 
 public enum Type {
     BEAST("Beast"),
-    MECH("Mech"),
-    NONE("");
+    MECH("Mech");
 
     final String type;
 

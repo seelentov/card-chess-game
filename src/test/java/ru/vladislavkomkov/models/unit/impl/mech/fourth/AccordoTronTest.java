@@ -1,12 +1,12 @@
-package ru.vladislavkomkov.models.unit.impl;
+package ru.vladislavkomkov.models.unit.impl.mech.fourth;
 
 import org.junit.jupiter.api.Test;
 import ru.vladislavkomkov.models.unit.Unit;
-import ru.vladislavkomkov.models.unit.UnitTest;
+import ru.vladislavkomkov.models.unit.impl.mech.MechTestCase;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class AccordoTronTest extends UnitTest {
+public class AccordoTronTest extends MechTestCase {
     Unit unit = new AccordoTron();
 
     @Test

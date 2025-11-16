@@ -1,4 +1,4 @@
-package ru.vladislavkomkov.models.spell.impl;
+package ru.vladislavkomkov.models.spell.impl.first;
 
 import ru.vladislavkomkov.models.Game;
 import ru.vladislavkomkov.models.player.Player;

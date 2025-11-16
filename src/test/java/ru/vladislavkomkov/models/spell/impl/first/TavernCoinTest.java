@@ -1,13 +1,13 @@
-package ru.vladislavkomkov.models.spell.impl;
+package ru.vladislavkomkov.models.spell.impl.first;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
 import ru.vladislavkomkov.models.spell.Spell;
-import ru.vladislavkomkov.models.spell.SpellTest;
+import ru.vladislavkomkov.models.spell.SpellTestCase;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-public class TavernCoinTest extends SpellTest {
+public class TavernCoinTest extends SpellTestCase {
     Spell spell = new TavernCoin();
     
     @Test

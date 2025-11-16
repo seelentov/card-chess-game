@@ -1,14 +1,14 @@
-package ru.vladislavkomkov.models.unit.impl;
+package ru.vladislavkomkov.models.unit.impl.beast.first;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import ru.vladislavkomkov.models.unit.Unit;
-import ru.vladislavkomkov.models.unit.UnitTest;
+import ru.vladislavkomkov.models.unit.UnitTestCase;
+import ru.vladislavkomkov.models.unit.impl.trash.beast.first.Cat;
 
-public class AlleycatTest extends UnitTest {
+public class AlleycatTest extends UnitTestCase {
     Unit unit = new Alleycat();
 
     @Test

@@ -8,10 +8,10 @@ import ru.vladislavkomkov.GamePlayerTestCase;
 import ru.vladislavkomkov.models.card.Card;
 import ru.vladislavkomkov.models.card.SpellCard;
 import ru.vladislavkomkov.models.card.UnitCard;
-import ru.vladislavkomkov.models.spell.impl.TavernCoin;
+import ru.vladislavkomkov.models.spell.impl.first.TavernCoin;
 import ru.vladislavkomkov.models.unit.Unit;
-import ru.vladislavkomkov.models.unit.impl.Alleycat;
-import ru.vladislavkomkov.models.unit.impl.Cat;
+import ru.vladislavkomkov.models.unit.impl.beast.first.Alleycat;
+import ru.vladislavkomkov.models.unit.impl.trash.beast.first.Cat;
 
 import java.util.Arrays;
 import java.util.Objects;

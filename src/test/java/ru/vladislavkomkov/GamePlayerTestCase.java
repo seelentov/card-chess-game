@@ -19,7 +19,13 @@ public abstract class GamePlayerTestCase {
         player2 = new Player();
         Map<String,Player> players = Map.of(
                 "1", player,
-                "2", player2
+                "2", player2,
+                "3",new Player(),
+                "4",new Player(),
+                "5",new Player(),
+                "6",new Player(),
+                "7",new Player(),
+                "8",new Player()
         );
         game = new Game(players);
         player.resetMoney();

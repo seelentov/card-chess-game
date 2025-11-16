@@ -1,7 +1,7 @@
 package ru.vladislavkomkov.consts;
 
 import ru.vladislavkomkov.models.spell.Spell;
-import ru.vladislavkomkov.models.spell.impl.TavernCoin;
+import ru.vladislavkomkov.models.spell.impl.first.TavernCoin;
 
 import java.util.ArrayList;
 import java.util.List;

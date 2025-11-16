@@ -1,19 +1,21 @@
-package ru.vladislavkomkov.models.unit;
+package ru.vladislavkomkov.models.unit.impl.mech;
 
 import ru.vladislavkomkov.models.Game;
 import ru.vladislavkomkov.models.player.Player;
+import ru.vladislavkomkov.models.unit.Type;
+import ru.vladislavkomkov.models.unit.Unit;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Mech extends Unit{
+public abstract class Mech extends Unit {
     public Mech(){
-        type = Type.MECH;
+        type = List.of(Type.BEAST);
     }
 
     public List<Mech> magnetized = new ArrayList<>();
 
-    public List<Mech> copyMagnetized(){
+    public List<Mech> cloneMagnetized(){
         return magnetized.stream().toList();
     } 
     
