@@ -1,5 +1,6 @@
-package ru.vladislavkomkov.models;
+package ru.vladislavkomkov.models.player;
 
+import ru.vladislavkomkov.models.Game;
 import ru.vladislavkomkov.models.actions.OnAttackAction;
 import ru.vladislavkomkov.models.actions.OnAttackedAction;
 import ru.vladislavkomkov.models.actions.OnDeadAction;
@@ -23,36 +24,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class Player {
-    public static class Listener{
-        public Listener(){}
-        public Map<Integer, OnPlayedAction> onPlayedListeners = new HashMap<>();
-        public Map<Integer, OnHandledAction> onHandledListeners = new HashMap<>();
-        
-        public Map<Integer, OnAttackAction> onAttackListeners = new HashMap<>();
-        public Map<Integer, OnAttackedAction> onAttackedListeners = new HashMap<>();
-        
-        public Map<Integer, OnDeadAction> onDeadListeners = new HashMap<>();
-        
-        public Map<Integer, OnSellAction> onSellListeners = new HashMap<>();
-        
-        public void removeListener(int i){
-            onPlayedListeners.remove(i);
-            onHandledListeners.remove(i);
-            onAttackListeners.remove(i);
-            onAttackedListeners.remove(i);
-            onDeadListeners.remove(i);
-            onSellListeners.remove(i);
-        }
-        
-        public void removeListener(Unit unit){
-            removeListener(unit.getID());
-        }
-    }
-    
-    public static class Statistic{
-        public Statistic(){}
-    }
-    
     static final int TABLE_LIMIT = 7;
     static final int HAND_LIMIT = 10;
 

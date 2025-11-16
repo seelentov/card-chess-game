@@ -1,7 +1,7 @@
 package ru.vladislavkomkov.models.unit.impl;
 
 import ru.vladislavkomkov.models.Game;
-import ru.vladislavkomkov.models.Player;
+import ru.vladislavkomkov.models.player.Player;
 import ru.vladislavkomkov.models.unit.Type;
 import ru.vladislavkomkov.models.unit.Unit;
 

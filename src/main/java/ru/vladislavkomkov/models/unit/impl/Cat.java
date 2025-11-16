@@ -5,6 +5,7 @@ import ru.vladislavkomkov.models.unit.TrashUnit;
 
 public class Cat extends TrashUnit {
     public Cat(){
+        super();
         type = Type.BEAST;
     }
 }

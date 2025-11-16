@@ -1,5 +1,6 @@
 package ru.vladislavkomkov.models;
 
+import ru.vladislavkomkov.models.player.Player;
 import ru.vladislavkomkov.models.unit.Unit;
 import ru.vladislavkomkov.service.RandService;
 
@@ -55,19 +56,9 @@ public class Fight {
         Player turnPlayer1 = isPlayer1Turn ? player1 : player2;
         Player turnPlayer2 = isPlayer1Turn ? player2 : player1;
 
-        attacked.onAttacked(game, turnPlayer2, turnPlayer1, attacker);
-
-        if (attacked.isDead()){
-            attacked.onDead(game,turnPlayer2,turnPlayer1,attacker);
-            if (attacked.isDead()){
-                if (isPlayer1Turn)
-                    player2Units.removeIf(o -> o == attacked);
-                else
-                    player1Units.removeIf(o -> o == attacked);
-            }
-        }
-
         attacker.onAttack(game, turnPlayer1, turnPlayer2, attacked);
+
+        attacked.onAttacked(game, turnPlayer2, turnPlayer1, attacker);
 
         if (attacker.isDead()){
             attacker.onDead(game,turnPlayer2,turnPlayer1,attacked);
@@ -76,6 +67,16 @@ public class Fight {
                     player1Units.removeIf(o -> o == attacker);
                 else
                     player2Units.removeIf(o -> o == attacker);
+            }
+        }
+
+        if (attacked.isDead()){
+            attacked.onDead(game,turnPlayer2,turnPlayer1,attacker);
+            if (attacked.isDead()){
+                if (isPlayer1Turn)
+                    player2Units.removeIf(o -> o == attacked);
+                else
+                    player1Units.removeIf(o -> o == attacked);
             }
         }
 

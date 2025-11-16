@@ -10,16 +10,15 @@ import ru.vladislavkomkov.models.unit.UnitTest;
 
 public class AlleycatTest extends UnitTest {
     Unit unit = new Alleycat();
-    
+
+    @Test
+    void testDefault(){
+        super.testDefault(unit);
+    }
+
     @Test
     protected void testOnPlayed() {
-        super.onPlayed(unit);
-        
+        unit.onPlayed(game, player, 0);
         assertEquals(new Cat().getName(), player.cloneTable()[1].getName());
-    }
-    
-    @Test
-    protected void testOnHanded() {
-        super.onHanded(unit);
     }
 }

@@ -2,7 +2,7 @@ package ru.vladislavkomkov.models.card;
 
 import ru.vladislavkomkov.models.Entity;
 import ru.vladislavkomkov.models.Game;
-import ru.vladislavkomkov.models.Player;
+import ru.vladislavkomkov.models.player.Player;
 import ru.vladislavkomkov.models.spell.Spell;
 import ru.vladislavkomkov.models.unit.Unit;
 

@@ -1,7 +1,7 @@
 package ru.vladislavkomkov.models.spell.impl;
 
 import ru.vladislavkomkov.models.Game;
-import ru.vladislavkomkov.models.Player;
+import ru.vladislavkomkov.models.player.Player;
 import ru.vladislavkomkov.models.spell.Spell;
 
 public class TavernCoin extends Spell {

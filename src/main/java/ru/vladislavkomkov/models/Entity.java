@@ -1,6 +1,7 @@
 package ru.vladislavkomkov.models;
 
 import ru.vladislavkomkov.models.card.Card;
+import ru.vladislavkomkov.models.player.Player;
 
 public abstract class Entity {
     protected int ID = System.identityHashCode(this);

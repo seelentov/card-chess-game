@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+import ru.vladislavkomkov.models.player.Player;
 import ru.vladislavkomkov.service.RandService;
 
 public class Game implements AutoCloseable {

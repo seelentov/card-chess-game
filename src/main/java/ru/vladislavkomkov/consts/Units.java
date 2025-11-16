@@ -1,6 +1,7 @@
 package ru.vladislavkomkov.consts;
 
 import ru.vladislavkomkov.models.unit.Unit;
+import ru.vladislavkomkov.models.unit.impl.AccordoTron;
 import ru.vladislavkomkov.models.unit.impl.Alleycat;
 import ru.vladislavkomkov.models.unit.impl.Cat;
 
@@ -19,6 +20,7 @@ public class Units {
     static void setupUnits(){
         units.add(new Alleycat());
         units.add(new Cat());
+        units.add(new AccordoTron());
     }
 
     static void setupTavernUnits(){

@@ -6,16 +6,21 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 import ru.vladislavkomkov.models.Game;
-import ru.vladislavkomkov.models.Player;
+import ru.vladislavkomkov.models.player.Player;
 
 public abstract class GamePlayerTestCase {
     protected Player player;
+    protected Player player2;
     protected Game game;
     
     @BeforeEach
     protected void setUp(){
         player = new Player();
-        Map<String,Player> players = Map.of("1", player);
+        player2 = new Player();
+        Map<String,Player> players = Map.of(
+                "1", player,
+                "2", player2
+        );
         game = new Game(players);
         player.resetMoney();
     }

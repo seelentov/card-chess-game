@@ -1,4 +1,4 @@
-package ru.vladislavkomkov.models;
+package ru.vladislavkomkov.models.player;
 
 import static org.junit.jupiter.api.Assertions.*;
 

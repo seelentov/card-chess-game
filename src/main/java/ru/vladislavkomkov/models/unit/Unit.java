@@ -2,10 +2,9 @@ package ru.vladislavkomkov.models.unit;
 
 import ru.vladislavkomkov.models.Entity;
 import ru.vladislavkomkov.models.Game;
-import ru.vladislavkomkov.models.Player;
-import ru.vladislavkomkov.models.card.UnitCard;
+import ru.vladislavkomkov.models.player.Player;
 
-public abstract class Unit extends Entity {
+public abstract class Unit extends Entity implements Cloneable {
     protected int attack = 0;
     protected int maxHealth = 1;
     protected Type type = Type.NONE;
@@ -33,7 +32,6 @@ public abstract class Unit extends Entity {
     }
     
     public void onStartTurn(Game game, Player player) {
-    
     }
     
     public void onEndTurn(Game game, Player player) {
@@ -99,5 +97,14 @@ public abstract class Unit extends Entity {
     
     public void incAttack(int i){
         attack+=i;
+    }
+
+    @Override
+    public Unit clone() {
+        try {
+            return (Unit) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }
