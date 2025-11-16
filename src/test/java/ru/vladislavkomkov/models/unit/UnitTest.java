@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import ru.vladislavkomkov.GamePlayerTestCase;
 import ru.vladislavkomkov.models.Game;
 import ru.vladislavkomkov.models.player.Player;
-import ru.vladislavkomkov.models.unit.impl.mech.Mech;
 
 public class UnitTest extends GamePlayerTestCase {
     @Test
@@ -15,14 +14,14 @@ public class UnitTest extends GamePlayerTestCase {
         int moneyStart = player.getMoney();
         int moneyStep = 10;
         
-        Unit mech = new Unit(){
+        Unit unit = new Unit(){
             public void onStartTurn(Game game, Player player){
                 super.onStartTurn(game,player);
                 player.addMoney(moneyStep);
             }
         };
 
-        player.addToTable(mech, 0);
+        player.addToTable(unit, 0);
         game.processStartTurn(player);
         
         assertEquals(moneyStart + (moneyStep), player.getMoney());
@@ -33,42 +32,112 @@ public class UnitTest extends GamePlayerTestCase {
         int moneyStart = player.getMoney();
         int moneyStep = 10;
         
-        Unit mech = new Unit(){
+        Unit unit = new Unit(){
             public void onEndTurn(Game game, Player player){
                 super.onEndTurn(game,player);
                 player.addMoney(moneyStep);
             }
         };
         
-        player.addToTable(mech, 0);
+        player.addToTable(unit, 0);
         game.processEndTurn(player);
         
         assertEquals(moneyStart + (moneyStep), player.getMoney());
-        
     }
     
     @Test
     void testOnStartFight(){
+        int moneyStart = player.getMoney();
+        int moneyStep = 10;
         
+        Unit unit = new Unit(){
+            public void onStartFight(Game game, Player player, Player player2){
+                super.onStartFight(game,player,player2);
+                player.addMoney(moneyStep);
+            }
+        };
+        
+        player.addToTable(unit, 0);
+        game.processStartFight(player,player2);
+        
+        assertEquals(moneyStart + (moneyStep), player.getMoney());
     }
     
     @Test
     void testOnEndFight(){
+        int moneyStart = player.getMoney();
+        int moneyStep = 10;
         
+        Unit unit = new Unit(){
+            public void onEndFight(Game game, Player player, Player player2){
+                super.onEndFight(game,player,player2);
+                player.addMoney(moneyStep);
+            }
+        };
+        
+        player.addToTable(unit, 0);
+        game.processEndFight(player,player2);
+        
+        assertEquals(moneyStart + (moneyStep), player.getMoney());
     }
     
     @Test
     void testOnAttacked(){
+        int moneyStart = player.getMoney();
+        int moneyStep = 10;
         
+        Unit unit = new Unit(){
+            public void onAttacked(Game game, Player player, Player player2, Unit attacker){
+                super.onAttacked(game,player,player2, attacker);
+                player.addMoney(moneyStep);
+            }
+        };
+        
+        Unit unit2 = new Unit(){};
+        
+        player.addToTable(unit, 0);
+        unit.onAttacked(game, player, player2, unit2);
+        
+        assertEquals(moneyStart + (moneyStep), player.getMoney());
     }
     
     @Test
     void testOnAttack(){
+        int moneyStart = player.getMoney();
+        int moneyStep = 10;
         
+        Unit unit = new Unit(){
+            public void onAttack(Game game, Player player, Player player2, Unit attacked){
+                super.onAttack(game,player,player2, attacked);
+                player.addMoney(moneyStep);
+            }
+        };
+        
+        Unit unit2 = new Unit(){};
+        
+        player.addToTable(unit, 0);
+        unit.onAttack(game, player, player2, unit2);
+        
+        assertEquals(moneyStart + (moneyStep), player.getMoney());
     }
     
     @Test
     void testOnDead(){
+        int moneyStart = player.getMoney();
+        int moneyStep = 10;
         
+        Unit unit = new Unit(){
+            public void onDead(Game game, Player player, Player player2, Unit attacker){
+                super.onDead(game,player,player2, attacker);
+                player.addMoney(moneyStep);
+            }
+        };
+        
+        Unit unit2 = new Unit(){};
+        
+        player.addToTable(unit, 0);
+        unit.onDead(game, player, player2, unit2);
+        
+        assertEquals(moneyStart + (moneyStep), player.getMoney());
     }
 }
