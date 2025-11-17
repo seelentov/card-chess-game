@@ -14,24 +14,48 @@ public class OnlyBluesTest extends SpellCraftTestCase {
     void testDefault(){
         super.testDefault(new OnlyBlues());
     }
-    
+
     @Test
     void testIncBoostAfterUse(){
         int unitIndex = 0;
-        
+
         Unit unit = new Unit() {};
-        
+
         player.addToTable(unit, unitIndex);
-        
+
         for (int i = 1; i <= 100; i++) {
             player.addToHand(Card.of(new OnlyBlues()));
-            
+
             int tempAttack = unit.getAttack();
             int tempHealth = unit.getHealth();
-            
+
             player.playCard(game,0,unitIndex);
             assertEquals(tempAttack + (OnlyBlues.ATTACK_BOOST * i), unit.getAttack());
             assertEquals(tempHealth + (OnlyBlues.HEALTH_BOOST * i), unit.getHealth());
         }
+    }
+
+    @Test
+    void testDisappearOnStartTurnOnce (){
+        int unitIndex = 0;
+
+        Unit unit = new Unit() {};
+
+        player.addToTable(unit, unitIndex);
+
+        player.addToHand(Card.of(new OnlyBlues()));
+
+        int tempAttack = unit.getAttack();
+        int tempHealth = unit.getHealth();
+
+        player.playCard(game,0,unitIndex);
+
+        assertEquals(tempAttack + (OnlyBlues.ATTACK_BOOST), unit.getAttack());
+        assertEquals(tempHealth + (OnlyBlues.HEALTH_BOOST), unit.getHealth());
+
+        game.processStartTurn(player);
+
+        assertEquals(tempAttack, unit.getAttack());
+        assertEquals(tempHealth, unit.getHealth());
     }
 }

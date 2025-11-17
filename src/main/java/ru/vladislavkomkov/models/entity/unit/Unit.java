@@ -1,15 +1,11 @@
 package ru.vladislavkomkov.models.entity.unit;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 
 import ru.vladislavkomkov.models.entity.Entity;
 import ru.vladislavkomkov.models.Game;
-import ru.vladislavkomkov.models.entity.unit.impl.mech.Mech;
 import ru.vladislavkomkov.models.player.Player;
-import ru.vladislavkomkov.util.SerializationUtils;
 
 public abstract class Unit extends Entity {
     protected int attack = 0;
@@ -33,9 +29,11 @@ public abstract class Unit extends Entity {
     
     public void onSell(Game game, Player player) {
         player.listener.removeListener(this);
+
         player.addMoney(1);
         player.removeFromTable(this);
-        player.listener.onSellListeners.values().forEach(action -> action.process(game,player,this));
+
+        processListeners(player.listener.onSellListeners, (action)->action.process(game,player,this), player);
     }
     
     public void onStartTurn(Game game, Player player) {
@@ -59,7 +57,7 @@ public abstract class Unit extends Entity {
     }
     
     public void onAttacked(Game game, Player player, Player player2, Unit attacker) {
-        player.listener.onAttackedListeners.values().forEach(action -> action.process(game,player,player2,this,attacker));
+        processListeners(player.listener.onAttackedListeners, (action)->action.process(game,player,player2,this,attacker), player);
         if (isBubbled) {
             isBubbled = false;
         } else {
@@ -68,7 +66,7 @@ public abstract class Unit extends Entity {
     }
     
     public void onAttack(Game game, Player player, Player player2, Unit attacked) {
-        player.listener.onAttackListeners.values().forEach(action -> action.process(game,player,player2,this,attacked));
+        processListeners(player.listener.onAttackListeners, (action)->action.process(game,player,player2,this,attacked), player);
         if (isBubbled) {
             isBubbled = false;
         } else {
@@ -81,7 +79,7 @@ public abstract class Unit extends Entity {
             isRebirth = false;
             actualHealth = 1;
         } else {
-            player.listener.onDeadListeners.values().forEach(action -> action.process(game,player,player2,this,attacker));
+            processListeners(player.listener.onDeadListeners, (action)->action.process(game,player,player2,this,attacker), player);
         }
     }
     

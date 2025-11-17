@@ -218,4 +218,6 @@ public class Player {
     public void addMoney(int i){
         money+=i;
     }
+
+    public void decMoney(int i) {money-=i;}
 }

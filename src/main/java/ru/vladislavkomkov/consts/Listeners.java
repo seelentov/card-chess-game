@@ -1,5 +1,5 @@
 package ru.vladislavkomkov.consts;
 
 public class Listeners {
-    public final static String KEY_ONE_USE_PREFIX = "one-use-";
+    public final static String KEY_ONCE_PREFIX = "once-";
 }

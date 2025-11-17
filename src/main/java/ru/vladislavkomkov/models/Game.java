@@ -41,29 +41,33 @@ public class Game implements AutoCloseable {
     }
     
     public void processStartTurn(Player player){
-        player.listener.onStartTurnListeners.forEach((k,v)->processStartEndAction(k,v,player));
+        processListeners(player.listener.onStartTurnListeners, player);
         player.doForAll(unit -> unit.onStartTurn(this, player));
     }
     
     public void processEndTurn(Player player) {
-        player.listener.onEndTurnListeners.forEach((k,v)->processStartEndAction(k,v,player));
+        processListeners(player.listener.onEndTurnListeners, player);
         player.doForAll(unit -> unit.onEndTurn(this, player));
         player.clearSpellCraft();
     }
     
     public void processStartFight(Player player,Player player2){
-        player.listener.onStartFightListeners.forEach((k,v)->processStartEndAction(k,v,player));
+        processListeners(player.listener.onStartFightListeners, player);
         player.doForAll(unit -> unit.onStartFight(this, player,player2));
     }
     
     public void processEndFight(Player player,Player player2) {
-        player.listener.onEndFightListeners.forEach((k,v)->processStartEndAction(k,v,player));
+        processListeners(player.listener.onEndFightListeners, player);
         player.doForAll(unit -> unit.onEndFight(this, player,player2));
+    }
+
+    void processListeners(Map<String,? extends GlobalAction> listeners, Player player){
+        new HashMap<>(listeners).forEach((k,v)->processStartEndAction(k,v,player));
     }
 
     void processStartEndAction(String key, GlobalAction action, Player player){
         action.process(this, player);
-        if (key.startsWith(Listeners.KEY_ONE_USE_PREFIX)) {
+        if (key.startsWith(Listeners.KEY_ONCE_PREFIX)) {
             player.listener.removeListener(key);
         }
     }
