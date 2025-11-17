@@ -6,8 +6,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+import ru.vladislavkomkov.consts.Listeners;
+import ru.vladislavkomkov.models.actions.GlobalAction;
 import ru.vladislavkomkov.models.player.Player;
-import ru.vladislavkomkov.service.RandService;
+import ru.vladislavkomkov.util.RandUtils;
 
 public class Game implements AutoCloseable {
     final int PLAYERS_COUNT = 8;
@@ -31,29 +33,41 @@ public class Game implements AutoCloseable {
         calcFights();
 
         for(Player player: players.values()){
-            processStartTurn(player);
             player.resetMoney();
             player.calcTavern();
+            processStartTurn(player);
             processEndTurn(player);
         }
     }
     
     public void processStartTurn(Player player){
+        player.listener.onStartTurnListeners.forEach((k,v)->processStartEndAction(k,v,player));
         player.doForAll(unit -> unit.onStartTurn(this, player));
     }
     
     public void processEndTurn(Player player) {
+        player.listener.onEndTurnListeners.forEach((k,v)->processStartEndAction(k,v,player));
         player.doForAll(unit -> unit.onEndTurn(this, player));
+        player.clearSpellCraft();
     }
     
     public void processStartFight(Player player,Player player2){
+        player.listener.onStartFightListeners.forEach((k,v)->processStartEndAction(k,v,player));
         player.doForAll(unit -> unit.onStartFight(this, player,player2));
     }
     
     public void processEndFight(Player player,Player player2) {
+        player.listener.onEndFightListeners.forEach((k,v)->processStartEndAction(k,v,player));
         player.doForAll(unit -> unit.onEndFight(this, player,player2));
     }
 
+    void processStartEndAction(String key, GlobalAction action, Player player){
+        action.process(this, player);
+        if (key.startsWith(Listeners.KEY_ONE_USE_PREFIX)) {
+            player.listener.removeListener(key);
+        }
+    }
+    
     public void doFight(){
         inFight = true;
 
@@ -61,7 +75,7 @@ public class Game implements AutoCloseable {
 
         for(Fight fight: fights){
             fightFutures.add(CompletableFuture.supplyAsync(()->{
-                boolean isPlayerFirst = RandService.getRand(1) == 0;
+                boolean isPlayerFirst = RandUtils.getRand(1) == 0;
                 
                 Player player = isPlayerFirst ? fight.getPlayer1() : fight.getPlayer2();
                 Player player2 = isPlayerFirst ? fight.getPlayer2() : fight.getPlayer1();

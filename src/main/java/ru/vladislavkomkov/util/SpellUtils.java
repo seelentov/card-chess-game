@@ -1,11 +1,11 @@
-package ru.vladislavkomkov.service;
+package ru.vladislavkomkov.util;
 
 import ru.vladislavkomkov.consts.Spells;
 import ru.vladislavkomkov.models.entity.spell.Spell;
 
 import java.util.List;
 
-public class SpellService {
+public class SpellUtils {
     public static List<Spell> getAll(){
         return Spells.spells;
     };

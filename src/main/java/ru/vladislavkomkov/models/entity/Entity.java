@@ -1,10 +1,15 @@
 package ru.vladislavkomkov.models.entity;
 
+import java.io.Serializable;
+import java.util.function.Supplier;
+
 import ru.vladislavkomkov.models.Game;
 import ru.vladislavkomkov.models.card.Card;
+import ru.vladislavkomkov.models.entity.unit.Unit;
 import ru.vladislavkomkov.models.player.Player;
+import ru.vladislavkomkov.util.SerializationUtils;
 
-public abstract class Entity {
+public abstract class Entity implements Serializable, Cloneable {
     protected int ID = System.identityHashCode(this);
     protected String name = this.getClass().getSimpleName();
     protected String description = "";
@@ -34,5 +39,27 @@ public abstract class Entity {
     
     public int getID(){
         return ID;
+    }
+    
+    public Entity newThis() {
+        Supplier<? extends Entity> supplier = () -> {
+            try {
+                return this.getClass().getDeclaredConstructor().newInstance();
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to create Mech instance", e);
+            }
+        };
+        
+        return supplier.get();
+    }
+    
+    @Override
+    public Unit clone() {
+        try {
+            Unit unit = (Unit) super.clone();
+            return SerializationUtils.deepCopy(unit);
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

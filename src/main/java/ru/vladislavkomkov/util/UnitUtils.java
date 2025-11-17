@@ -1,11 +1,11 @@
-package ru.vladislavkomkov.service;
+package ru.vladislavkomkov.util;
 
 import ru.vladislavkomkov.consts.Units;
 import ru.vladislavkomkov.models.entity.unit.Unit;
 
 import java.util.List;
 
-public class UnitService {
+public class UnitUtils {
     public static List<Unit> getUnits(){
         return Units.units;
     };

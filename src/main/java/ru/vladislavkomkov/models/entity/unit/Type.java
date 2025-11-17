@@ -2,6 +2,7 @@ package ru.vladislavkomkov.models.entity.unit;
 
 public enum Type {
     BEAST("Beast"),
+    NAGA("Naga"),
     MECH("Mech");
 
     final String type;

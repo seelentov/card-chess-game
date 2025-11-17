@@ -1,13 +1,17 @@
 package ru.vladislavkomkov.models.entity.unit;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import ru.vladislavkomkov.models.entity.Entity;
 import ru.vladislavkomkov.models.Game;
+import ru.vladislavkomkov.models.entity.unit.impl.mech.Mech;
 import ru.vladislavkomkov.models.player.Player;
+import ru.vladislavkomkov.util.SerializationUtils;
 
-public abstract class Unit extends Entity implements Cloneable {
+public abstract class Unit extends Entity {
     protected int attack = 0;
     protected int maxHealth = 1;
     protected List<Type> type = new ArrayList<>();
@@ -94,6 +98,11 @@ public abstract class Unit extends Entity implements Cloneable {
         actualHealth+=i;
     }
     
+    public void decHealth(int i){
+        maxHealth-=i;
+        actualHealth-=i;
+    }
+    
     public void incAttack(){
         incAttack(1);
     }
@@ -101,13 +110,8 @@ public abstract class Unit extends Entity implements Cloneable {
     public void incAttack(int i){
         attack+=i;
     }
-
-    @Override
-    public Unit clone() {
-        try {
-            return (Unit) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
-        }
+    
+    public void decAttack(int i){
+        attack-=i;
     }
 }

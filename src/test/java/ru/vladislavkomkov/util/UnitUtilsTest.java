@@ -1,12 +1,12 @@
-package ru.vladislavkomkov.service;
+package ru.vladislavkomkov.util;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
-public class UnitServiceTest {
+public class UnitUtilsTest {
     @Test
     void testGetUnits(){
-        var units = UnitService.getUnits();
+        var units = UnitUtils.getUnits();
 
         assertNotNull(units);
         assertFalse(units.isEmpty());
@@ -14,7 +14,7 @@ public class UnitServiceTest {
 
     @Test
     void testGetTavernUnits(){
-        var units = UnitService.getTavernUnits();
+        var units = UnitUtils.getTavernUnits();
 
         assertNotNull(units);
         units.forEach(unit -> assertTrue(unit.isTavern()));
@@ -25,7 +25,7 @@ public class UnitServiceTest {
         for (int level = 1; level <= 6; level++) {
             int fLevel = level;
 
-            var units = UnitService.getUnitsByTavern(fLevel);
+            var units = UnitUtils.getUnitsByTavern(fLevel);
 
             assertNotNull(units);
             units.forEach(unit -> assertEquals(fLevel, unit.getLevel()));

@@ -14,6 +14,7 @@ import ru.vladislavkomkov.models.entity.unit.impl.beast.first.Alleycat;
 import ru.vladislavkomkov.models.entity.unit.impl.trash.beast.first.Cat;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 public class PlayerTest extends GamePlayerTestCase {
@@ -23,13 +24,14 @@ public class PlayerTest extends GamePlayerTestCase {
             player.addToHand(Card.of(new Cat()));
         }
         
-        Card[] hand = player.cloneHand();
+        List<Card> hand = player.cloneHand();
         
-        assertEquals(new Cat().getName(), hand[0].get().getName());
-        assertEquals(new Cat().getName(), hand[1].get().getName());
+        assertEquals(new Cat().getName(), hand.get(0).get().getName());
+        assertEquals(new Cat().getName(), hand.get(1).get().getName());
         
         for (int i = 2; i < 10; i++) {
-            assertNull(hand[i]);
+            int finalI = i;
+            assertThrowsExactly(IndexOutOfBoundsException.class, ()->hand.get(finalI));
         }
     }
     
@@ -54,8 +56,8 @@ public class PlayerTest extends GamePlayerTestCase {
         player = new Player();
         player.addToHand(new SpellCard(new TavernCoin()));
 
-        assertEquals(1, Arrays.stream(player.cloneHand()).filter(Objects::nonNull).count());
-        assertEquals(player.cloneHand()[0].get().getName(), new TavernCoin().getName());
+        assertEquals(1, player.cloneHand().stream().filter(Objects::nonNull).count());
+        assertEquals(player.cloneHand().get(0).get().getName(), new TavernCoin().getName());
     }
 
     @Test
@@ -71,12 +73,12 @@ public class PlayerTest extends GamePlayerTestCase {
 
         player.addToHand(new UnitCard(new Alleycat()));
 
-        Card[] cards = player.cloneHand();
+        List<Card> cards = player.cloneHand();
 
-        assertEquals(10, Arrays.stream(cards).filter(Objects::nonNull).count());
+        assertEquals(10, cards.stream().filter(Objects::nonNull).count());
 
         for (int i = 0; i < 10; i++) {
-            String cardName = cards[i].get().getName();
+            String cardName = cards.get(i).get().getName();
             if(i % 2 == 0){
                 assertEquals(cardName, new TavernCoin().getName());
             } else {
@@ -89,7 +91,7 @@ public class PlayerTest extends GamePlayerTestCase {
     void testBuyCard(){
         player.getTavern().add(Card.of(new Alleycat()));
         player.buyCard(game, 0);
-        assertEquals(new Alleycat().getName(), player.cloneHand()[0].get().getName());
+        assertEquals(new Alleycat().getName(), player.cloneHand().get(0).get().getName());
     }
     
     @Test
@@ -101,7 +103,7 @@ public class PlayerTest extends GamePlayerTestCase {
         player.playCard(game, 0, 0);
 
         assertEquals(4, player.getMoney());
-        assertEquals(0, Arrays.stream(player.cloneHand()).filter(Objects::nonNull).count());
+        assertEquals(0, player.cloneHand().stream().filter(Objects::nonNull).count());
     }
     
     @Test
@@ -110,7 +112,7 @@ public class PlayerTest extends GamePlayerTestCase {
         
         player.playCard(game, 0, 0);
         
-        assertEquals(0, Arrays.stream(player.cloneHand()).filter(Objects::nonNull).count());
+        assertEquals(0, player.cloneHand().stream().filter(Objects::nonNull).count());
         
         assertEquals(2, Arrays.stream(player.cloneTable()).filter(Objects::nonNull).count());
         

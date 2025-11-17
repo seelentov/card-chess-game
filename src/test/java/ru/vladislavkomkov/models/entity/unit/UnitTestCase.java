@@ -14,40 +14,57 @@ public abstract class UnitTestCase extends GamePlayerTestCase {
     };
 
     void onPlayed(Unit unit){
+        setUp();
+        
         assertNull(player.cloneTable()[0]);
         unit.onPlayed(game, player, 0);
         assertEquals(unit.getName(), player.cloneTable()[0].getName());
+        
+        tearDown();
     }
     
     void onHanded(Unit unit){
-        assertNull(player.cloneHand()[0]);
+        setUp();
+        
         unit.onHandled(game, player);
-        assertEquals(unit.getName(), player.cloneHand()[0].get().getName());
+        assertEquals(unit.getName(), player.cloneHand().get(0).get().getName());
+        
+        tearDown();
     }
     
     void onSell(Unit unit){
+        setUp();
+        
         int money = player.getMoney();
         player.addToTable(unit, 0);
         assertNotNull(player.cloneTable()[0]);
         unit.onSell(game, player);
         assertEquals(money + 1, player.getMoney());
         assertNull(player.cloneTable()[0]);
+        
+        tearDown();
     }
 
     void onDead(Unit unit){
+        setUp();
+        
         player.addToTable(unit, 0);
-        Unit unit2 = unit.clone();
+        Unit unit2 = (Unit) unit.clone();
         player2.addToTable(unit2, 0);
 
         if(unit.isRebirth){
             unit.onDead(game,player,player2,unit2);
             assertFalse(unit.isRebirth);
         }
+        
+        tearDown();
     }
 
     void onAttackAttacked(Unit unit){
+        setUp();
+        
         player.addToTable(unit, 0);
-        Unit unit2 = unit.clone();
+        Unit unit2 = (Unit) unit.clone();
         player2.addToTable(unit2, 0);
 
         int unitBeginHP = unit.getHealth();
@@ -72,5 +89,7 @@ public abstract class UnitTestCase extends GamePlayerTestCase {
 
         assertEquals(unitBeginHP - unit2.getAttack(), unit.getHealth());
         assertEquals(unit2BeginHP - unit.getAttack(), unit2.getHealth());
+        
+        tearDown();
     }
 }

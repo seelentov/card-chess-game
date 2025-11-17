@@ -2,7 +2,7 @@ package ru.vladislavkomkov.models;
 
 import ru.vladislavkomkov.models.player.Player;
 import ru.vladislavkomkov.models.entity.unit.Unit;
-import ru.vladislavkomkov.service.RandService;
+import ru.vladislavkomkov.util.RandUtils;
 
 import java.util.List;
 
@@ -101,7 +101,7 @@ public class Fight {
 
 
     Unit getRandUnit(List<Unit> units){
-        int i = RandService.getRand(units.size() - 1);
+        int i = RandUtils.getRand(units.size() - 1);
         return units.get(i);
     }
 

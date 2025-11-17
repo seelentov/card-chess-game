@@ -1,4 +1,4 @@
-package ru.vladislavkomkov.service;
+package ru.vladislavkomkov.util;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RandServiceTest {
+public class RandUtilsTest {
     @Test
     void testGetRand(){
         List<Pair<Integer,Integer>> cases = new ArrayList<>();
@@ -25,7 +25,7 @@ public class RandServiceTest {
             int min = c.getKey();
             int max = c.getValue();
 
-            int i = RandService.getRand(min,max);
+            int i = RandUtils.getRand(min,max);
             assertTrue(i <= max && i >= min);
         }
     }
@@ -33,8 +33,8 @@ public class RandServiceTest {
     @Test
     void testGetRandLvl(){
         for (int i = 0; i < 1000; i++) {
-            int lvl = RandService.getRand(1,6);
-            int rLvl = RandService.getRandLvl(lvl);
+            int lvl = RandUtils.getRand(1,6);
+            int rLvl = RandUtils.getRandLvl(lvl);
             assertTrue(rLvl <= lvl);
         }
     }

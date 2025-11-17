@@ -32,9 +32,13 @@ public abstract class GamePlayerTestCase {
     }
     
     @AfterEach
-    protected void tearDown() throws Exception {
-        if(game != null){
-            game.close();
+    protected void tearDown() {
+        try{
+            if(game != null){
+                game.close();
+            }
+        } catch (Exception ex){
+            //
         }
     }
 }

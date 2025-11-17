@@ -1,4 +1,4 @@
 package ru.vladislavkomkov.models.actions;
 
-public interface OnStartFightAction extends InGameAction{
+public interface OnStartFightAction extends GlobalAction{
 }

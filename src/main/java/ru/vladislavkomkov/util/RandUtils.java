@@ -1,8 +1,8 @@
-package ru.vladislavkomkov.service;
+package ru.vladislavkomkov.util;
 
 import java.util.Map;
 
-public class RandService {
+public class RandUtils {
     static Map<Integer, Integer[]> lvlPercentMap = Map.of(
             1, new Integer[]{100,0,0,0,0,0},
             2, new Integer[]{70,30,0,0,0,0},

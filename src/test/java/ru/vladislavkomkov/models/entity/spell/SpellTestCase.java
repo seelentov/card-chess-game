@@ -5,13 +5,16 @@ import static org.junit.jupiter.api.Assertions.*;
 import ru.vladislavkomkov.GamePlayerTestCase;
 
 public abstract class SpellTestCase extends GamePlayerTestCase {
-    protected abstract void testOnPlayed();
+    protected void testDefault(Spell spell){
+        onHandled(spell);
+    };
     
-    protected abstract void testOnHanded();
-    
-    protected void onHanded(Spell spell){
-        assertNull(player.cloneHand()[0]);
+    void onHandled(Spell spell){
+        setUp();
+        
         spell.onHandled(game, player);
-        assertEquals(spell.getName(), player.cloneHand()[0].get().getName());
+        assertEquals(spell.getName(), player.cloneHand().get(0).get().getName());
+        
+        tearDown();
     }
 }

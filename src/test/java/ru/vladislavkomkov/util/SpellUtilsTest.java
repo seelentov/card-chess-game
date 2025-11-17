@@ -1,4 +1,4 @@
-package ru.vladislavkomkov.service;
+package ru.vladislavkomkov.util;
 
 import org.junit.jupiter.api.Test;
 
@@ -6,10 +6,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class SpellServiceTest {
+public class SpellUtilsTest {
     @Test
     void testGetAll(){
-        var units = SpellService.getAll();
+        var units = SpellUtils.getAll();
 
         assertNotNull(units);
         assertFalse(units.isEmpty());
@@ -17,7 +17,7 @@ public class SpellServiceTest {
 
     @Test
     void testGetTavern(){
-        var units = SpellService.getTavern();
+        var units = SpellUtils.getTavern();
 
         assertNotNull(units);
         units.forEach(unit -> assertTrue(unit.isTavern()));
@@ -28,7 +28,7 @@ public class SpellServiceTest {
         for (int level = 1; level <= 6; level++) {
             int fLevel = level;
 
-            var units = SpellService.getByTavern(fLevel);
+            var units = SpellUtils.getByTavern(fLevel);
 
             assertNotNull(units);
             units.forEach(unit -> assertEquals(fLevel, unit.getLevel()));

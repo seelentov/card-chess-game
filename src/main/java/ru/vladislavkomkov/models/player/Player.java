@@ -5,10 +5,11 @@ import ru.vladislavkomkov.models.card.Card;
 import ru.vladislavkomkov.models.card.SpellCard;
 import ru.vladislavkomkov.models.card.UnitCard;
 import ru.vladislavkomkov.models.entity.spell.Spell;
+import ru.vladislavkomkov.models.entity.spell.impl.spellcraft.SpellCraft;
 import ru.vladislavkomkov.models.entity.unit.Unit;
-import ru.vladislavkomkov.service.RandService;
-import ru.vladislavkomkov.service.SpellService;
-import ru.vladislavkomkov.service.UnitService;
+import ru.vladislavkomkov.util.RandUtils;
+import ru.vladislavkomkov.util.SpellUtils;
+import ru.vladislavkomkov.util.UnitUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,7 +21,9 @@ public class Player {
     static final int HAND_LIMIT = 10;
 
     final Unit[] table = new Unit[TABLE_LIMIT];
-    final Card[] hand = new Card[HAND_LIMIT];
+    
+    final List<Card> hand = new ArrayList<>();
+    
     final List<Card> tavern = new ArrayList<>();
     int health = 30;
     int armor = 0;
@@ -34,13 +37,13 @@ public class Player {
     public Statistic statistic = new Statistic();
     
     public void playCard(Game game, int indexCard, int indexPos){
-        if (indexCard < 0 || indexCard >= hand.length){
-            throw new IndexOutOfBoundsException("Index " + indexCard + " not existed in hand with length " + hand.length);
+        if (indexCard < 0 || indexCard >= hand.size()){
+            throw new IndexOutOfBoundsException("Index " + indexCard + " not existed in hand with length " + hand.size());
         }
-        hand[indexCard].play(game, this,indexPos);
-        hand[indexCard] = null;
+        hand.get(indexCard).play(game, this,indexPos);
+        hand.remove(indexCard);
     }
-
+    
     public void buyCard(Game game, int index){
         if(tavern.size() > index){
             Card card = tavern.get(index);
@@ -52,14 +55,10 @@ public class Player {
     int getFreeTableIndexFromRight(){
         return getFreeIndexFromRight(table);
     }
-
-    int getFreeHandIndexFromRight(){
-        return getFreeIndexFromRight(hand);
-    }
-
-    <T> int getFreeIndexFromRight(T[] table){
-        for (int i = 0; i < table.length; i++) {
-            if(table[i] == null){
+    
+    <T> int getFreeIndexFromRight(T[] array){
+        for (int i = 0; i < array.length; i++) {
+            if(array[i] == null){
                 return i;
             }
         }
@@ -102,19 +101,31 @@ public class Player {
         
         return -1;
     }
-
+    
+    public void clearSpellCraft(){
+        hand.removeIf(card -> card.get() instanceof SpellCraft);
+    }
+    
     public void addToHand(Card card){
-        int placeIndex = getFreeHandIndexFromRight();
-        if (placeIndex != -1){
-            hand[placeIndex] = card;
+        addToHand(card, false);
+    }
+    
+    public void addToHand(Card card, boolean force){
+        if(force || hand.size() < HAND_LIMIT){
+            hand.add(card);
         }
     }
 
     public void doForAll(Consumer<Unit> consumer){
-        for (Unit unit: table){
-            if(unit != null){
-                consumer.accept(unit);
-            }
+        for (int i = 0; i < table.length; i++) {
+            doFor(consumer,i);
+        }
+    }
+    
+    public void doFor(Consumer<Unit> consumer, int index){
+        Unit unit = table[index];
+        if(unit != null){
+            consumer.accept(unit);
         }
     }
 
@@ -122,8 +133,8 @@ public class Player {
         return Arrays.copyOf(this.table, this.table.length);
     }
 
-    public Card[] cloneHand(){
-        return Arrays.copyOf(this.hand, this.hand.length);
+    public List<Card> cloneHand(){
+        return new ArrayList<>(hand);
     }
 
     public int getLevel() {
@@ -171,15 +182,15 @@ public class Player {
         };
 
         for (int i = 0; i < count; i++) {
-            int lvl = RandService.getRandLvl(getLevel());
-            List<Unit> units = UnitService.getUnitsByTavern(lvl);
-            Unit unit = units.get(RandService.getRand(units.size() - 1));
+            int lvl = RandUtils.getRandLvl(getLevel());
+            List<Unit> units = UnitUtils.getUnitsByTavern(lvl);
+            Unit unit = units.get(RandUtils.getRand(units.size() - 1));
             tavern.add(new UnitCard(unit));
         }
 
-        int lvl = RandService.getRandLvl(getLevel());
-        List<Spell> spells = SpellService.getByTavern(lvl);
-        Spell spell = spells.get(RandService.getRand(spells.size() - 1));
+        int lvl = RandUtils.getRandLvl(getLevel());
+        List<Spell> spells = SpellUtils.getByTavern(lvl);
+        Spell spell = spells.get(RandUtils.getRand(spells.size() - 1));
 
         tavern.add(new SpellCard(spell));
     }
