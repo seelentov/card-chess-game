@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import ru.vladislavkomkov.consts.Listeners;
 import ru.vladislavkomkov.models.actions.GlobalAction;
 import ru.vladislavkomkov.models.player.Player;
+import ru.vladislavkomkov.util.ListenerUtils;
 import ru.vladislavkomkov.util.RandUtils;
 
 public class Game implements AutoCloseable {
@@ -34,42 +35,35 @@ public class Game implements AutoCloseable {
 
         for(Player player: players.values()){
             player.resetMoney();
-            player.calcTavern();
+            player.resetTavern();
             processStartTurn(player);
             processEndTurn(player);
         }
     }
     
     public void processStartTurn(Player player){
-        processListeners(player.listener.onStartTurnListeners, player);
+        ListenerUtils.processGlobalActionListeners(player.listener.onStartTurnListeners, this, player);
+
         player.doForAll(unit -> unit.onStartTurn(this, player));
     }
     
     public void processEndTurn(Player player) {
-        processListeners(player.listener.onEndTurnListeners, player);
+        ListenerUtils.processGlobalActionListeners(player.listener.onEndTurnListeners, this, player);
+
         player.doForAll(unit -> unit.onEndTurn(this, player));
         player.clearSpellCraft();
     }
     
     public void processStartFight(Player player,Player player2){
-        processListeners(player.listener.onStartFightListeners, player);
+        ListenerUtils.processGlobalActionListeners(player.listener.onEndTurnListeners, this, player);
+
         player.doForAll(unit -> unit.onStartFight(this, player,player2));
     }
     
     public void processEndFight(Player player,Player player2) {
-        processListeners(player.listener.onEndFightListeners, player);
+        ListenerUtils.processGlobalActionListeners(player.listener.onEndTurnListeners, this, player);
+
         player.doForAll(unit -> unit.onEndFight(this, player,player2));
-    }
-
-    void processListeners(Map<String,? extends GlobalAction> listeners, Player player){
-        new HashMap<>(listeners).forEach((k,v)->processStartEndAction(k,v,player));
-    }
-
-    void processStartEndAction(String key, GlobalAction action, Player player){
-        action.process(this, player);
-        if (key.startsWith(Listeners.KEY_ONCE_PREFIX)) {
-            player.listener.removeListener(key);
-        }
     }
     
     public void doFight(){

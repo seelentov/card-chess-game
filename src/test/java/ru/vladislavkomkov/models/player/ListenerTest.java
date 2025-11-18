@@ -227,7 +227,7 @@ public class ListenerTest extends GamePlayerTestCase {
     <T> void testListener(Map<String, T> listeners, Runnable processListener, T action, boolean once){
         int initMoney = player.getMoney();
 
-        listeners.put(once ? ListenerUtils.generateKeyOneUse() : ListenerUtils.generateKey(), action);
+        listeners.put(once ? ListenerUtils.generateKeyOnce() : ListenerUtils.generateKey(), action);
 
         processListener.run();
 

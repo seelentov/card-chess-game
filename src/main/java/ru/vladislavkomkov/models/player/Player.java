@@ -2,14 +2,9 @@ package ru.vladislavkomkov.models.player;
 
 import ru.vladislavkomkov.models.Game;
 import ru.vladislavkomkov.models.card.Card;
-import ru.vladislavkomkov.models.card.SpellCard;
-import ru.vladislavkomkov.models.card.UnitCard;
-import ru.vladislavkomkov.models.entity.spell.Spell;
 import ru.vladislavkomkov.models.entity.spell.impl.spellcraft.SpellCraft;
 import ru.vladislavkomkov.models.entity.unit.Unit;
-import ru.vladislavkomkov.util.RandUtils;
-import ru.vladislavkomkov.util.SpellUtils;
-import ru.vladislavkomkov.util.UnitUtils;
+import ru.vladislavkomkov.util.ListenerUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,7 +19,7 @@ public class Player {
     
     final List<Card> hand = new ArrayList<>();
     
-    final List<Card> tavern = new ArrayList<>();
+    final Tavern tavern = new Tavern();
     int health = 30;
     int armor = 0;
 
@@ -32,6 +27,8 @@ public class Player {
     int maxMoney = 3;
 
     int level;
+
+    int buyPrice = 3;
     
     public Listener listener = new Listener();
     public Statistic statistic = new Statistic();
@@ -45,11 +42,16 @@ public class Player {
     }
     
     public void buyCard(Game game, int index){
-        if(tavern.size() > index){
-            Card card = tavern.get(index);
+        if (money>=buyPrice && hand.size() < HAND_LIMIT){
             money-=3;
-            card.get().onHandled(game, this);
+            addToHand(tavern.buy(index));
         }
+    }
+
+    public void resetTavern(Game game){
+        tavern.reset(getLevel());
+
+        ListenerUtils.processGlobalActionListeners(listener.onResetTavernListeners, game, this);
     }
     
     int getFreeTableIndexFromRight(){
@@ -162,37 +164,12 @@ public class Player {
         health -= piercing;
     }
 
-    public List<Card> getTavern() {
+    public Tavern getTavern() {
         return tavern;
     }
 
     public boolean isAlive(){
         return health > 0;
-    }
-
-    public void calcTavern(){
-        tavern.clear();
-
-        int count = switch (getLevel()){
-            case 1 -> 3;
-            case 2,3 -> 4;
-            case 4,5 -> 5;
-            case 6 -> 6;
-            default -> throw new RuntimeException("Wrong level");
-        };
-
-        for (int i = 0; i < count; i++) {
-            int lvl = RandUtils.getRandLvl(getLevel());
-            List<Unit> units = UnitUtils.getUnitsByTavern(lvl);
-            Unit unit = units.get(RandUtils.getRand(units.size() - 1));
-            tavern.add(new UnitCard(unit));
-        }
-
-        int lvl = RandUtils.getRandLvl(getLevel());
-        List<Spell> spells = SpellUtils.getByTavern(lvl);
-        Spell spell = spells.get(RandUtils.getRand(spells.size() - 1));
-
-        tavern.add(new SpellCard(spell));
     }
 
     public void resetMoney(){

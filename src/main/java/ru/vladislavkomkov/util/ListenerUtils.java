@@ -1,16 +1,42 @@
 package ru.vladislavkomkov.util;
 
-import static ru.vladislavkomkov.consts.Listeners.KEY_ONCE_PREFIX;
+import ru.vladislavkomkov.consts.Listeners;
+import ru.vladislavkomkov.models.Game;
+import ru.vladislavkomkov.models.actions.GlobalAction;
+import ru.vladislavkomkov.models.player.Player;
 
+import static ru.vladislavkomkov.consts.Listeners.KEY_ONCE_PREFIX;
+import static ru.vladislavkomkov.consts.Listeners.KEY_TEMP_PREFIX;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class ListenerUtils {
-    
-    public static String generateKeyOneUse(){
-        return KEY_ONCE_PREFIX + generateKey();
+    public static String generateKeyOnce(){
+        return generateKey(KEY_ONCE_PREFIX);
+    }
+
+    public static String generateKeyTemp(){
+        return generateKey(KEY_TEMP_PREFIX);
     }
 
     public static String generateKey(){
-        return UUID.randomUUID().toString();
+        return generateKey("");
+    }
+
+    public static String generateKey(String prefix){
+        return prefix + UUID.randomUUID();
+    }
+
+    public static void processGlobalActionListeners(Map<String, ? extends GlobalAction> listeners, Game game, Player player){
+        new HashMap<>(listeners).forEach((k, v)->processStartEndAction(game,k,v,player));
+    }
+
+    static void processStartEndAction(Game game, String key, GlobalAction action, Player player){
+        action.process(game, player);
+        if (key.startsWith(Listeners.KEY_ONCE_PREFIX)) {
+            player.listener.removeListener(key);
+        }
     }
 }

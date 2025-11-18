@@ -19,7 +19,8 @@ public class Listener{
     public Map<String, OnEndTurnAction> onEndTurnListeners = new HashMap<>();
     public Map<String, OnStartFightAction> onStartFightListeners = new HashMap<>();
     public Map<String, OnEndFightAction> onEndFightListeners = new HashMap<>();
-    
+    public Map<String, OnResetTavernAction> onResetTavernListeners = new HashMap<>();
+
     public void removeListener(Unit unit){
         removeListener(unit.getID());
     }
@@ -39,5 +40,6 @@ public class Listener{
         onEndTurnListeners.remove(i);
         onStartFightListeners.remove(i);
         onEndFightListeners.remove(i);
+        onResetTavernListeners.remove(i);
     }
 }

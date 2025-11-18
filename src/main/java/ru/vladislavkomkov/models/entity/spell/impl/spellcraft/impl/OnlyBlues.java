@@ -1,7 +1,6 @@
 package ru.vladislavkomkov.models.entity.spell.impl.spellcraft.impl;
 
 import ru.vladislavkomkov.models.Game;
-import ru.vladislavkomkov.models.entity.spell.Spell;
 import ru.vladislavkomkov.models.entity.spell.impl.spellcraft.SpellCraft;
 import ru.vladislavkomkov.models.player.Player;
 import ru.vladislavkomkov.util.ListenerUtils;
@@ -31,7 +30,7 @@ public class OnlyBlues extends SpellCraft {
         }, index);
         
         player.listener.onStartTurnListeners.put(
-                ListenerUtils.generateKeyOneUse(),
+                ListenerUtils.generateKeyOnce(),
                 (game1, player1) -> player.doFor(unit -> {
                     unit.decAttack(attackBonus);
                     unit.decHealth(hpBonus);
