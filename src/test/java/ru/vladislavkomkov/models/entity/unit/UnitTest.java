@@ -1,6 +1,8 @@
 package ru.vladislavkomkov.models.entity.unit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
@@ -153,5 +155,25 @@ public class UnitTest extends GamePlayerTestCase {
         
         Unit unitClone = unit.clone();
         assertEquals(unit.getHealth(), unitClone.getHealth());
+    }
+    
+    @Test
+    void testIsDead(){
+        Unit unit = new Unit(){};
+        int health = unit.getHealth();
+        
+        Unit unit2 = new Unit(){
+            @Override
+            public int getAttack() {
+                return attack;
+            }
+            
+            private int attack = health;
+        };
+        
+        
+        assertFalse(unit.isDead());
+        unit.onAttacked(game,player,player2,unit2);
+        assertTrue(unit.isDead());
     }
 }

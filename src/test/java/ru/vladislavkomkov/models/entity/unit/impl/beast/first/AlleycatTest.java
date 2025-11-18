@@ -16,6 +16,6 @@ public class AlleycatTest extends UnitTestCase {
     @Test
     protected void testOnPlayed() {
         new Alleycat().onPlayed(game, player, 0);
-        assertEquals(new Cat().getName(), player.cloneTable()[1].getName());
+        assertEquals(new Cat().getName(), player.cloneTable()[0].getName());
     }
 }

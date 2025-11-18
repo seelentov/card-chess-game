@@ -6,31 +6,10 @@ import ru.vladislavkomkov.GamePlayerTestCase;
 
 public abstract class UnitTestCase extends GamePlayerTestCase {
     protected void testDefault(Unit unit){
-        onHanded(unit);
-        onPlayed(unit);
         onSell(unit);
         onDead(unit);
         onAttackAttacked(unit);
     };
-
-    void onPlayed(Unit unit){
-        setUp();
-        
-        assertNull(player.cloneTable()[0]);
-        unit.onPlayed(game, player, 0);
-        assertEquals(unit.getName(), player.cloneTable()[0].getName());
-        
-        tearDown();
-    }
-    
-    void onHanded(Unit unit){
-        setUp();
-        
-        unit.onHandled(game, player);
-        assertEquals(unit.getName(), player.cloneHand().get(0).get().getName());
-        
-        tearDown();
-    }
     
     void onSell(Unit unit){
         setUp();

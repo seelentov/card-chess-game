@@ -9,9 +9,11 @@ import ru.vladislavkomkov.util.ListenerUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class Player {
+    public static final int MAX_LEVEL = 6;
     static final int TABLE_LIMIT = 7;
     static final int HAND_LIMIT = 10;
 
@@ -21,12 +23,13 @@ public class Player {
     
     final Tavern tavern = new Tavern();
     int health = 30;
+    int maxHealth = 30;
     int armor = 0;
 
     int money = 0;
     int maxMoney = 3;
 
-    int level;
+    int level = 1;
 
     int buyPrice = 3;
     
@@ -147,20 +150,18 @@ public class Player {
         return health;
     }
 
-    public void incLevel() {
-        if(level < 6){
+    public void incLevel(Game game) {
+        if(level < MAX_LEVEL){
             level+=1;
+            
+            ListenerUtils.processGlobalActionListeners(listener.onIncLevelListeners, game, this);
         }
     }
 
     public void applyDamage(int damage){
-        int piercing = damage - armor;
-
-        armor -= damage;
-        if(armor < 0){
-            armor = 0;
-        }
-
+        int piercing = Math.max(damage - armor, 0);
+        
+        armor = Math.max(armor - damage, 0);
         health -= piercing;
     }
 
@@ -197,4 +198,24 @@ public class Player {
     }
 
     public void decMoney(int i) {money-=i;}
+    
+    public int getArmor(){
+        return armor;
+    }
+    
+    public void addArmor(int i){
+        armor += i;
+    }
+    
+    public void setArmor(int i){
+        armor = i;
+    }
+    
+    public int getMaxHealth(){
+        return maxHealth;
+    }
+    
+    public int getUnitsCount(){
+        return Math.toIntExact(Arrays.stream(table).filter(Objects::nonNull).count());
+    }
 }

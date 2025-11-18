@@ -29,7 +29,6 @@ public abstract class Entity implements Serializable, Cloneable {
     }
     
     public void onHandled(Game game, Player player){
-        player.addToHand(Card.of(this));
         processListeners(player.listener.onHandledListeners, (action)->action.process(game,player,this), player);
     };
     
@@ -59,7 +58,7 @@ public abstract class Entity implements Serializable, Cloneable {
             try {
                 return this.getClass().getDeclaredConstructor().newInstance();
             } catch (Exception e) {
-                throw new RuntimeException("Failed to create Mech instance", e);
+                throw new RuntimeException(e);
             }
         };
         

@@ -52,7 +52,6 @@ public abstract class Unit extends Entity {
     }
     
     public void onPlayed(Game game, Player player, int index) {
-        player.addToTable(this, index);
         super.onPlayed(game,player,index);
     }
     
@@ -87,8 +86,8 @@ public abstract class Unit extends Entity {
         return actualHealth;
     }
     
-    public void incHealth(){
-        incHealth(1);
+    public int getMaxHealth(){
+        return maxHealth;
     }
     
     public void incHealth(int i){
@@ -101,8 +100,8 @@ public abstract class Unit extends Entity {
         actualHealth-=i;
     }
     
-    public void incAttack(){
-        incAttack(1);
+    public void applyDamage(int i){
+        actualHealth-=i;
     }
     
     public void incAttack(int i){
@@ -111,5 +110,13 @@ public abstract class Unit extends Entity {
     
     public void decAttack(int i){
         attack-=i;
+    }
+    
+    public void setIsBubbled(boolean bubbled){
+        isBubbled = bubbled;
+    }
+    
+    public void kill(){
+        actualHealth = 0;
     }
 }

@@ -4,21 +4,21 @@ import java.util.List;
 
 import ru.vladislavkomkov.models.Game;
 import ru.vladislavkomkov.models.card.Card;
-import ru.vladislavkomkov.models.entity.spell.Spell;
+import ru.vladislavkomkov.models.entity.spell.impl.spellcraft.SpellCraft;
 import ru.vladislavkomkov.models.entity.unit.Type;
 import ru.vladislavkomkov.models.entity.unit.Unit;
 import ru.vladislavkomkov.models.player.Player;
 
 public class SpellCrafter extends Unit {
-    protected Spell spellcraft;
+    protected SpellCraft spellcraft;
     
-    public SpellCrafter(Spell spellcraft){
+    public SpellCrafter(SpellCraft spellcraft){
         super();
         this.spellcraft = spellcraft;
         type = List.of(Type.NAGA);
     }
     
-    public Spell getSpellcraft(){
+    public SpellCraft getSpellcraft(){
         return spellcraft;
     }
     

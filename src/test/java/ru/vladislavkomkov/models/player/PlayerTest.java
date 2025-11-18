@@ -5,19 +5,81 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 import ru.vladislavkomkov.GamePlayerTestCase;
+import ru.vladislavkomkov.models.Game;
 import ru.vladislavkomkov.models.card.Card;
-import ru.vladislavkomkov.models.card.SpellCard;
-import ru.vladislavkomkov.models.card.UnitCard;
+import ru.vladislavkomkov.models.entity.spell.Spell;
 import ru.vladislavkomkov.models.entity.spell.impl.first.TavernCoin;
 import ru.vladislavkomkov.models.entity.unit.Unit;
 import ru.vladislavkomkov.models.entity.unit.impl.beast.first.Alleycat;
 import ru.vladislavkomkov.models.entity.unit.impl.trash.beast.first.Cat;
+import ru.vladislavkomkov.util.ListenerUtils;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 public class PlayerTest extends GamePlayerTestCase {
+    @Test
+    void testResetTavern(){
+        player.resetTavern(game);
+        
+        assertEquals(
+                Tavern.getCountByLvl(player.getLevel()),
+                player.getTavern().cards.stream().filter(card1 -> card1.get() instanceof Unit).count()
+        );
+        
+        for (Card card: player.getTavern().cards){
+            assertEquals(player.getLevel(), card.get().getLevel());
+        }
+        
+        assertEquals(
+                1,
+                player.getTavern().cards.stream().filter(card1 -> card1.get() instanceof Spell).count()
+        );
+    }
+    
+    @Test
+    void testPlayCardSpell(){
+        
+        int incMoney = player.getMoney();
+        int moneyTest = 10;
+        
+        player.addToHand(Card.of(new Spell() {
+            @Override
+            public void cast(Game game, Player player, int index) {
+                player.addMoney(moneyTest);
+            }
+        }));
+        
+        assertEquals(1, player.cloneHand().size());
+        
+        player.playCard(game, 0, 0);
+        
+        assertTrue(player.cloneHand().isEmpty());
+        
+        assertEquals(incMoney + moneyTest, player.getMoney());
+    }
+    
+    @Test
+    void testPlayCardUnit(){
+        String testName = "test";
+        
+        player.addToHand(Card.of(new Unit() {
+            @Override
+            public String getName(){
+                return testName;
+            }
+        }));
+        
+        assertEquals(1, player.cloneHand().size());
+        
+        player.playCard(game, 0, 0);
+        
+        assertTrue(player.cloneHand().isEmpty());
+        
+        assertEquals(testName, player.cloneTable()[0].getName());
+    }
+    
     @Test
     void testCloneHand(){
         for (int i = 0; i < 2; i++) {
@@ -54,7 +116,7 @@ public class PlayerTest extends GamePlayerTestCase {
     @Test
     void testAddSingleToHand(){
         player = new Player();
-        player.addToHand(new SpellCard(new TavernCoin()));
+        player.addToHand(new Card(new TavernCoin()));
 
         assertEquals(1, player.cloneHand().stream().filter(Objects::nonNull).count());
         assertEquals(player.cloneHand().get(0).get().getName(), new TavernCoin().getName());
@@ -65,13 +127,13 @@ public class PlayerTest extends GamePlayerTestCase {
         player = new Player();
         for (int i = 0; i < 20; i++) {
             if(i % 2 == 0){
-                player.addToHand(new SpellCard(new TavernCoin()));
+                player.addToHand(new Card(new TavernCoin()));
             } else {
-                player.addToHand(new UnitCard(new Alleycat()));
+                player.addToHand(new Card(new Alleycat()));
             }
         }
 
-        player.addToHand(new UnitCard(new Alleycat()));
+        player.addToHand(new Card(new Alleycat()));
 
         List<Card> cards = player.cloneHand();
 
@@ -144,6 +206,44 @@ public class PlayerTest extends GamePlayerTestCase {
         
         for (int i = 0; i < 2; i++) {
             assertEquals(3,units[i].getAttack());
+        }
+    }
+    
+    @Test
+    void testApplyDamage(){
+        int armor = 5;
+        player.addArmor(armor);
+        
+        for (int i = 1; i <= armor; i++) {
+            player.applyDamage(1);
+            assertEquals(armor - i, player.getArmor());
+            assertEquals(player.maxHealth, player.getHealth());
+        }
+        
+        for (int i = 1; i <= player.maxHealth; i++) {
+            player.applyDamage(1);
+            assertEquals(player.maxHealth - i, player.getHealth());
+        }
+        
+        assertFalse(player.isAlive());
+    }
+    
+    @Test
+    void testIsAlive(){
+        int halfHP = player.getHealth() / 2;
+        int armor = player.getArmor();
+        
+        player.applyDamage(halfHP + armor);
+        assertTrue(player.isAlive());
+        player.applyDamage(halfHP + 1);
+        assertFalse(player.isAlive());
+    }
+    
+    @Test
+    void testIncLevel(){
+        for (int i = 1; i < 10;i++) {
+            assertEquals(Math.min(i, Player.MAX_LEVEL), player.getLevel());
+            player.incLevel(game);
         }
     }
 }

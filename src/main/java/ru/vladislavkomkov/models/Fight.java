@@ -4,12 +4,17 @@ import ru.vladislavkomkov.models.player.Player;
 import ru.vladislavkomkov.models.entity.unit.Unit;
 import ru.vladislavkomkov.util.RandUtils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class Fight {
     final Game game;
     final Player player1;
     final Player player2;
+    
+    static final int TURN_LIMIT = 10000;
 
     List<Unit> player1Units;
     List<Unit> player2Units;
@@ -29,19 +34,24 @@ public class Fight {
     public boolean doTurn(){
         if (turn == -1) {
             setup();
+        } else if(turn >= TURN_LIMIT){
+            return true;
         }
 
         if (player1Units.isEmpty() || player2Units.isEmpty()) {
-            boolean isPlayer1Win = player1Units.isEmpty();
-
+            if(player1Units.isEmpty() && player2Units.isEmpty()){
+                return true;
+            }
+            
+            boolean isPlayer1Win = player2Units.isEmpty();
             Player loser = isPlayer1Win ? player2 : player1;
 
             int dmg;
-
+            
             if (isPlayer1Win)
-                dmg = calcPlayerDamage(player1, List.of(player1.cloneTable()));
+                dmg = calcPlayerDamage(player1);
             else
-                dmg = calcPlayerDamage(player2, List.of(player2.cloneTable()));
+                dmg = calcPlayerDamage(player2);
 
             loser.applyDamage(dmg);
 
@@ -82,31 +92,52 @@ public class Fight {
 
         if(isPlayer1Turn)
             player1Turn++;
+            if(player1Turn >= player1Units.size())
+                player1Turn = 0;
+            
         else
             player2Turn++;
+            if(player2Turn >= player2Units.size())
+                player2Turn = 0;
+            
+        turn++;
 
         return false;
     }
-
+    
     void setup(){
-        player1Units = List.of(player1.cloneTable());
-        player2Units = List.of(player2.cloneTable());
-
-        turn = calcAttack(player1Units) > calcAttack(player2Units) ? 0 : 1;
+        this.player1Units = new ArrayList<>();
+        this.player2Units = new ArrayList<>();
+        
+        for (Unit item : player1.cloneTable()) {
+            if (item != null) {
+                this.player1Units.add(item);
+            }
+        }
+        
+        for (Unit item : player2.cloneTable()) {
+            if (item != null) {
+                this.player2Units.add(item);
+            }
+        }
+        
+        int player1Attack = calcAttack(this.player1Units);
+        int player2Attack = calcAttack(this.player2Units);
+        
+        turn = player1Attack > player2Attack ? 0 : player1Attack < player2Attack ? 1 : RandUtils.getRand(1);
     }
 
     int calcAttack(List<Unit> units){
         return units.stream().reduce(0, (total, unit) -> total + unit.getAttack(), Integer::sum);
     }
 
-
     Unit getRandUnit(List<Unit> units){
         int i = RandUtils.getRand(units.size() - 1);
         return units.get(i);
     }
 
-    int calcPlayerDamage(Player player, List<Unit> units){
-        int unitsDmg = units.stream().reduce(0, (total, unit) -> total + unit.getLevel(), Integer::sum);
+    int calcPlayerDamage(Player player){
+        int unitsDmg = Arrays.stream(player.cloneTable()).filter(Objects::nonNull).reduce(0, (total, unit) -> total + unit.getLevel(), Integer::sum);
         int playerDmg = player.getLevel();
         return playerDmg + unitsDmg;
     }

@@ -35,7 +35,7 @@ public class Game implements AutoCloseable {
 
         for(Player player: players.values()){
             player.resetMoney();
-            player.resetTavern();
+            player.resetTavern(this);
             processStartTurn(player);
             processEndTurn(player);
         }
@@ -55,13 +55,13 @@ public class Game implements AutoCloseable {
     }
     
     public void processStartFight(Player player,Player player2){
-        ListenerUtils.processGlobalActionListeners(player.listener.onEndTurnListeners, this, player);
+        ListenerUtils.processGlobalActionListeners(player.listener.onStartFightListeners, this, player);
 
         player.doForAll(unit -> unit.onStartFight(this, player,player2));
     }
     
     public void processEndFight(Player player,Player player2) {
-        ListenerUtils.processGlobalActionListeners(player.listener.onEndTurnListeners, this, player);
+        ListenerUtils.processGlobalActionListeners(player.listener.onEndFightListeners, this, player);
 
         player.doForAll(unit -> unit.onEndFight(this, player,player2));
     }

@@ -5,6 +5,10 @@ import ru.vladislavkomkov.models.player.Player;
 import ru.vladislavkomkov.models.entity.spell.Spell;
 
 public class TavernCoin extends Spell {
+    public TavernCoin(){
+        isTavern = true;
+    }
+    
     protected String description = "Gain 1 Gold";
 
     @Override

@@ -200,21 +200,59 @@ public class ListenerTest extends GamePlayerTestCase {
                 once
         );
     }
-
+    
     @Test
     void testOnceOnEndFight(){
         testOnEndFight(true);
     }
-
+    
     @Test
     void testManyOnEndFight(){
         testOnEndFight(false);
     }
-
+    
     void testOnEndFight(boolean once){
         testListener(
                 player.listener.onEndFightListeners,
                 ()->game.processEndFight(player, player2),
+                (game1, player1) -> testAction(),
+                once
+        );
+    }
+    
+    @Test
+    void testOnceOnResetTavern(){
+        testOnResetTavern(true);
+    }
+    
+    @Test
+    void testManyOnResetTavern(){
+        testOnResetTavern(false);
+    }
+    
+    void testOnResetTavern(boolean once){
+        testListener(
+                player.listener.onResetTavernListeners,
+                ()->player.resetTavern(game),
+                (game1, player1) -> testAction(),
+                once
+        );
+    }
+    
+    @Test
+    void testOnceOnIncLevel(){
+        testOnIncLevel(true);
+    }
+    
+    @Test
+    void testManyOnIncLevel(){
+        testOnIncLevel(false);
+    }
+    
+    void testOnIncLevel(boolean once){
+        testListener(
+                player.listener.onIncLevelListeners,
+                ()->player.incLevel(game),
                 (game1, player1) -> testAction(),
                 once
         );

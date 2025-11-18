@@ -1,7 +1,9 @@
 package ru.vladislavkomkov.models.player;
 
+import ru.vladislavkomkov.consts.Listeners;
 import ru.vladislavkomkov.models.actions.*;
 import ru.vladislavkomkov.models.entity.unit.Unit;
+import ru.vladislavkomkov.util.ListenerUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,13 +22,10 @@ public class Listener{
     public Map<String, OnStartFightAction> onStartFightListeners = new HashMap<>();
     public Map<String, OnEndFightAction> onEndFightListeners = new HashMap<>();
     public Map<String, OnResetTavernAction> onResetTavernListeners = new HashMap<>();
+    public Map<String, OnResetTavernAction> onIncLevelListeners = new HashMap<>();
 
     public void removeListener(Unit unit){
-        removeListener(unit.getID());
-    }
-    
-    public void removeListener(Integer i){
-        removeListener(i.toString());
+        removeListener(ListenerUtils.generateKeyTemp(unit.getID()));
     }
     
     public void removeListener(String i){
@@ -41,5 +40,6 @@ public class Listener{
         onStartFightListeners.remove(i);
         onEndFightListeners.remove(i);
         onResetTavernListeners.remove(i);
+        onIncLevelListeners.remove(i);
     }
 }
