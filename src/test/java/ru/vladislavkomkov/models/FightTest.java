@@ -12,8 +12,10 @@ import org.junit.jupiter.api.Test;
 
 import ru.vladislavkomkov.GamePlayerTestCase;
 import ru.vladislavkomkov.models.entity.unit.Unit;
+import ru.vladislavkomkov.models.entity.unit.impl.beast.first.Alleycat;
 import ru.vladislavkomkov.models.entity.unit.impl.demon.first.IckyImp;
 import ru.vladislavkomkov.models.entity.unit.impl.demon.first.IckyImpTest;
+import ru.vladislavkomkov.models.entity.unit.impl.dragon.fourth.Greenskeeper;
 import ru.vladislavkomkov.models.entity.unit.impl.trash.beast.first.Cat;
 import ru.vladislavkomkov.models.entity.unit.impl.trash.demon.first.Imp;
 import ru.vladislavkomkov.models.entity.unit.impl.undead.first.RisenRider;
@@ -233,15 +235,14 @@ public class FightTest extends GamePlayerTestCase {
 
     @Test
     void testFightOnDeadSummonInPlaceIfOverflow(){
-        Unit unit = new Cat();
-        unit.setIsDisguise(true);
+        player2.addToTable(new Cat(), -1);
+        
+        Unit unit = new IckyImp();
+        unit.setIsTaunt(true);
         player2.addToTable(unit, -1);
-
-        player2.addToTable(new IckyImp(), -1);
 
         for (int i = 0; i < 6; i++) {
             Unit u = new Cat();
-            u.setIsDisguise(true);
             player2.addToTable(u, -1);
         }
 
@@ -301,5 +302,116 @@ public class FightTest extends GamePlayerTestCase {
         }
 
         assertEquals(tauntHealth / 2, player.inFightTable.get(6).getHealth());
+    }
+    
+    @Test
+    void testFightActivateOnPlayedInPlace(){
+        player.addToTable(new Greenskeeper());
+        player.addToTable(new Imp());
+        player.addToTable(new Alleycat());
+        player.addToTable(new Imp());
+        player.addToTable(new Imp());
+        player.addToTable(new Imp());
+        
+        player2.addToTable(new Imp());
+        
+        Fight fight = new Fight(game, player,player2);
+        
+        assertFalse(fight.doTurn());
+        
+        assertEquals(7, player.getFightUnitsCount());
+        
+        assertEquals(player.inFightTable.get(0).getName(), new Greenskeeper().getName());
+        assertEquals(player.inFightTable.get(1).getName(), new Imp().getName());
+        assertEquals(player.inFightTable.get(2).getName(), new Alleycat().getName());
+        assertEquals(player.inFightTable.get(3).getName(), new Cat().getName());
+        assertEquals(player.inFightTable.get(4).getName(), new Imp().getName());
+        assertEquals(player.inFightTable.get(5).getName(), new Imp().getName());
+        assertEquals(player.inFightTable.get(6).getName(), new Imp().getName());
+        
+        assertTrue(player2.inFightTable.isEmpty());
+    }
+    
+    @Test
+    void testFightActivateOnPlayedOverflow(){
+        player.addToTable(new Greenskeeper());
+        player.addToTable(new Imp());
+        player.addToTable(new Alleycat());
+        player.addToTable(new Imp());
+        player.addToTable(new Imp());
+        player.addToTable(new Imp());
+        player.addToTable(new Imp());
+        
+        player2.addToTable(new Imp());
+        
+        Fight fight = new Fight(game, player,player2);
+        
+        assertFalse(fight.doTurn());
+        
+        assertEquals(7, player.getFightUnitsCount());
+        
+        assertEquals(player.inFightTable.get(0).getName(), new Greenskeeper().getName());
+        assertEquals(player.inFightTable.get(1).getName(), new Imp().getName());
+        assertEquals(player.inFightTable.get(2).getName(), new Alleycat().getName());
+        assertEquals(player.inFightTable.get(3).getName(), new Imp().getName());
+        assertEquals(player.inFightTable.get(4).getName(), new Imp().getName());
+        assertEquals(player.inFightTable.get(5).getName(), new Imp().getName());
+        assertEquals(player.inFightTable.get(6).getName(), new Imp().getName());
+        
+        assertTrue(player2.inFightTable.isEmpty());
+    }
+    
+    @Test
+    void testAllNullAttack(){
+        for (int i = 0; i < 7; i++) {
+            Unit unit = new Cat();
+            unit.setAttack(0);
+            player.addToTable(unit);
+        }
+        
+        for (int i = 0; i < 7; i++) {
+            Unit unit = new Cat();
+            unit.setAttack(0);
+            player2.addToTable(unit);
+        }
+        
+        Fight fight = new Fight(game, player,player2);
+        
+        for (int i = 0; i < Integer.MAX_VALUE; i++) {
+            if(fight.turn >= Fight.TURN_LIMIT){
+                assertTrue(fight.doTurn());
+                break;
+            }
+            
+            assertFalse(fight.doTurn());
+        }
+    }
+    
+    @Test
+    void testAllIsDisguise(){
+        for (int i = 0; i < 7; i++) {
+            Unit unit = new Cat();
+            unit.setIsDisguise(true);
+            player.addToTable(unit);
+        }
+        
+        for (int i = 0; i < 7; i++) {
+            Unit unit = new Cat();
+            unit.setIsDisguise(true);
+            player2.addToTable(unit);
+        }
+        
+        Fight fight = new Fight(game, player,player2);
+        
+        for (int i = 0; i < Integer.MAX_VALUE; i++) {
+            if(fight.turn >= Fight.TURN_LIMIT){
+                assertTrue(fight.doTurn());
+                break;
+            }
+            
+            assertFalse(fight.doTurn());
+        }
+        
+        assertEquals(player.getHealth(), player2.getHealth());
     }
 }

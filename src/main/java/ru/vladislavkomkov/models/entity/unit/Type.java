@@ -3,6 +3,7 @@ package ru.vladislavkomkov.models.entity.unit;
 public enum Type {
     BEAST("Beast"),
     NAGA("Naga"),
+    DRAGON("Dragon"),
     UNDEAD("Undead"),
     DEMON("Demon"),
     MECH("Mech");

@@ -1,12 +1,10 @@
 package ru.vladislavkomkov.models.entity.unit;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import ru.vladislavkomkov.models.entity.Entity;
 import ru.vladislavkomkov.models.Game;
-import ru.vladislavkomkov.models.entity.unit.impl.trash.demon.first.Imp;
 import ru.vladislavkomkov.models.player.Player;
 
 public abstract class Unit extends Entity {
@@ -19,7 +17,10 @@ public abstract class Unit extends Entity {
     protected boolean isRebirth = false;
     protected boolean isDoubleAttack = false;
     protected boolean isDisguise = false;
-
+    
+    protected boolean answerOnPlayed = false;
+    protected boolean answerOnDead = false;
+    
     protected int actualHealth = 1;
     
     public int getAttack() {
@@ -54,8 +55,8 @@ public abstract class Unit extends Entity {
     
     }
     
-    public void onPlayed(Game game, Player player, int index) {
-        super.onPlayed(game,player,index);
+    public void onPlayed(Game game, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2) {
+        super.onPlayed(game,player,index,isTavernIndex,index2,isTavernIndex2);
     }
     
     public void onAttacked(Game game, Player player, Player player2, Unit attacker) {
@@ -150,4 +151,14 @@ public abstract class Unit extends Entity {
     public boolean getIsRebirth(){
         return isRebirth;
     }
+    
+    public boolean isAnswerOnPlayed(){
+        return answerOnPlayed;
+    }
+    
+    public boolean isAnswerOnDead(){
+        return answerOnDead;
+    }
+    
+//    public abstract Unit getGold();
 }

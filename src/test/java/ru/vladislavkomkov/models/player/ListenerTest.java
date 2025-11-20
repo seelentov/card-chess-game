@@ -2,6 +2,8 @@ package ru.vladislavkomkov.models.player;
 
 import org.junit.jupiter.api.Test;
 import ru.vladislavkomkov.GamePlayerTestCase;
+import ru.vladislavkomkov.models.Game;
+import ru.vladislavkomkov.models.entity.Entity;
 import ru.vladislavkomkov.models.entity.unit.Unit;
 import ru.vladislavkomkov.util.ListenerUtils;
 
@@ -28,7 +30,7 @@ public class ListenerTest extends GamePlayerTestCase {
         testListener(
                 player.listener.onPlayedListeners,
                 ()->unit.onPlayed(game,player,0),
-                (game1, player1, entity, index) -> testAction(),
+                (Game game, Player player, Entity entity, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2) -> testAction(),
                 once
         );
     }

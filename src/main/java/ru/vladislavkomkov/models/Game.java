@@ -45,6 +45,7 @@ public class Game implements AutoCloseable {
         ListenerUtils.processGlobalActionListeners(player.listener.onStartTurnListeners, this, player);
 
         player.doForAll(unit -> unit.onStartTurn(this, player));
+        player.calcTriplets();
     }
     
     public void processEndTurn(Player player) {

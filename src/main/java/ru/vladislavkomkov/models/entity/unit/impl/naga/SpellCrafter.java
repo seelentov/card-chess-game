@@ -27,8 +27,8 @@ public class SpellCrafter extends Unit {
         addSpellCraft(player);
     }
     
-    public void onPlayed(Game game, Player player, int index) {
-        super.onPlayed(game,player,index);
+    public void onPlayed(Game game, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2) {
+        super.onPlayed(game,player,index, isTavernIndex, index2, isTavernIndex2);
         addSpellCraft(player);
     }
     

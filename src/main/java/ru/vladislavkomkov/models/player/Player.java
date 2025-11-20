@@ -16,8 +16,8 @@ import java.util.function.Consumer;
 
 public class Player implements Cloneable, Serializable {
     public static final int MAX_LEVEL = 6;
-    static final int TABLE_LIMIT = 7;
-    static final int HAND_LIMIT = 10;
+    public static final int TABLE_LIMIT = 7;
+    public static final int HAND_LIMIT = 10;
 
     final List<Unit> table = new ArrayList<>(TABLE_LIMIT);
     
@@ -39,12 +39,28 @@ public class Player implements Cloneable, Serializable {
     public Statistic statistic = new Statistic();
 
     public List<Unit> inFightTable = null;
-
-    public void playCard(Game game, int indexCard, int indexPos){
+    
+    public void playCard(Game game, int indexCard){
+        playCard(game,indexCard,0);
+    }
+    
+    public void playCard(Game game, int indexCard, int index){
+        playCard(game,indexCard,index,false);
+    }
+    
+    public void playCard(Game game, int indexCard, int index, boolean isTavernIndex){
+        playCard(game,indexCard,index,isTavernIndex,0);
+    }
+    
+    public void playCard(Game game, int indexCard, int index, boolean isTavernIndex, int index2){
+        playCard(game,indexCard,index,isTavernIndex,index2,false);
+    }
+    
+    public void playCard(Game game, int indexCard, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2){
         if (indexCard < 0 || indexCard >= hand.size()){
             throw new IndexOutOfBoundsException("Index " + indexCard + " not existed in hand with length " + hand.size());
         }
-        hand.get(indexCard).play(game, this,indexPos);
+        hand.get(indexCard).play(game, this,index, isTavernIndex, index2, isTavernIndex2);
         hand.remove(indexCard);
     }
     
@@ -60,23 +76,56 @@ public class Player implements Cloneable, Serializable {
 
         ListenerUtils.processGlobalActionListeners(listener.onResetTavernListeners, game, this);
     }
-
-    public boolean addToTable(Unit unit){
-        return addToTable(unit, -1);
-    }
-
-    public boolean addToTable(Unit unit, int index){
-        if (table.size() >= TABLE_LIMIT){
+    
+    public boolean addToTable(Unit unit, List<Unit> table, int index, boolean withoutOne) {
+        int size = table.size();
+        
+        if(withoutOne){
+            size--;
+        }
+        
+        if (size >= TABLE_LIMIT){
             return false;
         }
-
-        if (index < 0 || index >= table.size()){
+        
+        if (index < 0 || index >= size){
             table.add(unit);
         } else {
             table.add(index, unit);
         }
-
+        
         return true;
+    }
+    
+    public boolean addToFightTable(Unit unit, int index, boolean withoutOne) {
+        return addToTable(unit, inFightTable, index, withoutOne);
+    }
+
+    public boolean addToTable(Unit unit, int index) {
+        return addToTable(unit, table, index, false);
+    }
+    
+    public void addToFightTable(List<Unit> units, int index, boolean withoutOne) {
+        units.forEach(unit -> addToFightTable(unit, index, withoutOne));
+    }
+    
+    public void addToTable(List<Unit> units, int index) {
+        units.forEach(unit -> addToTable(unit, index));
+    }
+    
+    public boolean addToFightTable(Unit unit, int index) {
+        return addToTable(unit, inFightTable, index, false);
+    }
+    
+    public void addToFightTable(List<Unit> units, int index) {
+        units.forEach(unit -> addToFightTable(unit, index, false));
+    }
+
+    public boolean addToTable(Unit unit) {
+        return addToTable(unit, -1);
+    }
+    public boolean addToFightTable(Unit unit) {
+        return addToFightTable(unit, -1, false);
     }
     
     public void removeFromTable(Unit unit){
@@ -99,6 +148,12 @@ public class Player implements Cloneable, Serializable {
         if(force || hand.size() < HAND_LIMIT){
             hand.add(card);
         }
+        
+        calcTriplets();
+    }
+    
+    public void calcTriplets(){
+    
     }
 
     public int getIndex(Unit unit){

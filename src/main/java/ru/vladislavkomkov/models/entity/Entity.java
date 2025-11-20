@@ -32,8 +32,28 @@ public abstract class Entity implements Serializable, Cloneable {
         processListeners(player.listener.onHandledListeners, (action)->action.process(game,player,this), player);
     };
     
+    public void onPlayed(Game game, Player player){
+        onPlayed(game,player,0,false,0, false);
+    }
+    
     public void onPlayed(Game game, Player player, int index){
-        processListeners(player.listener.onPlayedListeners, (action)->action.process(game,player,this,index), player);
+        onPlayed(game,player,index,false,0, false);
+    }
+    
+    public void onPlayed(Game game, Player player, int index, int index2){
+        onPlayed(game,player,index,false,index2, false);
+    }
+    
+    public void onPlayed(Game game, Player player, int index, boolean isTavernIndex){
+        onPlayed(game,player,index,isTavernIndex,0, false);
+    }
+    
+    public void onPlayed(Game game, Player player, int index, boolean isTavernIndex, int index2){
+        onPlayed(game,player,index,isTavernIndex,index2, false);
+    }
+    
+    public void onPlayed(Game game, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2){
+        processListeners(player.listener.onPlayedListeners, (action)->action.process(game,player,this,index,isTavernIndex,index2,isTavernIndex2), player);
     };
 
     protected <T> void processListeners(Map<String, T> listeners, Consumer<T> actionMove,Player player){

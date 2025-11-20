@@ -27,14 +27,16 @@ public class IckyImp extends Unit {
     @Override
     public void onDead(Game game, Player player, Player player2, Unit attacker) {
         super.onDead(game, player, player2, attacker);
-        if(player.inFightTable != null && player.getFightUnitsCount() - 1 < 7){
+        if(player.inFightTable != null){
             int index = player.getFightIndex(this);
-            player.inFightTable.add(index + 1, new Imp());
-            player.inFightTable.add(index + 1, new Imp());
+            for (int i = 0; i < 2; i++) {
+                player.addToFightTable(new Imp(), index + 1, true);
+            }
         } else {
             int index = player.getIndex(this);
-            player.addToTable(new Imp(),index + 1);
-            player.addToTable(new Imp(),index + 1);
+            for (int i = 0; i < 2; i++) {
+                player.addToTable(new Imp(),index + 1);
+            }
         }
     }
 }

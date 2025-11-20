@@ -16,9 +16,11 @@ public class AccordoTron extends Mech {
         maxHealth = 5;
         actualHealth = 5;
     }
-
+    
     public void onStartTurn(Game game, Player player) {
         super.onStartTurn(game,player);
         player.addMoney();
     }
+
+    
 }

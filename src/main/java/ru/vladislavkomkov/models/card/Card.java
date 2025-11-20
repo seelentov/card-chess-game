@@ -19,11 +19,11 @@ public class Card implements Serializable {
        return new Card(entity);
     }
 
-    public void play(Game game, Player player, int index){
+    public void play(Game game, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2){
         if(entity instanceof Unit unit){
             player.addToTable(unit, index);
         }
-        entity.onPlayed(game,player,index);
+        entity.onPlayed(game,player,index, isTavernIndex, index2, isTavernIndex2);
     }
 
     public Entity get(){

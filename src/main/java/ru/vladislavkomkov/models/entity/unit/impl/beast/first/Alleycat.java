@@ -1,6 +1,5 @@
 package ru.vladislavkomkov.models.entity.unit.impl.beast.first;
 
-import java.util.Arrays;
 import java.util.List;
 
 import ru.vladislavkomkov.models.Game;
@@ -21,14 +20,28 @@ public class Alleycat extends Unit {
         actualHealth = 1;
         
         type = List.of(Type.BEAST);
+        
+        answerOnPlayed = true;
     }
 
-    public void onPlayed(Game game, Player player, int index) {
-        super.onPlayed(game,player,index);
-        if(player.inFightTable != null && player.getFightUnitsCount() < 7){
-            player.inFightTable.add(index + 1, new Cat());
-        } else if (player.getUnitsCount() < 7) {
-            player.addToTable(new Cat(),index + 1);
+    public void onPlayed(Game game, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2) {
+        super.onPlayed(game,player,index, isTavernIndex, index2, isTavernIndex2);
+        if(player.inFightTable != null){
+            int indexParent = player.getFightIndex(this);
+            player.addToFightTable(new Cat(), indexParent + 1);
+        } else {
+            int indexParent = player.getIndex(this);
+            player.addToTable(new Cat(),indexParent + 1);
         }
+    }
+    
+    public class Gold extends Alleycat{
+        public Gold(){
+        
+        }
+    }
+    
+    public Gold getGold() {
+        return new Gold();
     }
 }

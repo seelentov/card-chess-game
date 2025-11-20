@@ -151,8 +151,8 @@ public class Fight {
     }
 
     Optional<Unit> getRandAttackedUnit(List<Unit> units){
-        Stream<Unit> unitsStream = units.stream().filter(this::filterAttacked);
-        units = unitsStream.noneMatch(Unit::getIsTaunt)
+        units = units.stream().filter(this::filterAttacked).toList();
+        units = units.stream().noneMatch(Unit::getIsTaunt)
                 ? units
                 : units.stream().filter(Unit::getIsTaunt).toList();
 
