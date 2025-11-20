@@ -16,10 +16,10 @@ public abstract class UnitTestCase extends GamePlayerTestCase {
         
         int money = player.getMoney();
         player.addToTable(unit, 0);
-        assertNotNull(player.cloneTable()[0]);
+        assertNotNull(player.cloneTable().get(0));
         unit.onSell(game, player);
         assertEquals(money + 1, player.getMoney());
-        assertNull(player.cloneTable()[0]);
+        assertEquals(0, player.getUnitsCount());
         
         tearDown();
     }

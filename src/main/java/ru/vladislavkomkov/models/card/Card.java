@@ -6,7 +6,9 @@ import ru.vladislavkomkov.models.player.Player;
 import ru.vladislavkomkov.models.entity.spell.Spell;
 import ru.vladislavkomkov.models.entity.unit.Unit;
 
-public class Card {
+import java.io.Serializable;
+
+public class Card implements Serializable {
     private Entity entity;
     
     public Card(Entity entity){

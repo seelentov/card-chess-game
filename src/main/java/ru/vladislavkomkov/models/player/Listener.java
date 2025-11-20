@@ -5,10 +5,11 @@ import ru.vladislavkomkov.models.actions.*;
 import ru.vladislavkomkov.models.entity.unit.Unit;
 import ru.vladislavkomkov.util.ListenerUtils;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Listener{
+public class Listener implements Serializable {
     public Listener(){}
     
     public Map<String, OnPlayedAction> onPlayedListeners = new HashMap<>();

@@ -1,6 +1,8 @@
 package ru.vladislavkomkov.models.player;
 
-public class Statistic{
+import java.io.Serializable;
+
+public class Statistic implements Serializable {
     public Statistic(){}
     
     public int onlyBluesPlayed = 0;

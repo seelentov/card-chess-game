@@ -1,10 +1,12 @@
 package ru.vladislavkomkov.models.entity.unit;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import ru.vladislavkomkov.models.entity.Entity;
 import ru.vladislavkomkov.models.Game;
+import ru.vladislavkomkov.models.entity.unit.impl.trash.demon.first.Imp;
 import ru.vladislavkomkov.models.player.Player;
 
 public abstract class Unit extends Entity {
@@ -16,7 +18,8 @@ public abstract class Unit extends Entity {
     protected boolean isTaunt = false;
     protected boolean isRebirth = false;
     protected boolean isDoubleAttack = false;
-    
+    protected boolean isDisguise = false;
+
     protected int actualHealth = 1;
     
     public int getAttack() {
@@ -77,19 +80,23 @@ public abstract class Unit extends Entity {
         if (isRebirth) {
             isRebirth = false;
             actualHealth = 1;
-        } else {
-            processListeners(player.listener.onDeadListeners, (action)->action.process(game,player,player2,this,attacker), player);
         }
+        processListeners(player.listener.onDeadListeners, (action)->action.process(game,player,player2,this,attacker), player);
     }
     
     public int getHealth(){
         return actualHealth;
     }
-    
+
     public int getMaxHealth(){
         return maxHealth;
     }
-    
+
+    public void setHealth(int i){
+        maxHealth=i;
+        actualHealth=i;
+    }
+
     public void incHealth(int i){
         maxHealth+=i;
         actualHealth+=i;
@@ -111,12 +118,36 @@ public abstract class Unit extends Entity {
     public void decAttack(int i){
         attack-=i;
     }
-    
+
+    public void setAttack(int i){
+        attack = i;
+    }
+
     public void setIsBubbled(boolean bubbled){
         isBubbled = bubbled;
     }
-    
+
+    public boolean getIsTaunt(){
+        return isTaunt;
+    }
+
+    public void setIsTaunt(boolean isTaunt){
+        this.isTaunt = isTaunt;
+    }
+
+    public boolean getIsDisguise(){
+        return isDisguise;
+    }
+
+    public void setIsDisguise(boolean disguise){
+        isDisguise = disguise;
+    }
+
     public void kill(){
         actualHealth = 0;
+    }
+
+    public boolean getIsRebirth(){
+        return isRebirth;
     }
 }

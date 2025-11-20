@@ -4,10 +4,8 @@ import ru.vladislavkomkov.models.player.Player;
 import ru.vladislavkomkov.models.entity.unit.Unit;
 import ru.vladislavkomkov.util.RandUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Stream;
 
 public class Fight {
     final Game game;
@@ -22,24 +20,26 @@ public class Fight {
     int player1Turn = 0;
     int player2Turn = 0;
 
-    int turn = -1;
+    int turn;
 
     public Fight(Game game, Player player1, Player player2){
         this.player1 = player1;
         this.player2 = player2;
 
         this.game = game;
+
+        setup();
     }
 
     public boolean doTurn(){
-        if (turn == -1) {
-            setup();
-        } else if(turn >= TURN_LIMIT){
+        if(turn >= TURN_LIMIT){
+            clearFightUnitList();
             return true;
         }
 
         if (player1Units.isEmpty() || player2Units.isEmpty()) {
             if(player1Units.isEmpty() && player2Units.isEmpty()){
+                clearFightUnitList();
                 return true;
             }
             
@@ -49,59 +49,75 @@ public class Fight {
             int dmg;
             
             if (isPlayer1Win)
-                dmg = calcPlayerDamage(player1);
+                dmg = calcPlayerDamage(player1, player1Units);
             else
-                dmg = calcPlayerDamage(player2);
+                dmg = calcPlayerDamage(player2, player2Units);
 
             loser.applyDamage(dmg);
 
+            clearFightUnitList();
             return true;
         }
 
         boolean isPlayer1Turn = turn % 2 == 0;
 
-        Unit attacker = isPlayer1Turn ? player1Units.get(player1Turn) : player2Units.get(player2Turn);
-        Unit attacked = isPlayer1Turn ? getRandUnit(player2Units) : getRandUnit(player1Units);
+        Optional<Unit> attackerOpt = Optional.empty();
 
-        Player turnPlayer1 = isPlayer1Turn ? player1 : player2;
-        Player turnPlayer2 = isPlayer1Turn ? player2 : player1;
+        int startTurn = isPlayer1Turn ? player1Turn : player2Turn;
 
-        attacker.onAttack(game, turnPlayer1, turnPlayer2, attacked);
+        while (true){
+            Unit attacker = isPlayer1Turn ? player1Units.get(player1Turn) : player2Units.get(player2Turn);
 
-        attacked.onAttacked(game, turnPlayer2, turnPlayer1, attacker);
+            if(checkAttacker(attacker)){
+                attackerOpt = Optional.of(attacker);
+                break;
+            }
 
-        if (attacker.isDead()){
-            attacker.onDead(game,turnPlayer2,turnPlayer1,attacked);
+            incTurn(isPlayer1Turn);
+            turn+=2;
+
+            if((isPlayer1Turn ? player1Turn : player2Turn) == startTurn){
+                break;
+            }
+        }
+
+        Optional<Unit> attackedOpt = isPlayer1Turn ? getRandAttackedUnit(player2Units) : getRandAttackedUnit(player1Units);
+
+        if(attackedOpt.isPresent() && attackerOpt.isPresent()){
+            Unit attacker = attackerOpt.get();
+            Unit attacked = attackedOpt.get();
+
+            Player turnPlayer1 = isPlayer1Turn ? player1 : player2;
+            Player turnPlayer2 = isPlayer1Turn ? player2 : player1;
+
+            attacker.onAttack(game, turnPlayer1, turnPlayer2, attacked);
+
+            attacked.onAttacked(game, turnPlayer2, turnPlayer1, attacker);
+
             if (attacker.isDead()){
-                if (isPlayer1Turn)
-                    player1Units.removeIf(o -> o == attacker);
-                else
-                    player2Units.removeIf(o -> o == attacker);
+                attacker.onDead(game,turnPlayer1,turnPlayer2,attacked);
+                if (attacker.isDead()){
+                    if (isPlayer1Turn)
+                        player1Units.removeIf(o -> o == attacker);
+                    else
+                        player2Units.removeIf(o -> o == attacker);
+                }
             }
-        }
 
-        if (attacked.isDead()){
-            attacked.onDead(game,turnPlayer2,turnPlayer1,attacker);
             if (attacked.isDead()){
-                if (isPlayer1Turn)
-                    player2Units.removeIf(o -> o == attacked);
-                else
-                    player1Units.removeIf(o -> o == attacked);
+                attacked.onDead(game,turnPlayer2,turnPlayer1,attacker);
+                if (attacked.isDead()){
+                    if (isPlayer1Turn)
+                        player2Units.removeIf(o -> o == attacked);
+                    else
+                        player1Units.removeIf(o -> o == attacked);
+                }
             }
         }
 
-        if(isPlayer1Turn)
-            player1Turn++;
-            if(player1Turn >= player1Units.size())
-                player1Turn = 0;
-            
-        else
-            player2Turn++;
-            if(player2Turn >= player2Units.size())
-                player2Turn = 0;
+        incTurn(isPlayer1Turn);
             
         turn++;
-
         return false;
     }
     
@@ -125,19 +141,53 @@ public class Fight {
         int player2Attack = calcAttack(this.player2Units);
         
         turn = player1Attack > player2Attack ? 0 : player1Attack < player2Attack ? 1 : RandUtils.getRand(1);
+
+        player1.inFightTable = player1Units;
+        player2.inFightTable = player2Units;
     }
 
     int calcAttack(List<Unit> units){
         return units.stream().reduce(0, (total, unit) -> total + unit.getAttack(), Integer::sum);
     }
 
-    Unit getRandUnit(List<Unit> units){
+    Optional<Unit> getRandAttackedUnit(List<Unit> units){
+        Stream<Unit> unitsStream = units.stream().filter(this::filterAttacked);
+        units = unitsStream.noneMatch(Unit::getIsTaunt)
+                ? units
+                : units.stream().filter(Unit::getIsTaunt).toList();
+
+        if(units.isEmpty()){
+            return Optional.empty();
+        }
+
         int i = RandUtils.getRand(units.size() - 1);
-        return units.get(i);
+        return Optional.of(units.get(i));
     }
 
-    int calcPlayerDamage(Player player){
-        int unitsDmg = Arrays.stream(player.cloneTable()).filter(Objects::nonNull).reduce(0, (total, unit) -> total + unit.getLevel(), Integer::sum);
+    boolean filterAttacked(Unit unit){
+        boolean isNotDisguise = !unit.getIsDisguise();
+        return isNotDisguise;
+    }
+
+    boolean checkAttacker(Unit unit){
+        boolean attackMoreThanZero = unit.getAttack() > 0;
+        return attackMoreThanZero;
+    }
+
+    void incTurn(boolean isPlayer1Turn){
+        if(isPlayer1Turn)
+            player1Turn++;
+        if(player1Turn >= player1Units.size())
+            player1Turn = 0;
+
+        else
+            player2Turn++;
+        if(player2Turn >= player2Units.size())
+            player2Turn = 0;
+    }
+
+    int calcPlayerDamage(Player player, List<Unit> units){
+        int unitsDmg = units.stream().reduce(0, (total, unit) -> total + unit.getLevel(), Integer::sum);
         int playerDmg = player.getLevel();
         return playerDmg + unitsDmg;
     }
@@ -148,5 +198,10 @@ public class Fight {
     
     public Player getPlayer2(){
         return player2;
+    }
+
+    void clearFightUnitList(){
+        player1.inFightTable = null;
+        player2.inFightTable = null;
     }
 }

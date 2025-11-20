@@ -77,7 +77,7 @@ public class PlayerTest extends GamePlayerTestCase {
         
         assertTrue(player.cloneHand().isEmpty());
         
-        assertEquals(testName, player.cloneTable()[0].getName());
+        assertEquals(testName, player.cloneTable().get(0).getName());
     }
     
     @Test
@@ -103,14 +103,11 @@ public class PlayerTest extends GamePlayerTestCase {
             player.addToTable(new Cat(), i);
         }
         
-        Unit[] units = player.cloneTable();
-        
-        assertEquals(new Cat().getName(), units[0].getName());
-        assertEquals(new Cat().getName(), units[1].getName());
-        
-        for (int i = 2; i < 7; i++) {
-            assertNull(units[i]);
-        }
+        List<Unit> units = player.cloneTable();
+
+        assertEquals(2, units.size());
+        assertEquals(new Cat().getName(), units.get(0).getName());
+        assertEquals(new Cat().getName(), units.get(1).getName());
     }
 
     @Test
@@ -176,10 +173,10 @@ public class PlayerTest extends GamePlayerTestCase {
         
         assertEquals(0, player.cloneHand().stream().filter(Objects::nonNull).count());
         
-        assertEquals(2, Arrays.stream(player.cloneTable()).filter(Objects::nonNull).count());
+        assertEquals(2, player.cloneTable().stream().filter(Objects::nonNull).count());
         
-        Unit unit1 = player.cloneTable()[0];
-        Unit unit2 = player.cloneTable()[1];
+        Unit unit1 = player.cloneTable().get(0);
+        Unit unit2 = player.cloneTable().get(1);
         
         assertEquals(new Alleycat().getName(), unit1.getName());
         assertEquals(new Cat().getName(), unit2.getName());
@@ -189,7 +186,7 @@ public class PlayerTest extends GamePlayerTestCase {
     void testAddToTable(){
         player.addToTable(new Alleycat(), 1);
         
-        assertEquals(new Alleycat().getName(), player.cloneTable()[1].getName());
+        assertEquals(new Alleycat().getName(), player.cloneTable().get(0).getName());
     }
     
     @Test
@@ -202,10 +199,10 @@ public class PlayerTest extends GamePlayerTestCase {
             unit.incAttack(2);
         });
         
-        Unit[] units = player.cloneTable();
+        List<Unit> units = player.cloneTable();
         
         for (int i = 0; i < 2; i++) {
-            assertEquals(3,units[i].getAttack());
+            assertEquals(3,units.get(i).getAttack());
         }
     }
     

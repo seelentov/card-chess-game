@@ -10,7 +10,7 @@ import java.util.List;
 
 public abstract class Mech extends Unit {
     public Mech(){
-        type = List.of(Type.BEAST);
+        type = List.of(Type.MECH);
     }
 
     public List<Mech> magnetized = new ArrayList<>();

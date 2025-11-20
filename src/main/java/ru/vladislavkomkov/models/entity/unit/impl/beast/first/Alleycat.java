@@ -1,5 +1,6 @@
 package ru.vladislavkomkov.models.entity.unit.impl.beast.first;
 
+import java.util.Arrays;
 import java.util.List;
 
 import ru.vladislavkomkov.models.Game;
@@ -24,6 +25,10 @@ public class Alleycat extends Unit {
 
     public void onPlayed(Game game, Player player, int index) {
         super.onPlayed(game,player,index);
-        player.addToTable(new Cat(), -1);
+        if(player.inFightTable != null && player.getFightUnitsCount() < 7){
+            player.inFightTable.add(index + 1, new Cat());
+        } else if (player.getUnitsCount() < 7) {
+            player.addToTable(new Cat(),index + 1);
+        }
     }
 }

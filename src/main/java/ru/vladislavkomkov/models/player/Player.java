@@ -5,19 +5,21 @@ import ru.vladislavkomkov.models.card.Card;
 import ru.vladislavkomkov.models.entity.spell.impl.spellcraft.SpellCraft;
 import ru.vladislavkomkov.models.entity.unit.Unit;
 import ru.vladislavkomkov.util.ListenerUtils;
+import ru.vladislavkomkov.util.SerializationUtils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public class Player {
+public class Player implements Cloneable, Serializable {
     public static final int MAX_LEVEL = 6;
     static final int TABLE_LIMIT = 7;
     static final int HAND_LIMIT = 10;
 
-    final Unit[] table = new Unit[TABLE_LIMIT];
+    final List<Unit> table = new ArrayList<>(TABLE_LIMIT);
     
     final List<Card> hand = new ArrayList<>();
     
@@ -35,7 +37,9 @@ public class Player {
     
     public Listener listener = new Listener();
     public Statistic statistic = new Statistic();
-    
+
+    public List<Unit> inFightTable = null;
+
     public void playCard(Game game, int indexCard, int indexPos){
         if (indexCard < 0 || indexCard >= hand.size()){
             throw new IndexOutOfBoundsException("Index " + indexCard + " not existed in hand with length " + hand.size());
@@ -56,55 +60,31 @@ public class Player {
 
         ListenerUtils.processGlobalActionListeners(listener.onResetTavernListeners, game, this);
     }
-    
-    int getFreeTableIndexFromRight(){
-        return getFreeIndexFromRight(table);
+
+    public boolean addToTable(Unit unit){
+        return addToTable(unit, -1);
     }
-    
-    <T> int getFreeIndexFromRight(T[] array){
-        for (int i = 0; i < array.length; i++) {
-            if(array[i] == null){
-                return i;
-            }
+
+    public boolean addToTable(Unit unit, int index){
+        if (table.size() >= TABLE_LIMIT){
+            return false;
         }
 
-        return -1;
-    }
-    
-    public void addToTable(Unit unit, int index){
-        if(index < table.length && index >= 0 && table[index] == null){
-            table[index] = unit;
-            return;
+        if (index < 0 || index >= table.size()){
+            table.add(unit);
+        } else {
+            table.add(index, unit);
         }
-        
-        int placeIndex = getFreeTableIndexFromRight();
-        if (placeIndex != -1){
-            table[placeIndex] = unit;
-        }
+
+        return true;
     }
     
     public void removeFromTable(Unit unit){
-        int index = findTableIndex(unit);
-        
-        if(index != -1){
-            removeFromTable(index);
-        }
+        table.removeIf(unit1 -> unit == unit1);
     }
     
     public void removeFromTable(int index){
-        if(index < table.length && index >= 0 && table[index] != null){
-            table[index] = null;
-        }
-    }
-    
-    public int findTableIndex(Unit unit){
-        for (int i = 0; i < table.length; i++) {
-            if(table[i] != null && table[i].getID() == unit.getID()){
-               return i;
-            }
-        }
-        
-        return -1;
+        table.remove(index);
     }
     
     public void clearSpellCraft(){
@@ -121,21 +101,24 @@ public class Player {
         }
     }
 
+    public int getIndex(Unit unit){
+        return table.indexOf(unit);
+    }
+
+    public int getFightIndex(Unit unit){
+        return inFightTable.indexOf(unit);
+    }
+
     public void doForAll(Consumer<Unit> consumer){
-        for (int i = 0; i < table.length; i++) {
-            doFor(consumer,i);
-        }
+        table.forEach(consumer);
     }
     
     public void doFor(Consumer<Unit> consumer, int index){
-        Unit unit = table[index];
-        if(unit != null){
-            consumer.accept(unit);
-        }
+        consumer.accept(table.get(index));
     }
 
-    public Unit[] cloneTable(){
-        return Arrays.copyOf(this.table, this.table.length);
+    public List<Unit> cloneTable(){
+        return table.stream().toList();
     }
 
     public List<Card> cloneHand(){
@@ -214,8 +197,22 @@ public class Player {
     public int getMaxHealth(){
         return maxHealth;
     }
-    
+
     public int getUnitsCount(){
-        return Math.toIntExact(Arrays.stream(table).filter(Objects::nonNull).count());
+        return table.size();
+    }
+
+    public int getFightUnitsCount(){
+        return inFightTable.size();
+    }
+
+    @Override
+    public Player clone() {
+        try {
+            Player player = (Player) super.clone();
+            return SerializationUtils.deepCopy(player);
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
