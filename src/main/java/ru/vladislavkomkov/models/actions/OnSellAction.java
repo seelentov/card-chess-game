@@ -1,4 +1,5 @@
 package ru.vladislavkomkov.models.actions;
 
-public interface OnSellAction extends PrepareAction{
+public interface OnSellAction extends PrepareAction
+{
 }

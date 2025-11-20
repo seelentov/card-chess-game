@@ -1,4 +1,5 @@
 package ru.vladislavkomkov.models.card;
 
-public class CardTest {
+public class CardTest
+{
 }

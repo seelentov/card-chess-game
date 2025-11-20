@@ -1,18 +1,20 @@
 package ru.vladislavkomkov.models.entity.spell.impl.first;
 
-import ru.vladislavkomkov.models.Game;
-import ru.vladislavkomkov.models.player.Player;
+import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
+
 import ru.vladislavkomkov.models.entity.spell.Spell;
 
-public class TavernCoin extends Spell {
-    public TavernCoin(){
-        isTavern = true;
-    }
+public class TavernCoin extends Spell
+{
+  public TavernCoin()
+  {
+    isTavern = true;
+    description = "Gain 1 Gold";
     
-    protected String description = "Gain 1 Gold";
-
-    @Override
-    public void cast(Game game, Player player, int index) {
-        player.addMoney();
-    }
+    listener.onPlayedListeners.put(
+        KEY_CORE,
+        (game, player, entity, index, isTavernIndex, index2, isTavernIndex2) -> {
+          player.addMoney();
+        });
+  }
 }

@@ -1,9 +1,10 @@
 package ru.vladislavkomkov.models.actions;
 
-import ru.vladislavkomkov.models.entity.Entity;
 import ru.vladislavkomkov.models.Game;
+import ru.vladislavkomkov.models.entity.Entity;
 import ru.vladislavkomkov.models.player.Player;
 
-public interface PrepareAction {
-    void process(Game game, Player player, Entity entity);
+public interface PrepareAction extends Action
+{
+  void process(Game game, Player player, Entity entity);
 }

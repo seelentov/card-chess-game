@@ -1,4 +1,5 @@
 package ru.vladislavkomkov.models.actions;
 
-public interface OnEndFightAction extends GlobalAction{
+public interface OnEndFightAction extends GlobalAction
+{
 }

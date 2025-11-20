@@ -1,9 +1,10 @@
 package ru.vladislavkomkov.models.actions;
 
 import ru.vladislavkomkov.models.Game;
-import ru.vladislavkomkov.models.player.Player;
 import ru.vladislavkomkov.models.entity.unit.Unit;
+import ru.vladislavkomkov.models.player.Player;
 
-public interface OnAttackAction{
-    void process(Game game, Player player1, Player player2, Unit unit,Unit attacked);
+public interface OnAttackAction extends Action
+{
+  void process(Game game, Player player1, Player player2, Unit unit, Unit attacked);
 }
