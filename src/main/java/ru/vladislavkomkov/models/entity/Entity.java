@@ -153,4 +153,9 @@ public abstract class Entity implements Serializable, Cloneable
   {
     this.isGold = isGold;
   }
+  
+  public Listener getListener()
+  {
+    return listener;
+  }
 }

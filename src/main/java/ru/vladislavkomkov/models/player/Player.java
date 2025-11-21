@@ -12,6 +12,7 @@ import javafx.util.Pair;
 import ru.vladislavkomkov.models.Game;
 import ru.vladislavkomkov.models.Listener;
 import ru.vladislavkomkov.models.card.Card;
+import ru.vladislavkomkov.models.entity.spell.impl.TripleReward;
 import ru.vladislavkomkov.models.entity.spell.impl.spellcraft.SpellCraft;
 import ru.vladislavkomkov.models.entity.unit.Unit;
 import ru.vladislavkomkov.util.ListenerUtils;
@@ -268,9 +269,8 @@ public class Player implements Cloneable, Serializable
             }
           }
           
-          Card goldCard = Card.of(UnitUtils.buildGold(unitsForGold));
+          Card goldCard = Card.of(unitsForGold.get(0).buildGold(unitsForGold));
           hand.add(goldCard);
-          
           break;
         }
       }

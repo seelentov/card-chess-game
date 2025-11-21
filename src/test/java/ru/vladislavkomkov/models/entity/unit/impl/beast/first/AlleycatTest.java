@@ -1,6 +1,7 @@
 package ru.vladislavkomkov.models.entity.unit.impl.beast.first;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
@@ -22,6 +23,19 @@ public class AlleycatTest extends UnitTestCase
   {
     new Alleycat().onPlayed(game, player, 0);
     assertEquals(new Cat().getName(), player.cloneTable().get(0).getName());
+  }
+  
+  @Test
+  protected void testOnPlayedGold()
+  {
+    new Alleycat().buildGold().onPlayed(game, player, 0);
+    
+    assertEquals(new Cat().getName(), player.cloneTable().get(0).getName());
+    
+    assertEquals(new Cat().getAttack() * 2, player.cloneTable().get(0).getAttack());
+    assertEquals(new Cat().getHealth() * 2, player.cloneTable().get(0).getHealth());
+    
+    assertTrue(player.cloneTable().get(0).isGold());
   }
   
   @Test
@@ -71,5 +85,10 @@ public class AlleycatTest extends UnitTestCase
     {
       assertEquals(new Imp().getName(), player.cloneTable().get(i).getName());
     }
+  }
+  
+  @Test
+  void testGold(){
+  
   }
 }

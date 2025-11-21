@@ -30,6 +30,24 @@ public class IckyImpTest extends UnitTestCase
   }
   
   @Test
+  void testOnDeadGold()
+  {
+    Unit unit = new IckyImp().buildGold();
+    player.addToTable(unit, -1);
+    unit.onDead(game, player, player2, new Cat());
+    
+    assertEquals(3, player.getUnitsCount());
+    assertEquals(new Imp().getName(), player.cloneTable().get(1).getName());
+    assertEquals(new Imp().getName(), player.cloneTable().get(2).getName());
+    
+    assertEquals(new Imp().getAttack() * 2, player.cloneTable().get(1).getAttack());
+    assertEquals(new Imp().getHealth() * 2, player.cloneTable().get(1).getHealth());
+    
+    assertEquals(new Imp().getAttack() * 2, player.cloneTable().get(2).getAttack());
+    assertEquals(new Imp().getHealth() * 2, player.cloneTable().get(2).getHealth());
+  }
+  
+  @Test
   protected void testOnDeadByIndex()
   {
     player.addToTable(new Cat());

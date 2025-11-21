@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.vladislavkomkov.models.Game;
+import ru.vladislavkomkov.models.card.Card;
 import ru.vladislavkomkov.models.entity.Entity;
+import ru.vladislavkomkov.models.entity.spell.impl.TripleReward;
 import ru.vladislavkomkov.models.player.Player;
 import ru.vladislavkomkov.util.ListenerUtils;
 
@@ -135,6 +137,14 @@ public abstract class Unit extends Entity
     listener.processOnDeadListeners(game, player, player2, this, attacker);
   }
   
+  @Override
+  public void onPlayed(Game game, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2) {
+    super.onPlayed(game, player, index, isTavernIndex, index2, isTavernIndex2);
+    if(this.isGold()){
+      player.addToHand(Card.of(new TripleReward(player.getLevel() + 1)));
+    }
+  }
+  
   public int getHealth()
   {
     return actualHealth;
@@ -248,4 +258,43 @@ public abstract class Unit extends Entity
     listener.removeCoreListener();
   }
   
+  public Unit buildGold(){
+    return buildGold((Unit) this.newThis(), (Unit) this.newThis(), (Unit) this.newThis());
+  }
+  
+  public Unit buildGold(List<Unit> units){
+    return buildGold(units.get(0),units.get(1),units.get(2));
+  }
+  
+  public Unit buildGold(Unit unit, Unit unit2, Unit unit3)
+  {
+    Unit entity = (Unit) this.newThis();
+    entity.setAttack(entity.getAttack() * 2);
+    entity.setHealth(entity.getHealth() * 2);
+    
+    List<Unit> units = List.of(unit, unit2, unit3);
+    units.forEach(Unit::removeCoreListeners);
+    units.stream()
+            .map(Unit::getBuffs)
+            .flatMap(List::stream)
+            .forEach(entity::addBuff);
+    
+    entity.setIsGold(true);
+    return entity;
+  };
+  
+  @Override
+  public Entity newThis() {
+    return super.newThis();
+  }
+  
+  public Unit newGold() {
+    Unit u = (Unit) this.newThis();
+    
+    u.setHealth(u.getHealth() * 2);
+    u.setAttack(u.getAttack() * 2);
+    u.setIsGold(true);
+    
+    return u;
+  }
 }

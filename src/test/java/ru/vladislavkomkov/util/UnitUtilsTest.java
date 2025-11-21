@@ -48,7 +48,7 @@ public class UnitUtilsTest
   @Test
   void testBuildGold()
   {
-    Unit unit = UnitUtils.buildGold(new Cat(), new Cat(), new Cat());
+    Unit unit = new Cat().buildGold(new Cat(), new Cat(), new Cat());
     assertTrue(unit.isGold());
     assertEquals(new Cat().getName(), unit.getName());
     assertEquals(new Cat().getAttack() * 2, unit.getAttack());
@@ -72,7 +72,7 @@ public class UnitUtilsTest
           unit1.decHealth(boost);
         }, description));
     
-    Unit gold = UnitUtils.buildGold(new Cat(), unit, new Cat());
+    Unit gold = new Cat().buildGold(new Cat(), unit, new Cat());
     assertTrue(gold.isGold());
     assertEquals(new Cat().getName(), gold.getName());
     assertEquals(new Cat().getAttack() * 2 + boost, gold.getAttack());

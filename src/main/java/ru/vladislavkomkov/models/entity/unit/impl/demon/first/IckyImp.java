@@ -6,6 +6,7 @@ import java.util.List;
 
 import ru.vladislavkomkov.models.entity.unit.Type;
 import ru.vladislavkomkov.models.entity.unit.Unit;
+import ru.vladislavkomkov.models.entity.unit.impl.trash.beast.first.Cat;
 import ru.vladislavkomkov.models.entity.unit.impl.trash.demon.first.Imp;
 
 public class IckyImp extends Unit
@@ -44,4 +45,32 @@ public class IckyImp extends Unit
           }
         });
   }
+    
+    @Override
+    public Unit buildGold(Unit unit, Unit unit2, Unit unit3)
+    {
+        Unit gold = super.buildGold(unit, unit2, unit3);
+        gold.getListener().onDeadListeners.put(
+                KEY_CORE,
+                (game, player, player2, uni1, attacker) -> {
+                    if (player.inFight())
+                    {
+                        int index = player.getFightIndex(gold);
+                        for (int i = 0; i < 2; i++)
+                        {
+                            player.addToFightTable(new Imp().newGold(), index + 1, true);
+                        }
+                    }
+                    else
+                    {
+                        int index = player.getIndex(gold);
+                        for (int i = 0; i < 2; i++)
+                        {
+                            player.addToTable(new Imp().newGold(), index + 1);
+                        }
+                    }
+                });
+        
+        return gold;
+    }
 }
