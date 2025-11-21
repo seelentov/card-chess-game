@@ -4,21 +4,22 @@ import java.io.Serializable;
 
 import ru.vladislavkomkov.models.Game;
 import ru.vladislavkomkov.models.entity.Entity;
+import ru.vladislavkomkov.models.entity.spell.Spell;
 import ru.vladislavkomkov.models.entity.unit.Unit;
 import ru.vladislavkomkov.models.player.Player;
 
-public class Card implements Serializable
+public class Card<T extends Entity> implements Serializable
 {
-  private Entity entity;
+  private final T entity;
   
-  public Card(Entity entity)
+  public Card(T entity)
   {
     this.entity = entity;
   }
   
-  public static Card of(Entity entity)
+  public static <T extends Entity> Card<T> of(T entity)
   {
-    return new Card(entity);
+    return new Card<>(entity);
   }
   
   public void play(Game game, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2)
@@ -33,5 +34,20 @@ public class Card implements Serializable
   public Entity get()
   {
     return entity;
+  }
+  
+  public boolean isGold()
+  {
+    return entity.isGold();
+  }
+  
+  public String getName()
+  {
+    return entity.getName();
+  }
+  
+  public boolean isSpell()
+  {
+    return entity instanceof Spell;
   }
 }

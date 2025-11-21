@@ -245,7 +245,7 @@ public abstract class Unit extends Entity
   
   public void removeCoreListeners()
   {
-    buffs.removeIf(buff -> buff.getRollback() != null);
+    listener.removeCoreListener();
   }
   
 }

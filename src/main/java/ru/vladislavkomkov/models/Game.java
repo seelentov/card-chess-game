@@ -1,12 +1,15 @@
 package ru.vladislavkomkov.models;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-import ru.vladislavkomkov.models.entity.unit.Unit;
 import ru.vladislavkomkov.models.player.Player;
 import ru.vladislavkomkov.util.ListenerUtils;
 import ru.vladislavkomkov.util.RandUtils;
@@ -45,7 +48,7 @@ public class Game implements AutoCloseable
     ListenerUtils.processGlobalActionListeners(player.listener.onStartTurnListeners, this, player);
     
     player.doForAll(unit -> unit.onStartTurn(this, player));
-    player.doForAll(Unit::removeTempBuffs);
+    player.removeTempBuffs();
     player.calcTriplets();
   }
   

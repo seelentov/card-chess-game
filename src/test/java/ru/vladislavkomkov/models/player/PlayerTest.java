@@ -1,6 +1,9 @@
 package ru.vladislavkomkov.models.player;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Objects;
@@ -12,6 +15,7 @@ import ru.vladislavkomkov.models.Game;
 import ru.vladislavkomkov.models.card.Card;
 import ru.vladislavkomkov.models.entity.spell.Spell;
 import ru.vladislavkomkov.models.entity.spell.impl.first.TavernCoin;
+import ru.vladislavkomkov.models.entity.spell.impl.spellcraft.impl.DeepBlues;
 import ru.vladislavkomkov.models.entity.unit.Unit;
 import ru.vladislavkomkov.models.entity.unit.impl.beast.first.Alleycat;
 import ru.vladislavkomkov.models.entity.unit.impl.trash.beast.first.Cat;
@@ -274,5 +278,50 @@ public class PlayerTest extends GamePlayerTestCase
       assertEquals(Math.min(i, Player.MAX_LEVEL), player.getLevel());
       player.incLevel(game);
     }
+  }
+  
+  @Test
+  void testTriplet()
+  {
+    player.addToHand(Card.of(new Cat()));
+    assertEquals(1, player.hand.size());
+    
+    player.addToHand(Card.of(new Cat()));
+    assertEquals(2, player.hand.size());
+    
+    player.addToHand(Card.of(new Cat()));
+    assertEquals(1, player.hand.size());
+    
+    Unit goldUnit = (Unit) player.hand.get(0).get();
+    assertEquals(new Cat().getName(), goldUnit.getName());
+    assertEquals(new Cat().getAttack() * 2, goldUnit.getAttack());
+    assertEquals(new Cat().getHealth() * 2, goldUnit.getHealth());
+  }
+  
+  @Test
+  void testTripletBuffed()
+  {
+    Unit unit = new Cat();
+    player.addToTable(unit);
+    
+    new DeepBlues().onPlayed(game, player, 0);
+    
+    player.addToHand(Card.of(new Cat()));
+    assertEquals(1, player.hand.size());
+    
+    player.addToHand(Card.of(new Cat()));
+    assertEquals(1, player.hand.size());
+    
+    Unit goldUnit = (Unit) player.hand.get(0).get();
+    assertEquals(new Cat().getName(), goldUnit.getName());
+    assertEquals(new Cat().getAttack() * 2 + (DeepBlues.ATTACK_BOOST), goldUnit.getAttack());
+    assertEquals(new Cat().getHealth() * 2 + (DeepBlues.HEALTH_BOOST), goldUnit.getHealth());
+    
+    game.processStartTurn(player);
+    
+    goldUnit = (Unit) player.hand.get(0).get();
+    assertEquals(new Cat().getName(), goldUnit.getName());
+    assertEquals(new Cat().getAttack() * 2, goldUnit.getAttack());
+    assertEquals(new Cat().getHealth() * 2, goldUnit.getHealth());
   }
 }

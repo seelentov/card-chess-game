@@ -28,7 +28,7 @@ public class Alleycat extends Unit
     listener.onPlayedListeners.put(
         KEY_CORE,
         (game, player, entity, index, isTavernIndex, index2, isTavernIndex2) -> {
-          if (player.inFightTable != null)
+          if (player.inFight())
           {
             int indexParent = player.getFightIndex(this);
             player.addToFightTable(new Cat(), indexParent + 1);

@@ -2,9 +2,13 @@ package ru.vladislavkomkov.models.player;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
+import javafx.util.Pair;
 import ru.vladislavkomkov.models.Game;
 import ru.vladislavkomkov.models.Listener;
 import ru.vladislavkomkov.models.card.Card;
@@ -12,6 +16,7 @@ import ru.vladislavkomkov.models.entity.spell.impl.spellcraft.SpellCraft;
 import ru.vladislavkomkov.models.entity.unit.Unit;
 import ru.vladislavkomkov.util.ListenerUtils;
 import ru.vladislavkomkov.util.SerializationUtils;
+import ru.vladislavkomkov.util.UnitUtils;
 
 public class Player implements Cloneable, Serializable
 {
@@ -27,6 +32,7 @@ public class Player implements Cloneable, Serializable
   public Listener listener = new Listener();
   public Statistic statistic = new Statistic();
   public List<Unit> inFightTable = null;
+  
   int health = 30;
   int maxHealth = 30;
   int armor = 0;
@@ -179,7 +185,98 @@ public class Player implements Cloneable, Serializable
   
   public void calcTriplets()
   {
+    Supplier<Map<String, List<Pair<Boolean, Integer>>>> calc = () -> {
+      Map<String, List<Pair<Boolean, Integer>>> indexCountMap = new HashMap<>();
+      
+      for (int i = 0; i < hand.size(); i++)
+      {
+        Card card = hand.get(i);
+        if (card.isSpell() || card.isGold())
+        {
+          continue;
+        }
+        
+        String key = card.getName();
+        Pair<Boolean, Integer> pair = new Pair<>(false, i);
+        indexCountMap.computeIfAbsent(key, k -> new ArrayList<>()).add(pair);
+      }
+      
+      for (int i = 0; i < table.size(); i++)
+      {
+        Unit unit = table.get(i);
+        if (unit.isGold())
+        {
+          continue;
+        }
+        
+        String key = unit.getName();
+        Pair<Boolean, Integer> pair = new Pair<>(true, i);
+        indexCountMap.computeIfAbsent(key, k -> new ArrayList<>()).add(pair);
+      }
+      
+      return indexCountMap;
+    };
     
+    boolean foundTriplets;
+    
+    do
+    {
+      foundTriplets = false;
+      Map<String, List<Pair<Boolean, Integer>>> indexCountMap = calc.get();
+      
+      for (List<Pair<Boolean, Integer>> cardList : indexCountMap.values())
+      {
+        if (cardList.size() >= 3)
+        {
+          foundTriplets = true;
+          
+          List<Pair<Boolean, Integer>> triplets = cardList.subList(0, 3);
+          
+          List<Card> removedCards = new ArrayList<>();
+          
+          List<Unit> unitsForGold = new ArrayList<>();
+          for (Pair<Boolean, Integer> pair : triplets)
+          {
+            boolean isOnTable = pair.getKey();
+            int index = pair.getValue();
+            
+            if (isOnTable)
+            {
+              unitsForGold.add(table.get(index));
+            }
+            else
+            {
+              unitsForGold.add((Unit) hand.get(index).get());
+            }
+          }
+          
+          triplets.sort((p1, p2) -> Boolean.compare(p2.getKey(), p1.getKey())); // сначала стол, потом рука
+          triplets.sort((p1, p2) -> Integer.compare(p2.getValue(), p1.getValue())); // с конца
+          
+          for (Pair<Boolean, Integer> pair : triplets)
+          {
+            boolean isOnTable = pair.getKey();
+            int index = pair.getValue();
+            
+            if (isOnTable)
+            {
+              table.remove(index);
+            }
+            else
+            {
+              hand.remove(index);
+            }
+          }
+          
+          Card goldCard = Card.of(UnitUtils.buildGold(unitsForGold));
+          hand.add(goldCard);
+          
+          break;
+        }
+      }
+      
+    }
+    while (foundTriplets);
   }
   
   public int getIndex(Unit unit)
@@ -200,6 +297,20 @@ public class Player implements Cloneable, Serializable
   public void doFor(Consumer<Unit> consumer, int index)
   {
     consumer.accept(table.get(index));
+  }
+  
+  public void removeTempBuffs()
+  {
+    doForAll(Unit::removeTempBuffs);
+    
+    hand.stream()
+        .map(Card::get)
+        .forEach(entity -> {
+          if (entity instanceof Unit)
+          {
+            ((Unit) entity).removeTempBuffs();
+          }
+        });
   }
   
   public List<Unit> cloneTable()
@@ -332,5 +443,10 @@ public class Player implements Cloneable, Serializable
   public List<Unit> getTable()
   {
     return table;
+  }
+  
+  public boolean inFight()
+  {
+    return inFightTable != null;
   }
 }

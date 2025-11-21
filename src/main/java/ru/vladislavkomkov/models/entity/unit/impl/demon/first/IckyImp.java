@@ -26,7 +26,7 @@ public class IckyImp extends Unit
     listener.onDeadListeners.put(
         KEY_CORE,
         (game, player, player2, unit, attacker) -> {
-          if (player.inFightTable != null)
+          if (player.inFight())
           {
             int index = player.getFightIndex(this);
             for (int i = 0; i < 2; i++)
