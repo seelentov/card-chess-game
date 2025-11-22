@@ -8,10 +8,9 @@ public class SpellCrafterTestCase extends UnitTestCase
 {
   protected void testDefault(SpellCrafter spellCrafter)
   {
-    super.testDefault(spellCrafter);
-    
-    onStartTurn(spellCrafter);
     onPlayed(spellCrafter);
+    onStartTurn(spellCrafter);
+    super.testDefault(spellCrafter);
   }
   
   void onStartTurn(SpellCrafter spellCrafter)

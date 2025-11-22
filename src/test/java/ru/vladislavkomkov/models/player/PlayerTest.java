@@ -146,7 +146,7 @@ public class PlayerTest extends GamePlayerTestCase
       }
       else
       {
-        player.addToHand(new Card(new Alleycat()));
+        player.addToHand(new Card(new DeepBlues()));
       }
     }
     
@@ -165,7 +165,7 @@ public class PlayerTest extends GamePlayerTestCase
       }
       else
       {
-        assertEquals(cardName, new Alleycat().getName());
+        assertEquals(cardName, new DeepBlues().getName());
       }
     }
   }

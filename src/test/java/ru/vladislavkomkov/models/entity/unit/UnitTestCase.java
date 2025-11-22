@@ -53,6 +53,7 @@ public abstract class UnitTestCase extends GamePlayerTestCase
   void triplet(Unit unit)
   {
     setUp();
+    
     player.incLevel(game);
     player.incLevel(game);
     
