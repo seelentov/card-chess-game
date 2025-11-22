@@ -14,8 +14,8 @@ import ru.vladislavkomkov.model.Listener;
 import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.spell.impl.spellcraft.SpellCraft;
 import ru.vladislavkomkov.model.entity.unit.Unit;
-import ru.vladislavkomkov.util.UUIDUtils;
 import ru.vladislavkomkov.util.SerializationUtils;
+import ru.vladislavkomkov.util.UUIDUtils;
 
 public class Player implements Cloneable, Serializable
 {

@@ -19,7 +19,6 @@ public abstract class Unit extends Entity
   protected boolean isBubbled = false;
   protected boolean isTaunt = false;
   protected boolean isRebirth = false;
-  protected boolean isDoubleAttack = false;
   protected boolean isDisguise = false;
   protected boolean answerOnPlayed = false;
   protected boolean answerOnDead = false;
@@ -265,6 +264,11 @@ public abstract class Unit extends Entity
     return buildGold(this.newThis(), this.newThis(), this.newThis());
   }
   
+  public Unit buildGold(Unit unit)
+  {
+    return buildGold(unit.newThis(), unit.newThis(), unit.newThis());
+  }
+  
   public Unit buildGold(List<Unit> units)
   {
     if (units.size() != 3)
@@ -306,5 +310,10 @@ public abstract class Unit extends Entity
     u.setIsGold(true);
     
     return u;
+  }
+  
+  public boolean isType(Type type)
+  {
+    return this.type.contains(type);
   }
 }

@@ -1,15 +1,19 @@
 package ru.vladislavkomkov.model;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import ru.vladislavkomkov.model.player.Player;
-import ru.vladislavkomkov.util.UUIDUtils;
 import ru.vladislavkomkov.util.RandUtils;
+import ru.vladislavkomkov.util.UUIDUtils;
 
 public class Game implements AutoCloseable, Serializable
 {
@@ -20,7 +24,7 @@ public class Game implements AutoCloseable, Serializable
   ExecutorService executor = Executors.newFixedThreadPool(FIGHTS_COUNT);
   Map<String, Player> players;
   int turn = 1;
-
+  
   public Game(Map<String, Player> players)
   {
     this.players = players;

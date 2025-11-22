@@ -11,8 +11,8 @@ import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.Listener;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.player.Player;
-import ru.vladislavkomkov.util.UUIDUtils;
 import ru.vladislavkomkov.util.SerializationUtils;
+import ru.vladislavkomkov.util.UUIDUtils;
 
 public abstract class Entity implements Serializable, Cloneable
 {

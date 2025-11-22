@@ -12,7 +12,7 @@ public class Statistic implements Serializable
   {
   }
   
-  static class Played
+  public static class Played
   {
     public int onlyBluesPlayed = 0;
   }
@@ -20,12 +20,12 @@ public class Statistic implements Serializable
   static class Counters
   {
     private final AtomicInteger freeTavernCounter = new AtomicInteger(0);
-
+    
     public int freeTavernCounter()
     {
       return freeTavernCounter.getAndUpdate(i -> i > 0 ? i - 1 : i);
     }
-
+    
     public int freeTavernCounterInc()
     {
       return freeTavernCounter.incrementAndGet();
