@@ -10,25 +10,24 @@ import ru.vladislavkomkov.model.player.Player;
 
 public abstract class Mech extends Unit
 {
-  public List<Mech> magnetized = new ArrayList<>();
+  public List<Unit> magnetized = new ArrayList<>();
   
   public Mech()
   {
     type = List.of(Type.MECH);
   }
   
-  public List<Mech> cloneMagnetized()
+  public List<Unit> cloneMagnetized()
   {
     return magnetized.stream().toList();
   }
   
-  public void magnetize(Mech mech)
+  public void magnetize(Unit unit)
   {
-    this.maxHealth += mech.maxHealth;
-    this.actualHealth += mech.actualHealth;
-    this.attack += mech.attack;
+    unit.getBuffs().forEach(this::addBuff);
+    Unit u = unit.isGold() ? unit.newGold() : unit.newThis();
     
-    magnetized.add(mech);
+    magnetized.add(unit);
   }
   
   public void onStartTurn(Game game, Player player)
