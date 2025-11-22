@@ -5,13 +5,15 @@ import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
-import ru.vladislavkomkov.models.Game;
-import ru.vladislavkomkov.models.player.Player;
+import ru.vladislavkomkov.model.Game;
+import ru.vladislavkomkov.model.player.Player;
 
 public abstract class GamePlayerTestCase
 {
   protected Player player;
   protected Player player2;
+  
+  protected Map<String, Player> players;
   protected Game game;
   
   @BeforeEach
@@ -19,7 +21,7 @@ public abstract class GamePlayerTestCase
   {
     player = new Player();
     player2 = new Player();
-    Map<String, Player> players = Map.of(
+    players = Map.of(
         "1", player,
         "2", player2,
         "3", new Player(),

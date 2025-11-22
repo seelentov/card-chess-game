@@ -3,7 +3,7 @@ package ru.vladislavkomkov.util;
 import java.util.List;
 
 import ru.vladislavkomkov.consts.Units;
-import ru.vladislavkomkov.models.entity.unit.Unit;
+import ru.vladislavkomkov.model.entity.unit.Unit;
 
 public class UnitUtils
 {

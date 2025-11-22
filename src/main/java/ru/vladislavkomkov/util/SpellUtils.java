@@ -3,7 +3,7 @@ package ru.vladislavkomkov.util;
 import java.util.List;
 
 import ru.vladislavkomkov.consts.Spells;
-import ru.vladislavkomkov.models.entity.spell.Spell;
+import ru.vladislavkomkov.model.entity.spell.Spell;
 
 public class SpellUtils
 {

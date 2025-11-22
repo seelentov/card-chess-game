@@ -3,10 +3,10 @@ package ru.vladislavkomkov.consts;
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.vladislavkomkov.models.entity.unit.Unit;
-import ru.vladislavkomkov.models.entity.unit.impl.beast.first.Alleycat;
-import ru.vladislavkomkov.models.entity.unit.impl.mech.fourth.AccordoTron;
-import ru.vladislavkomkov.models.entity.unit.impl.trash.beast.first.Cat;
+import ru.vladislavkomkov.model.entity.unit.Unit;
+import ru.vladislavkomkov.model.entity.unit.impl.beast.first.Alleycat;
+import ru.vladislavkomkov.model.entity.unit.impl.mech.fourth.AccordoTron;
+import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
 
 public class Units
 {

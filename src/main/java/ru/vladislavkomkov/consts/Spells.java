@@ -3,8 +3,8 @@ package ru.vladislavkomkov.consts;
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.vladislavkomkov.models.entity.spell.Spell;
-import ru.vladislavkomkov.models.entity.spell.impl.first.TavernCoin;
+import ru.vladislavkomkov.model.entity.spell.Spell;
+import ru.vladislavkomkov.model.entity.spell.impl.first.TavernCoin;
 
 public class Spells
 {

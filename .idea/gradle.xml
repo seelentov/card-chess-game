@@ -9,6 +9,11 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/api" />
+            <option value="$PROJECT_DIR$/dk" />
+            <option value="$PROJECT_DIR$/server" />
+            <option value="$PROJECT_DIR$/storage" />
+            <option value="$PROJECT_DIR$/web-client" />
           </set>
         </option>
       </GradleProjectSettings>

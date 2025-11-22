@@ -1,15 +1,12 @@
 package ru.vladislavkomkov.util;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-import ru.vladislavkomkov.models.entity.unit.Buff;
-import ru.vladislavkomkov.models.entity.unit.Unit;
-import ru.vladislavkomkov.models.entity.unit.impl.trash.beast.first.Cat;
+import ru.vladislavkomkov.model.entity.unit.Buff;
+import ru.vladislavkomkov.model.entity.unit.Unit;
+import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
 
 public class UnitUtilsTest
 {
