@@ -2,15 +2,19 @@ package ru.vladislavkomkov.model.entity.unit.impl.mech.fourth;
 
 import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
 
-import ru.vladislavkomkov.model.entity.unit.Unit;
-import ru.vladislavkomkov.model.entity.unit.impl.mech.Mech;
+import java.util.List;
 
-public class AccordoTron extends Mech
+import ru.vladislavkomkov.model.entity.unit.Type;
+import ru.vladislavkomkov.model.entity.unit.Unit;
+
+public class AccordoTron extends Unit
 {
+  public static int GOLD = 1;
+  
   public AccordoTron()
   {
     super();
-    description = "At the start of your turn, gain 1 Gold";
+    description = "At the start of your turn, gain " + GOLD + " Gold";
     level = 4;
     isTavern = true;
     
@@ -19,9 +23,13 @@ public class AccordoTron extends Mech
     maxHealth = 5;
     actualHealth = 5;
     
+    type = List.of(Type.MECH);
+
+    isMagnet = true;
+
     listener.onStartTurnListeners.put(
         KEY_CORE,
-        (game, player) -> player.addMoney());
+        (game, player) -> player.addMoney(GOLD));
   }
   
   @Override
@@ -31,7 +39,7 @@ public class AccordoTron extends Mech
     gold.setDescription("At the start of your turn, gain 2 Gold");
     gold.getListener().onStartTurnListeners.put(
         KEY_CORE,
-        (game, player) -> player.addMoney(2));
+        (game, player) -> player.addMoney(GOLD * 2));
     
     return gold;
   }

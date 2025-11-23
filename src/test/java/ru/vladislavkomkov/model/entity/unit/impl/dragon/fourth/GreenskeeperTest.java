@@ -40,7 +40,7 @@ public class GreenskeeperTest extends UnitTestCase
         }
         
         @Override
-        public void onPlayed(Game game, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2)
+        public void onPlayed(Game game, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2, boolean auto)
         {
           player.addMoney(finalI * moneyStep);
         }

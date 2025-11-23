@@ -35,8 +35,8 @@ public abstract class Entity implements Serializable, Cloneable
     
     listener.onPlayedListeners.put(
         UUIDUtils.generateKey(),
-        (game, player, entity, index, isTavernIndex, index2, isTavernIndex2) -> processListeners(player.listener.onPlayedListeners,
-            (action) -> action.process(game, player, this, index, isTavernIndex, index2, isTavernIndex2), player));
+        (game, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto) -> processListeners(player.listener.onPlayedListeners,
+            (action) -> action.process(game, player, this, index, isTavernIndex, index2, isTavernIndex2, auto), player));
     
     listener.onHandledListeners.put(
         UUIDUtils.generateKey(),
@@ -87,7 +87,12 @@ public abstract class Entity implements Serializable, Cloneable
   
   public void onPlayed(Game game, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2)
   {
-    listener.processOnPlayedListeners(game, player, this, index, isTavernIndex, index2, isTavernIndex2);
+    onPlayed(game, player, index, isTavernIndex, index2, isTavernIndex2, false);
+  }
+  
+  public void onPlayed(Game game, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2, boolean auto)
+  {
+    listener.processOnPlayedListeners(game, player, this, index, isTavernIndex, index2, isTavernIndex2, auto);
   };
   
   protected <T> void processListeners(Map<String, T> listeners, Consumer<T> actionMove, Player player)

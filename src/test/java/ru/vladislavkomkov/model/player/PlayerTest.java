@@ -1,9 +1,6 @@
 package ru.vladislavkomkov.model.player;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 import java.util.Objects;
@@ -57,7 +54,7 @@ public class PlayerTest extends GamePlayerTestCase
       }
       
       @Override
-      public void onPlayed(Game game, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2)
+      public void onPlayed(Game game, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2, boolean auto)
       {
         player.addMoney(moneyTest);
       }

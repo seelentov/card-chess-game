@@ -76,7 +76,7 @@ public class Tavern
     
     cards.add(new Card(spell));
   }
-  
+
   public List<Card> getCards()
   {
     return cards;

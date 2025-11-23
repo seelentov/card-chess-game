@@ -7,19 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ru.vladislavkomkov.model.action.GlobalAction;
-import ru.vladislavkomkov.model.action.OnAttackAction;
-import ru.vladislavkomkov.model.action.OnAttackedAction;
-import ru.vladislavkomkov.model.action.OnDeadAction;
-import ru.vladislavkomkov.model.action.OnEndFightAction;
-import ru.vladislavkomkov.model.action.OnEndTurnAction;
-import ru.vladislavkomkov.model.action.OnHandledAction;
-import ru.vladislavkomkov.model.action.OnIncTavernLevel;
-import ru.vladislavkomkov.model.action.OnPlayedAction;
-import ru.vladislavkomkov.model.action.OnResetTavernAction;
-import ru.vladislavkomkov.model.action.OnSellAction;
-import ru.vladislavkomkov.model.action.OnStartFightAction;
-import ru.vladislavkomkov.model.action.OnStartTurnAction;
+import ru.vladislavkomkov.model.action.*;
 import ru.vladislavkomkov.model.entity.Entity;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.player.Player;
@@ -56,14 +44,44 @@ public class Listener implements Serializable
   public Listener()
   {
   }
-  
+
   public void removeCoreListener()
   {
     listeners.forEach(listener -> {
       listener.remove(KEY_CORE);
     });
   }
-  
+
+  public Listener newCoreListener(){
+    return newCoreListener(true);
+  }
+
+  public Listener newCoreListener(boolean isDeduplication)
+  {
+    Listener listener = new Listener();
+
+    for (int i = 0; i < listeners.size(); i++) {
+      Map l = listeners.get(i);
+      if(l.containsKey(KEY_CORE)){
+        listener.listeners.get(i).put(isDeduplication ? KEY_CORE : UUIDUtils.generateKeyCore(),l.get(KEY_CORE));
+      };
+    }
+
+    return listener;
+  }
+
+  public void push(Listener listener)
+  {
+    push(listener, false);
+  }
+
+  public void push(Listener listener, boolean isDeduplication)
+  {
+    for (int i = 0; i < listeners.size(); i++) {
+      listeners.get(i).putAll(listener.listeners.get(i));
+    }
+  }
+
   public void removeListener(Unit unit)
   {
     removeListener(UUIDUtils.generateKeyTemp(unit.getID()));
@@ -81,9 +99,10 @@ public class Listener implements Serializable
       int index,
       boolean isTavernIndex,
       int index2,
-      boolean isTavernIndex2)
+      boolean isTavernIndex2,
+      boolean auto)
   {
-    onPlayedListeners.forEach((s, action) -> action.process(game, player, entity, index, isTavernIndex, index2, isTavernIndex2));
+    onPlayedListeners.forEach((s, action) -> action.process(game, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto));
   }
   
   public void processOnHandledListeners(

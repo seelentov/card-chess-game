@@ -7,6 +7,9 @@ import org.junit.jupiter.api.BeforeEach;
 
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.player.Player;
+import ru.vladislavkomkov.util.UUIDUtils;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public abstract class GamePlayerTestCase
 {
@@ -48,5 +51,22 @@ public abstract class GamePlayerTestCase
     {
       //
     }
+  }
+
+  protected static final int STEP_MONEY = 10;
+
+  protected <T> void testListener(Map<String, T> listeners, Runnable processListener, T action, boolean once)
+  {
+    int initMoney = player.getMoney();
+
+    listeners.put(once ? UUIDUtils.generateKeyOnce() : UUIDUtils.generateKey(), action);
+
+    processListener.run();
+
+    assertEquals(initMoney + STEP_MONEY, player.getMoney());
+
+    processListener.run();
+
+    assertEquals(initMoney + (STEP_MONEY * (once ? 1 : 2)), player.getMoney());
   }
 }

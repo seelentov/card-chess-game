@@ -27,7 +27,7 @@ public class Alleycat extends Unit
     
     listener.onPlayedListeners.put(
         KEY_CORE,
-        (game, player, entity, index, isTavernIndex, index2, isTavernIndex2) -> {
+        (game, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto) -> {
           if (player.inFight())
           {
             int indexParent = player.getFightIndex(this);
@@ -49,7 +49,7 @@ public class Alleycat extends Unit
     gold.setDescription("Summon a 2/2 Cat");
     gold.getListener().onPlayedListeners.put(
         KEY_CORE,
-        (game, player, entity, index, isTavernIndex, index2, isTavernIndex2) -> {
+        (game, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto) -> {
           if (player.inFight())
           {
             int indexParent = player.getFightIndex(gold);

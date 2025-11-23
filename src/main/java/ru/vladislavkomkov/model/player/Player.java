@@ -14,6 +14,7 @@ import ru.vladislavkomkov.model.Listener;
 import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.spell.impl.spellcraft.SpellCraft;
 import ru.vladislavkomkov.model.entity.unit.Unit;
+import ru.vladislavkomkov.util.ListenerUtils;
 import ru.vladislavkomkov.util.SerializationUtils;
 import ru.vladislavkomkov.util.UUIDUtils;
 
@@ -112,13 +113,13 @@ public class Player implements Cloneable, Serializable
     tavern.freeze = false;
     
     tavern.reset(getLevel());
-    UUIDUtils.processGlobalActionListeners(listener.onResetTavernListeners, game, this);
+    ListenerUtils.processGlobalActionListeners(listener.onResetTavernListeners, game, this);
   }
   
   public void resetTavern(Game game)
   {
     tavern.reset(getLevel());
-    UUIDUtils.processGlobalActionListeners(listener.onResetTavernListeners, game, this);
+    ListenerUtils.processGlobalActionListeners(listener.onResetTavernListeners, game, this);
   }
   
   public boolean addToTable(Unit unit, List<Unit> table, int index, boolean withoutOne)
@@ -204,13 +205,24 @@ public class Player implements Cloneable, Serializable
   
   public void addToHand(Card card)
   {
-    addToHand(card, false);
+    addToHand(null, card);
   }
   
   public void addToHand(Card card, boolean force)
   {
+    addToHand(null, card, force);
+  }
+  
+  public void addToHand(Game game, Card card)
+  {
+    addToHand(game, card, false);
+  }
+  
+  public void addToHand(Game game, Card card, boolean force)
+  {
     if (force || hand.size() < HAND_LIMIT)
     {
+      card.get().onHandled(game, this);
       hand.add(card);
     }
     
@@ -303,7 +315,7 @@ public class Player implements Cloneable, Serializable
           }
           
           Card goldCard = Card.of(unitsForGold.get(0).buildGold(unitsForGold));
-          hand.add(goldCard);
+          addToHand(goldCard);
           break;
         }
       }
@@ -372,7 +384,7 @@ public class Player implements Cloneable, Serializable
     {
       level += 1;
       
-      UUIDUtils.processGlobalActionListeners(listener.onIncLevelListeners, game, this);
+      ListenerUtils.processGlobalActionListeners(listener.onIncLevelListeners, game, this);
     }
   }
   

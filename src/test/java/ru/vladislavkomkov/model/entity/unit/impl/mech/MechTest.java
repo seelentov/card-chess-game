@@ -1,261 +1,121 @@
 package ru.vladislavkomkov.model.entity.unit.impl.mech;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.junit.jupiter.api.Test;
-
 import ru.vladislavkomkov.GamePlayerTestCase;
-import ru.vladislavkomkov.model.Game;
+import ru.vladislavkomkov.consts.Listeners;
+import ru.vladislavkomkov.model.entity.unit.Buff;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.impl.mech.fourth.AccordoTron;
-import ru.vladislavkomkov.model.player.Player;
+import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MechTest extends GamePlayerTestCase
 {
   @Test
-  void testMagnetize()
+  void testMagnetStats()
   {
-    Mech mech = new AccordoTron();
-    Mech mech2 = new AccordoTron();
-    Mech mech3 = new AccordoTron();
-    mech.magnetize(mech2);
-    mech.magnetize(mech3);
-    assertEquals(new AccordoTron().getName(), mech.cloneMagnetized().get(0).getName());
-    assertEquals(new AccordoTron().getName(), mech.cloneMagnetized().get(1).getName());
+    Unit unit = new AccordoTron();
+    unit.magnetize(new AccordoTron());
+    
+    assertEquals(unit.newThis().getAttack() * 2, unit.getAttack());
+  }
+
+  @Test
+  void testMagnetBuffGold()
+  {
+    testMagnetBuff(new AccordoTron(), new AccordoTron().buildGold());
+  }
+
+  @Test
+  void testMagnetBuffDef()
+  {
+    testMagnetBuff(new AccordoTron(), new AccordoTron());
+  }
+  
+  void testMagnetBuff(Unit unit, Unit unit2)
+  {
+    String testBuffName = "Test buff";
+    
+    for (int i = 0; i < 5; i++)
+    {
+      unit.addBuff(new Buff(
+          unit1 -> {
+          },
+          unit1 -> {
+          },
+          testBuffName + i));
+    }
+    
+    for (int i = 5; i < 10; i++)
+    {
+      unit2.addBuff(new Buff(
+          unit1 -> {
+          },
+          unit1 -> {
+          },
+          testBuffName + i));
+    }
+    
+    unit.magnetize(unit2);
+    
+    assertEquals(11, unit.getBuffs().size());
+    
+    for (int i = 0; i < unit.getBuffs().size() - 1; i++)
+    {
+      assertEquals(testBuffName + i, unit.getBuffs().get(i).getDescription());
+    }
+    
+    assertEquals(unit2.getDescription(), unit.getBuffs().get(10).getDescription());
   }
   
   @Test
-  void testMagnetizedOnStartTurn()
+  void testMagnetOnAttack()
   {
-    int moneyStart = player.getMoney();
     int moneyStep = 10;
-    
-    Mech mech = new Mech()
-    {
-      public void onStartTurn(Game game, Player player)
-      {
-        super.onStartTurn(game, player);
-        player.addMoney(moneyStep);
-      }
-    };
-    
-    Mech mech2 = new Mech()
-    {
-      public void onStartTurn(Game game, Player player)
-      {
-        super.onStartTurn(game, player);
-        player.addMoney(moneyStep);
-      }
-    };
-    
-    player.addToTable(mech, 0);
-    mech.magnetize(mech2);
-    
+    int initMoney = player.getMoney();
+
+    Unit unit = new AccordoTron();
+    unit.getListener().onAttackListeners.put(
+            Listeners.KEY_CORE,
+            (game1, player1, player3, unit1, attacked) -> player1.addMoney(moneyStep)
+    );
+
+    Unit unit2 = new AccordoTron();
+    unit2.getListener().onAttackListeners.put(
+            Listeners.KEY_CORE,
+            (game1, player1, player3, unit1, attacked) -> player.addMoney(moneyStep)
+    );
+
+    unit.magnetize(unit2);
+
+    unit.onAttack(game,player,player2,new Cat());
+    assertEquals(moneyStep * 2 + initMoney, player.getMoney());
+  }
+
+  @Test
+  void testMagnetOnStartTurn()
+  {
+    int moneyStep = 10;
+    int initMoney = player.getMoney();
+
+    Unit unit = new AccordoTron();
+    unit.getListener().onStartTurnListeners.put(
+            Listeners.KEY_CORE,
+            (game1, player1) -> player1.addMoney(moneyStep)
+    );
+
+    player.addToTable(unit);
+
+    Unit unit2 = new AccordoTron();
+    unit2.getListener().onStartTurnListeners.put(
+            Listeners.KEY_CORE,
+            (game1, player1) -> player1.addMoney(moneyStep)
+    );
+
+    unit.magnetize(unit2);
+
     game.processStartTurn(player);
-    
-    assertEquals(moneyStart + (moneyStep * 2), player.getMoney());
-  }
-  
-  @Test
-  void testMagnetizedOnEndTurn()
-  {
-    int moneyStart = player.getMoney();
-    int moneyStep = 10;
-    
-    Mech mech = new Mech()
-    {
-      public void onEndTurn(Game game, Player player)
-      {
-        super.onEndTurn(game, player);
-        player.addMoney(moneyStep);
-      }
-    };
-    
-    Mech mech2 = new Mech()
-    {
-      public void onEndTurn(Game game, Player player)
-      {
-        super.onEndTurn(game, player);
-        player.addMoney(moneyStep);
-      }
-    };
-    
-    player.addToTable(mech, 0);
-    mech.magnetize(mech2);
-    
-    game.processEndTurn(player);
-    
-    assertEquals(moneyStart + (moneyStep * 2), player.getMoney());
-  }
-  
-  @Test
-  void testMagnetizedOnStartFight()
-  {
-    int moneyStart = player.getMoney();
-    int moneyStep = 10;
-    
-    Mech mech = new Mech()
-    {
-      public void onStartFight(Game game, Player player, Player player2)
-      {
-        super.onStartFight(game, player, player2);
-        player.addMoney(moneyStep);
-      }
-    };
-    
-    Mech mech2 = new Mech()
-    {
-      public void onStartFight(Game game, Player player, Player player2)
-      {
-        super.onStartFight(game, player, player2);
-        player.addMoney(moneyStep);
-      }
-    };
-    
-    player.addToTable(mech, 0);
-    mech.magnetize(mech2);
-    
-    game.processStartFight(player, player2);
-    
-    assertEquals(moneyStart + (moneyStep * 2), player.getMoney());
-  }
-  
-  @Test
-  void testMagnetizedOnEndFight()
-  {
-    int moneyStart = player.getMoney();
-    int moneyStep = 10;
-    
-    Mech mech = new Mech()
-    {
-      public void onEndFight(Game game, Player player, Player player2)
-      {
-        super.onEndFight(game, player, player2);
-        player.addMoney(moneyStep);
-      }
-    };
-    
-    Mech mech2 = new Mech()
-    {
-      public void onEndFight(Game game, Player player, Player player2)
-      {
-        super.onEndFight(game, player, player2);
-        player.addMoney(moneyStep);
-      }
-    };
-    
-    player.addToTable(mech, 0);
-    mech.magnetize(mech2);
-    
-    game.processEndFight(player, player2);
-    
-    assertEquals(moneyStart + (moneyStep * 2), player.getMoney());
-  }
-  
-  @Test
-  void testMagnetizedOnAttacked()
-  {
-    int moneyStart = player.getMoney();
-    int moneyStep = 10;
-    
-    Mech mech = new Mech()
-    {
-      public void onAttacked(Game game, Player player, Player player2, Unit attacker)
-      {
-        super.onAttacked(game, player, player2, attacker);
-        player.addMoney(moneyStep);
-      }
-    };
-    
-    Mech mech2 = new Mech()
-    {
-      public void onAttacked(Game game, Player player, Player player2, Unit attacker)
-      {
-        super.onAttacked(game, player, player2, attacker);
-        player.addMoney(moneyStep);
-      }
-    };
-    
-    Unit enemy = new Unit()
-    {
-    };
-    
-    player.addToTable(mech, 0);
-    mech.magnetize(mech2);
-    
-    mech.onAttacked(game, player, player2, enemy);
-    
-    assertEquals(moneyStart + (moneyStep * 2), player.getMoney());
-  }
-  
-  @Test
-  void testMagnetizedOnAttack()
-  {
-    int moneyStart = player.getMoney();
-    int moneyStep = 10;
-    
-    Mech mech = new Mech()
-    {
-      public void onAttack(Game game, Player player, Player player2, Unit attacked)
-      {
-        super.onAttack(game, player, player2, attacked);
-        player.addMoney(moneyStep);
-      }
-    };
-    
-    Mech mech2 = new Mech()
-    {
-      public void onAttack(Game game, Player player, Player player2, Unit attacked)
-      {
-        super.onAttack(game, player, player2, attacked);
-        player.addMoney(moneyStep);
-      }
-    };
-    
-    Unit enemy = new Unit()
-    {
-    };
-    
-    player.addToTable(mech, 0);
-    mech.magnetize(mech2);
-    
-    mech.onAttack(game, player, player2, enemy);
-    
-    assertEquals(moneyStart + (moneyStep * 2), player.getMoney());
-  }
-  
-  @Test
-  void testMagnetizedOnDead()
-  {
-    int moneyStart = player.getMoney();
-    int moneyStep = 10;
-    
-    Mech mech = new Mech()
-    {
-      public void onDead(Game game, Player player, Player player2, Unit attacker)
-      {
-        super.onDead(game, player, player2, attacker);
-        player.addMoney(moneyStep);
-      }
-    };
-    
-    Mech mech2 = new Mech()
-    {
-      public void onDead(Game game, Player player, Player player2, Unit attacker)
-      {
-        super.onDead(game, player, player2, attacker);
-        player.addMoney(moneyStep);
-      }
-    };
-    Unit enemy = new Unit()
-    {
-    };
-    
-    player.addToTable(mech, 0);
-    mech.magnetize(mech2);
-    
-    mech.onDead(game, player, player2, enemy);
-    
-    assertEquals(moneyStart + (moneyStep * 2), player.getMoney());
+    assertEquals(moneyStep * 2 + initMoney, player.getMoney());
   }
 }

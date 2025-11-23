@@ -1,8 +1,6 @@
 package ru.vladislavkomkov.util;
 
-import static ru.vladislavkomkov.consts.Listeners.KEY_CORE_PREFIX;
-import static ru.vladislavkomkov.consts.Listeners.KEY_ONCE_PREFIX;
-import static ru.vladislavkomkov.consts.Listeners.KEY_TEMP_PREFIX;
+import static ru.vladislavkomkov.consts.Listeners.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,19 +46,5 @@ public class UUIDUtils
   public static String generateKey(String prefix)
   {
     return prefix + UUID.randomUUID();
-  }
-  
-  public static void processGlobalActionListeners(Map<String, ? extends GlobalAction> listeners, Game game, Player player)
-  {
-    new HashMap<>(listeners).forEach((k, v) -> processStartEndAction(game, k, v, player));
-  }
-  
-  static void processStartEndAction(Game game, String key, GlobalAction action, Player player)
-  {
-    action.process(game, player);
-    if (key.startsWith(Listeners.KEY_ONCE_PREFIX))
-    {
-      player.listener.removeListener(key);
-    }
   }
 }

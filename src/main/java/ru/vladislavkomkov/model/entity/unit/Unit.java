@@ -19,6 +19,7 @@ public abstract class Unit extends Entity
   protected boolean isBubbled = false;
   protected boolean isTaunt = false;
   protected boolean isRebirth = false;
+  protected boolean isMagnet = false;
   protected boolean isDisguise = false;
   protected boolean answerOnPlayed = false;
   protected boolean answerOnDead = false;
@@ -89,6 +90,25 @@ public abstract class Unit extends Entity
     attack = i;
   }
   
+  public void magnetize(Unit unit)
+  {
+    if (!unit.isType(Type.MECH) || type.stream().noneMatch(unit::isType))
+    {
+      return;
+    }
+    
+    unit.getBuffs().forEach(this::addBuff);
+    Unit u = unit.isGold() ? unit.newGold() : unit.newThis();
+    this.incAttack(u.getAttack());
+    this.incHealth(u.getHealth());
+    this.addBuff(new Buff(
+        unit1 -> {
+          listener.push(unit1.listener.newCoreListener(false));
+        },
+        null,
+        unit.getDescription()));
+  }
+  
   public boolean isDead()
   {
     return actualHealth < 1;
@@ -102,13 +122,11 @@ public abstract class Unit extends Entity
   public void onStartTurn(Game game, Player player)
   {
     listener.processOnStartTurnListeners(game, player);
-    
   }
   
   public void onEndTurn(Game game, Player player)
   {
     listener.processOnEndTurnListeners(game, player);
-    
   }
   
   public void onStartFight(Game game, Player player, Player player2)
@@ -140,6 +158,18 @@ public abstract class Unit extends Entity
   public void onPlayed(Game game, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2)
   {
     super.onPlayed(game, player, index, isTavernIndex, index2, isTavernIndex2);
+  }
+  
+  @Override
+  public void onHandled(Game game, Player player)
+  {
+    super.onHandled(game, player);
+  }
+  
+  @Override
+  public void onPlayed(Game game, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2, boolean auto)
+  {
+    super.onPlayed(game, player, index, isTavernIndex, index2, isTavernIndex2, auto);
     if (this.isGold())
     {
       player.addToHand(Card.of(new TripleReward(player.getLevel() + 1)));
@@ -286,7 +316,6 @@ public abstract class Unit extends Entity
     entity.setHealth(entity.getHealth() * 2);
     
     List<Unit> units = List.of(unit, unit2, unit3);
-    units.forEach(Unit::removeCoreListeners);
     units.stream()
         .map(Unit::getBuffs)
         .flatMap(List::stream)

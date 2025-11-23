@@ -29,12 +29,12 @@ public class HungrySnapjaw extends Unit
     
     listener.onPlayedListeners.put(
         KEY_CORE,
-        (game, player, entity, index, isTavernIndex, index2, isTavernIndex2) -> {
+        (game, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto) -> {
           player.listener.onDeadListeners.put(
               UUIDUtils.generateKeyTemp(),
               (game1, player1, player2, unit, attacker) -> this.addBuff(new Buff(
                   unit1 -> unit1.incHealth(ATTACK_BOOST),
-                  unit1 -> unit1.decHealth(ATTACK_BOOST),
+                  null,
                   "After a friendly Beast dies, gain +1 Health permanently.")));
         });
   }
@@ -47,12 +47,12 @@ public class HungrySnapjaw extends Unit
     gold.setDescription("After a friendly Beast dies, gain +2 Health permanently.");
     gold.getListener().onPlayedListeners.put(
         KEY_CORE,
-        (game, player, entity, index, isTavernIndex, index2, isTavernIndex2) -> {
+        (game, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto) -> {
           player.listener.onDeadListeners.put(
               UUIDUtils.generateKeyTemp(),
               (game1, player1, player2, unit, attacker) -> this.addBuff(new Buff(
                   unit4 -> unit.incHealth(ATTACK_BOOST * 2),
-                  unit4 -> unit.decHealth(ATTACK_BOOST * 2),
+                  null,
                   "After a friendly Beast dies, gain +2 Health permanently.")));
         });
     

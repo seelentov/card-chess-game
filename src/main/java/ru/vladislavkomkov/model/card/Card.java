@@ -28,7 +28,7 @@ public class Card<T extends Entity> implements Serializable
     {
       player.addToTable(unit, index);
     }
-    entity.onPlayed(game, player, index, isTavernIndex, index2, isTavernIndex2);
+    entity.onPlayed(game, player, index, isTavernIndex, index2, isTavernIndex2, false);
   }
   
   public Entity get()

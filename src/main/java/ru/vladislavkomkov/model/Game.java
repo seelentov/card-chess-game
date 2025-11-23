@@ -1,17 +1,14 @@
 package ru.vladislavkomkov.model;
 
 import java.io.Serializable;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import ru.vladislavkomkov.model.player.Player;
+import ru.vladislavkomkov.util.ListenerUtils;
 import ru.vladislavkomkov.util.RandUtils;
 import ru.vladislavkomkov.util.UUIDUtils;
 
@@ -81,7 +78,7 @@ public class Game implements AutoCloseable, Serializable
   
   public void processStartTurn(Player player)
   {
-    UUIDUtils.processGlobalActionListeners(player.listener.onStartTurnListeners, this, player);
+    ListenerUtils.processGlobalActionListeners(player.listener.onStartTurnListeners, this, player);
     
     player.doForAll(unit -> unit.onStartTurn(this, player));
     player.removeTempBuffs();
@@ -90,7 +87,7 @@ public class Game implements AutoCloseable, Serializable
   
   public void processEndTurn(Player player)
   {
-    UUIDUtils.processGlobalActionListeners(player.listener.onEndTurnListeners, this, player);
+    ListenerUtils.processGlobalActionListeners(player.listener.onEndTurnListeners, this, player);
     player.clearSpellCraft();
     
     player.doForAll(unit -> unit.onEndTurn(this, player));
@@ -98,14 +95,14 @@ public class Game implements AutoCloseable, Serializable
   
   public void processStartFight(Player player, Player player2)
   {
-    UUIDUtils.processGlobalActionListeners(player.listener.onStartFightListeners, this, player);
+    ListenerUtils.processGlobalActionListeners(player.listener.onStartFightListeners, this, player);
     
     player.doForAll(unit -> unit.onStartFight(this, player, player2));
   }
   
   public void processEndFight(Player player, Player player2)
   {
-    UUIDUtils.processGlobalActionListeners(player.listener.onEndFightListeners, this, player);
+    ListenerUtils.processGlobalActionListeners(player.listener.onEndFightListeners, this, player);
     
     player.doForAll(unit -> unit.onEndFight(this, player, player2));
   }
