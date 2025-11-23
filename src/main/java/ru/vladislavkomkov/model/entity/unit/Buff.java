@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 public class Buff implements Serializable
 {
   private final String description;
-
+  
   private transient Consumer<Unit> upgrade = unit -> {
   };
   private transient Consumer<Unit> rollback = unit -> {

@@ -16,7 +16,6 @@ import ru.vladislavkomkov.model.entity.spell.impl.spellcraft.SpellCraft;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.util.ListenerUtils;
 import ru.vladislavkomkov.util.SerializationUtils;
-import ru.vladislavkomkov.util.UUIDUtils;
 
 public class Player implements Cloneable, Serializable
 {
@@ -56,7 +55,7 @@ public class Player implements Cloneable, Serializable
     
     Unit unit = table.get(index);
     table.remove(index);
-    addToTable(unit, index2);
+    addToTable(null, unit, index2);
   }
   
   public void freezeTavern()
@@ -112,17 +111,16 @@ public class Player implements Cloneable, Serializable
     
     tavern.freeze = false;
     
-    tavern.reset(getLevel());
-    ListenerUtils.processGlobalActionListeners(listener.onResetTavernListeners, game, this);
+    resetTavern(game);
   }
   
   public void resetTavern(Game game)
   {
     tavern.reset(getLevel());
-    ListenerUtils.processGlobalActionListeners(listener.onResetTavernListeners, game, this);
+    listener.processOnResetTavernListeners(game,this);
   }
   
-  public boolean addToTable(Unit unit, List<Unit> table, int index, boolean withoutOne)
+  public boolean addToTable(Game game, Unit unit, List<Unit> table, int index, boolean withoutOne)
   {
     int size = table.size();
     
@@ -145,56 +143,78 @@ public class Player implements Cloneable, Serializable
       table.add(index, unit);
     }
     
+    unit.onAppear(game, this);
+    
     return true;
   }
   
-  public boolean addToFightTable(Unit unit, int index, boolean withoutOne)
+  public boolean addToFightTable(Game game, Unit unit, int index, boolean withoutOne)
   {
-    return addToTable(unit, inFightTable, index, withoutOne);
+    return addToTable(game, unit, inFightTable, index, withoutOne);
   }
   
-  public boolean addToTable(Unit unit, int index)
+  public boolean addToTable(Game game, Unit unit, int index)
   {
-    return addToTable(unit, table, index, false);
+    return addToTable(game, unit, table, index, false);
   }
   
-  public void addToFightTable(List<Unit> units, int index, boolean withoutOne)
+  public void addToFightTable(Game game, List<Unit> units, int index, boolean withoutOne)
   {
-    units.forEach(unit -> addToFightTable(unit, index, withoutOne));
+    units.forEach(unit -> addToFightTable(game, unit, index, withoutOne));
   }
   
-  public void addToTable(List<Unit> units, int index)
+  public void addToTable(Game game, List<Unit> units, int index)
   {
-    units.forEach(unit -> addToTable(unit, index));
+    units.forEach(unit -> addToTable(game, unit, index));
   }
   
-  public boolean addToFightTable(Unit unit, int index)
+  public boolean addToFightTable(Game game, Unit unit, int index)
   {
-    return addToTable(unit, inFightTable, index, false);
+    return addToTable(game, unit, inFightTable, index, false);
   }
   
-  public void addToFightTable(List<Unit> units, int index)
+  public void addToFightTable(Game game, List<Unit> units, int index)
   {
-    units.forEach(unit -> addToFightTable(unit, index, false));
+    units.forEach(unit -> addToFightTable(game, unit, index, false));
   }
   
   public boolean addToTable(Unit unit)
   {
-    return addToTable(unit, -1);
+    return addToTable(null, unit, -1);
+  }
+  
+  public boolean addToTable(Unit unit,int index)
+  {
+    return addToTable(null, unit, index);
+  }
+  
+  public boolean addToTable(Game game, Unit unit)
+  {
+    return addToTable(game, unit, -1);
   }
   
   public boolean addToFightTable(Unit unit)
   {
-    return addToFightTable(unit, -1, false);
+    return addToFightTable(null, unit, -1, false);
   }
   
-  public void removeFromTable(Unit unit)
+  public boolean addToFightTable(Game game, Unit unit)
   {
+    return addToFightTable(game, unit, -1, false);
+  }
+  
+  public void removeFromTable(Game game, Unit unit)
+  {
+    if (game != null)
+    {
+      unit.onDisappear(game, this);
+    }
     table.removeIf(unit1 -> unit == unit1);
   }
   
-  public void removeFromTable(int index)
+  public void removeFromTable(Game game, int index)
   {
+    table.get(index).onAppear(game, this);
     table.remove(index);
   }
   
@@ -383,8 +403,7 @@ public class Player implements Cloneable, Serializable
     if (level < MAX_LEVEL)
     {
       level += 1;
-      
-      ListenerUtils.processGlobalActionListeners(listener.onIncLevelListeners, game, this);
+      listener.processOnIncTavernLevelListener(game,this);
     }
   }
   

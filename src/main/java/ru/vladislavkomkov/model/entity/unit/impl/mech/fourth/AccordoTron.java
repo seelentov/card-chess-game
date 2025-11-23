@@ -24,9 +24,9 @@ public class AccordoTron extends Unit
     actualHealth = 5;
     
     type = List.of(Type.MECH);
-
+    
     isMagnet = true;
-
+    
     listener.onStartTurnListeners.put(
         KEY_CORE,
         (game, player) -> player.addMoney(GOLD));

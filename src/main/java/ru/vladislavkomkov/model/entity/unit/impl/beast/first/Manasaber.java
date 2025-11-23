@@ -33,7 +33,7 @@ public class Manasaber extends Unit
             int index = player.getFightIndex(this);
             for (int i = 0; i < 2; i++)
             {
-              player.addToFightTable(new Cubling(), index + 1, true);
+              player.addToFightTable(game,new Cubling(), index + 1, true);
             }
           }
           else
@@ -41,7 +41,7 @@ public class Manasaber extends Unit
             int index = player.getIndex(this);
             for (int i = 0; i < 2; i++)
             {
-              player.addToTable(new Cubling(), index + 1);
+              player.addToTable(game,new Cubling(), index + 1);
             }
           }
         });
@@ -61,7 +61,7 @@ public class Manasaber extends Unit
             int index = player.getFightIndex(gold);
             for (int i = 0; i < 2; i++)
             {
-              player.addToFightTable(new Cubling().newGold(), index + 1, true);
+              player.addToFightTable(game,new Cubling().newGold(), index + 1, true);
             }
           }
           else
@@ -69,7 +69,7 @@ public class Manasaber extends Unit
             int index = player.getIndex(gold);
             for (int i = 0; i < 2; i++)
             {
-              player.addToTable(new Cubling().newGold(), index + 1);
+              player.addToTable(game,new Cubling().newGold(), index + 1);
             }
           }
         });

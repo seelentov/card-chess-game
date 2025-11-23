@@ -1,15 +1,10 @@
 package ru.vladislavkomkov.util;
 
-import static ru.vladislavkomkov.consts.Listeners.*;
+import static ru.vladislavkomkov.consts.Listeners.KEY_CORE_PREFIX;
+import static ru.vladislavkomkov.consts.Listeners.KEY_ONCE_PREFIX;
+import static ru.vladislavkomkov.consts.Listeners.KEY_TEMP_PREFIX;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
-
-import ru.vladislavkomkov.consts.Listeners;
-import ru.vladislavkomkov.model.Game;
-import ru.vladislavkomkov.model.action.GlobalAction;
-import ru.vladislavkomkov.model.player.Player;
 
 public class UUIDUtils
 {
