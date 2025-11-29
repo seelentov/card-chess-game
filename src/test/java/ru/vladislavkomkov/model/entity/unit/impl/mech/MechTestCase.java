@@ -1,7 +1,5 @@
 package ru.vladislavkomkov.model.entity.unit.impl.mech;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.UnitTestCase;
 
@@ -23,7 +21,7 @@ public class MechTestCase extends UnitTestCase
     
     mech.magnetize(mech2);
     mech.magnetize(mech3);
-
+    
     tearDown();
   }
 }

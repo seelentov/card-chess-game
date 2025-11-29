@@ -44,44 +44,49 @@ public class Listener implements Serializable
   public Listener()
   {
   }
-
+  
   public void removeCoreListener()
   {
     listeners.forEach(listener -> {
       listener.remove(KEY_CORE);
     });
   }
-
-  public Listener newCoreListener(){
+  
+  public Listener newCoreListener()
+  {
     return newCoreListener(true);
   }
-
+  
   public Listener newCoreListener(boolean isDeduplication)
   {
     Listener listener = new Listener();
-
-    for (int i = 0; i < listeners.size(); i++) {
+    
+    for (int i = 0; i < listeners.size(); i++)
+    {
       Map l = listeners.get(i);
-      if(l.containsKey(KEY_CORE)){
-        listener.listeners.get(i).put(isDeduplication ? KEY_CORE : UUIDUtils.generateKeyCore(),l.get(KEY_CORE));
-      };
+      if (l.containsKey(KEY_CORE))
+      {
+        listener.listeners.get(i).put(isDeduplication ? KEY_CORE : UUIDUtils.generateKeyCore(), l.get(KEY_CORE));
+      }
+      ;
     }
-
+    
     return listener;
   }
-
+  
   public void push(Listener listener)
   {
     push(listener, false);
   }
-
+  
   public void push(Listener listener, boolean isDeduplication)
   {
-    for (int i = 0; i < listeners.size(); i++) {
+    for (int i = 0; i < listeners.size(); i++)
+    {
       listeners.get(i).putAll(listener.listeners.get(i));
     }
   }
-
+  
   public void removeListener(Unit unit)
   {
     removeListener(UUIDUtils.generateKeyTemp(unit.getID()));

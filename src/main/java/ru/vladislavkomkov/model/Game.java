@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+import ru.vladislavkomkov.controller.sender.Sender;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.ListenerUtils;
 import ru.vladislavkomkov.util.RandUtils;
@@ -14,17 +15,36 @@ import ru.vladislavkomkov.util.UUIDUtils;
 
 public class Game implements AutoCloseable, Serializable
 {
+  public enum State
+  {
+    FIGHT,
+    PREPARE,
+    LOBBY
+  }
+  
   final int PLAYERS_COUNT = 8;
   final int FIGHTS_COUNT = 4;
   final Fight[] fights = new Fight[FIGHTS_COUNT];
-  boolean inFight = false;
+  
+  public State state = State.LOBBY;
+  
   ExecutorService executor = Executors.newFixedThreadPool(FIGHTS_COUNT);
   Map<String, Player> players;
   int turn = 1;
   
+  public Game()
+  {
+    this(new HashMap<>());
+  }
+  
   public Game(Map<String, Player> players)
   {
     this.players = players;
+  }
+  
+  public void setPlayerSender(String playerUUID, Sender sender)
+  {
+    players.get(playerUUID).setSender(sender);
   }
   
   public void buyTavernCard(String uuid, int index)
@@ -64,7 +84,7 @@ public class Game implements AutoCloseable, Serializable
   
   public void doPreFight()
   {
-    inFight = false;
+    state = State.PREPARE;
     calcFights();
     
     for (Player player : players.values())
@@ -109,7 +129,7 @@ public class Game implements AutoCloseable, Serializable
   
   public void doFight()
   {
-    inFight = true;
+    state = State.FIGHT;
     
     List<CompletableFuture<?>> fightFutures = new ArrayList<>();
     
@@ -177,7 +197,17 @@ public class Game implements AutoCloseable, Serializable
       }
     }
   }
-  
+
+  public String addPlayer(){
+    String key = UUIDUtils.generateKey();
+    players.put(key, new Player());
+    return key;
+  }
+
+  public void removePlayer(String key){
+    players.remove(key);
+  }
+
   @Override
   public void close() throws Exception
   {

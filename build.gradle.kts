@@ -10,6 +10,8 @@ repositories {
 }
 
 dependencies {
+    implementation("org.java-websocket:Java-WebSocket:1.5.4")
+
     implementation("org.reflections:reflections:0.10.2")
 
     testImplementation(platform("org.junit:junit-bom:5.10.0"))

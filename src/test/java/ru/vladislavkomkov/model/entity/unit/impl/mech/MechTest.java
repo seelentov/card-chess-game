@@ -1,14 +1,15 @@
 package ru.vladislavkomkov.model.entity.unit.impl.mech;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
+
 import ru.vladislavkomkov.GamePlayerTestCase;
 import ru.vladislavkomkov.consts.Listeners;
 import ru.vladislavkomkov.model.entity.unit.Buff;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.impl.mech.fourth.AccordoTron;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MechTest extends GamePlayerTestCase
 {
@@ -20,13 +21,13 @@ public class MechTest extends GamePlayerTestCase
     
     assertEquals(unit.newThis().getAttack() * 2, unit.getAttack());
   }
-
+  
   @Test
   void testMagnetBuffGold()
   {
     testMagnetBuff(new AccordoTron(), new AccordoTron().buildGold());
   }
-
+  
   @Test
   void testMagnetBuffDef()
   {
@@ -74,47 +75,43 @@ public class MechTest extends GamePlayerTestCase
   {
     int moneyStep = 10;
     int initMoney = player.getMoney();
-
+    
     Unit unit = new AccordoTron();
     unit.getListener().onAttackListeners.put(
-            Listeners.KEY_CORE,
-            (game1, player1, player3, unit1, attacked) -> player1.addMoney(moneyStep)
-    );
-
+        Listeners.KEY_CORE,
+        (game1, player1, player3, unit1, attacked) -> player1.addMoney(moneyStep));
+    
     Unit unit2 = new AccordoTron();
     unit2.getListener().onAttackListeners.put(
-            Listeners.KEY_CORE,
-            (game1, player1, player3, unit1, attacked) -> player.addMoney(moneyStep)
-    );
-
+        Listeners.KEY_CORE,
+        (game1, player1, player3, unit1, attacked) -> player.addMoney(moneyStep));
+    
     unit.magnetize(unit2);
-
-    unit.onAttack(game,player,player2,new Cat());
+    
+    unit.onAttack(game, player, player2, new Cat());
     assertEquals(moneyStep * 2 + initMoney, player.getMoney());
   }
-
+  
   @Test
   void testMagnetOnStartTurn()
   {
     int moneyStep = 10;
     int initMoney = player.getMoney();
-
+    
     Unit unit = new AccordoTron();
     unit.getListener().onStartTurnListeners.put(
-            Listeners.KEY_CORE,
-            (game1, player1) -> player1.addMoney(moneyStep)
-    );
-
+        Listeners.KEY_CORE,
+        (game1, player1) -> player1.addMoney(moneyStep));
+    
     player.addToTable(unit);
-
+    
     Unit unit2 = new AccordoTron();
     unit2.getListener().onStartTurnListeners.put(
-            Listeners.KEY_CORE,
-            (game1, player1) -> player1.addMoney(moneyStep)
-    );
-
+        Listeners.KEY_CORE,
+        (game1, player1) -> player1.addMoney(moneyStep));
+    
     unit.magnetize(unit2);
-
+    
     game.processStartTurn(player);
     assertEquals(moneyStep * 2 + initMoney, player.getMoney());
   }

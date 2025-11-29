@@ -3,8 +3,6 @@ package ru.vladislavkomkov.model.player;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Map;
-
 import org.junit.jupiter.api.Test;
 
 import ru.vladislavkomkov.GamePlayerTestCase;
@@ -18,67 +16,86 @@ import ru.vladislavkomkov.util.UUIDUtils;
 public class ListenerTest extends GamePlayerTestCase
 {
   @Test
-  void testPush(){
+  void testPush()
+  {
     Listener listener = new Listener();
-    listener.onAttackedListeners.put(Listeners.KEY_CORE, (game1, player1, player3, unit, attacker) -> {});
-    listener.onAttackedListeners.put(UUIDUtils.generateKey(), (game1, player1, player3, unit, attacker) -> {});
-    listener.onAttackListeners.put(Listeners.KEY_CORE, (game1, player1, player3, unit, attacker) -> {});
-    listener.onAttackListeners.put(UUIDUtils.generateKey(), (game1, player1, player3, unit, attacker) -> {});
-    listener.onAttackListeners.put(UUIDUtils.generateKey(), (game1, player1, player3, unit, attacker) -> {});
-
+    listener.onAttackedListeners.put(Listeners.KEY_CORE, (game1, player1, player3, unit, attacker) -> {
+    });
+    listener.onAttackedListeners.put(UUIDUtils.generateKey(), (game1, player1, player3, unit, attacker) -> {
+    });
+    listener.onAttackListeners.put(Listeners.KEY_CORE, (game1, player1, player3, unit, attacker) -> {
+    });
+    listener.onAttackListeners.put(UUIDUtils.generateKey(), (game1, player1, player3, unit, attacker) -> {
+    });
+    listener.onAttackListeners.put(UUIDUtils.generateKey(), (game1, player1, player3, unit, attacker) -> {
+    });
+    
     assertEquals(2, listener.onAttackedListeners.size());
     assertEquals(3, listener.onAttackListeners.size());
-
+    
     Listener listener2 = new Listener();
-
-    listener.onAttackedListeners.put(Listeners.KEY_CORE, (game1, player1, player3, unit, attacker) -> {});
-    listener.onAttackedListeners.put(UUIDUtils.generateKey(), (game1, player1, player3, unit, attacker) -> {});
-    listener.onAttackListeners.put(Listeners.KEY_CORE, (game1, player1, player3, unit, attacker) -> {});
-    listener.onAttackListeners.put(UUIDUtils.generateKey(), (game1, player1, player3, unit, attacker) -> {});
-    listener.onAttackListeners.put(UUIDUtils.generateKey(), (game1, player1, player3, unit, attacker) -> {});
-
+    
+    listener.onAttackedListeners.put(Listeners.KEY_CORE, (game1, player1, player3, unit, attacker) -> {
+    });
+    listener.onAttackedListeners.put(UUIDUtils.generateKey(), (game1, player1, player3, unit, attacker) -> {
+    });
+    listener.onAttackListeners.put(Listeners.KEY_CORE, (game1, player1, player3, unit, attacker) -> {
+    });
+    listener.onAttackListeners.put(UUIDUtils.generateKey(), (game1, player1, player3, unit, attacker) -> {
+    });
+    listener.onAttackListeners.put(UUIDUtils.generateKey(), (game1, player1, player3, unit, attacker) -> {
+    });
+    
     listener2.push(listener);
-
+    
     assertEquals(3, listener.onAttackedListeners.size());
     assertEquals(5, listener.onAttackListeners.size());
   }
-
+  
   @Test
-  void testPushDuplicates(){
+  void testPushDuplicates()
+  {
     Listener listener = new Listener();
-
-    listener.onAttackedListeners.put(Listeners.KEY_CORE, (game1, player1, player3, unit, attacker) -> {});
-    listener.onAttackListeners.put(Listeners.KEY_CORE, (game1, player1, player3, unit, attacker) -> {});
-
+    
+    listener.onAttackedListeners.put(Listeners.KEY_CORE, (game1, player1, player3, unit, attacker) -> {
+    });
+    listener.onAttackListeners.put(Listeners.KEY_CORE, (game1, player1, player3, unit, attacker) -> {
+    });
+    
     assertEquals(1, listener.onAttackedListeners.size());
     assertEquals(1, listener.onAttackListeners.size());
-
+    
     Listener listener2 = listener.newCoreListener(false);
-
+    
     listener.push(listener2);
-
+    
     assertEquals(2, listener.onAttackedListeners.size());
     assertEquals(2, listener.onAttackListeners.size());
   }
-
+  
   @Test
   void testGetCore()
   {
     Listener listener = new Listener();
-    listener.onAttackedListeners.put(Listeners.KEY_CORE, (game1, player1, player3, unit, attacker) -> {});
-    listener.onAttackedListeners.put(UUIDUtils.generateKey(), (game1, player1, player3, unit, attacker) -> {});
-    listener.onAttackListeners.put(Listeners.KEY_CORE, (game1, player1, player3, unit, attacker) -> {});
-    listener.onAttackListeners.put(UUIDUtils.generateKey(), (game1, player1, player3, unit, attacker) -> {});
-    listener.onAttackListeners.put(UUIDUtils.generateKey(), (game1, player1, player3, unit, attacker) -> {});
-
+    listener.onAttackedListeners.put(Listeners.KEY_CORE, (game1, player1, player3, unit, attacker) -> {
+    });
+    listener.onAttackedListeners.put(UUIDUtils.generateKey(), (game1, player1, player3, unit, attacker) -> {
+    });
+    listener.onAttackListeners.put(Listeners.KEY_CORE, (game1, player1, player3, unit, attacker) -> {
+    });
+    listener.onAttackListeners.put(UUIDUtils.generateKey(), (game1, player1, player3, unit, attacker) -> {
+    });
+    listener.onAttackListeners.put(UUIDUtils.generateKey(), (game1, player1, player3, unit, attacker) -> {
+    });
+    
     assertEquals(2, listener.onAttackedListeners.size());
     assertEquals(3, listener.onAttackListeners.size());
-
+    
     Listener coreListener = listener.newCoreListener();
-
+    
     assertEquals(1, coreListener.onAttackedListeners.size());
     assertEquals(1, coreListener.onAttackListeners.size());
-
+    
     assertTrue(coreListener.onAttackedListeners.containsKey(Listeners.KEY_CORE));
     assertTrue(coreListener.onAttackListeners.containsKey(Listeners.KEY_CORE));
   }

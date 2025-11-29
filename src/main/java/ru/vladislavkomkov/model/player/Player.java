@@ -1,22 +1,20 @@
 package ru.vladislavkomkov.model.player;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import javafx.util.Pair;
+import ru.vladislavkomkov.controller.sender.Sender;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.Listener;
 import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.spell.impl.spellcraft.SpellCraft;
 import ru.vladislavkomkov.model.entity.unit.Unit;
+import ru.vladislavkomkov.model.event.Event;
 import ru.vladislavkomkov.util.ListenerUtils;
 import ru.vladislavkomkov.util.SerializationUtils;
-import ru.vladislavkomkov.util.UUIDUtils;
 
 public class Player implements Cloneable, Serializable
 {
@@ -41,12 +39,18 @@ public class Player implements Cloneable, Serializable
   int level = 1;
   int buyPrice = 3;
   int resetTavernPrice = 1;
+
+  Sender sender;
   
   public Player()
   {
     super();
   }
-  
+
+  public void setSender(Sender sender){
+    this.sender = sender;
+  }
+
   public void moveTable(int index, int index2)
   {
     if (table.size() <= index)

@@ -62,8 +62,10 @@ public class Tavern
         }
         else if (lvl == 1)
         {
-          lvl = 6;
+          lvl = level;
         }
+        
+        units = UnitUtils.getUnitsByTavern(lvl);
       }
       
       Unit unit = units.get(RandUtils.getRand(units.size() - 1));
@@ -72,11 +74,25 @@ public class Tavern
     
     int lvl = RandUtils.getRandLvl(level);
     List<Spell> spells = SpellUtils.getByTavern(lvl);
+    while (spells.isEmpty())
+    {
+      if (lvl > 1)
+      {
+        lvl--;
+      }
+      else if (lvl == 1)
+      {
+        lvl = level;
+      }
+      
+      spells = SpellUtils.getByTavern(lvl);
+    }
+    
     Spell spell = spells.get(RandUtils.getRand(spells.size() - 1));
     
     cards.add(new Card(spell));
   }
-
+  
   public List<Card> getCards()
   {
     return cards;
