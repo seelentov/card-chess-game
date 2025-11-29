@@ -7,7 +7,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ru.vladislavkomkov.model.action.*;
+import ru.vladislavkomkov.model.action.GlobalAction;
+import ru.vladislavkomkov.model.action.OnAppearAction;
+import ru.vladislavkomkov.model.action.OnAppearEnemyAction;
+import ru.vladislavkomkov.model.action.OnAttackAction;
+import ru.vladislavkomkov.model.action.OnAttackedAction;
+import ru.vladislavkomkov.model.action.OnDeadAction;
+import ru.vladislavkomkov.model.action.OnDisappearAction;
+import ru.vladislavkomkov.model.action.OnDisappearEnemyAction;
+import ru.vladislavkomkov.model.action.OnEndFightAction;
+import ru.vladislavkomkov.model.action.OnEndTurnAction;
+import ru.vladislavkomkov.model.action.OnHandledAction;
+import ru.vladislavkomkov.model.action.OnIncTavernLevel;
+import ru.vladislavkomkov.model.action.OnPlayedAction;
+import ru.vladislavkomkov.model.action.OnResetTavernAction;
+import ru.vladislavkomkov.model.action.OnSellAction;
+import ru.vladislavkomkov.model.action.OnStartFightAction;
+import ru.vladislavkomkov.model.action.OnStartTurnAction;
+import ru.vladislavkomkov.model.action.PrepareAction;
 import ru.vladislavkomkov.model.entity.Entity;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.player.Player;
@@ -17,16 +34,26 @@ public class Listener implements Serializable
 {
   public Map<String, OnPlayedAction> onPlayedListeners = new HashMap<>();
   public Map<String, OnHandledAction> onHandledListeners = new HashMap<>();
+  
   public Map<String, OnAttackAction> onAttackListeners = new HashMap<>();
+  
   public Map<String, OnAttackedAction> onAttackedListeners = new HashMap<>();
   public Map<String, OnDeadAction> onDeadListeners = new HashMap<>();
+  
   public Map<String, OnSellAction> onSellListeners = new HashMap<>();
+  
   public Map<String, OnStartTurnAction> onStartTurnListeners = new HashMap<>();
   public Map<String, OnEndTurnAction> onEndTurnListeners = new HashMap<>();
+  
   public Map<String, OnStartFightAction> onStartFightListeners = new HashMap<>();
   public Map<String, OnEndFightAction> onEndFightListeners = new HashMap<>();
+  
   public Map<String, OnResetTavernAction> onResetTavernListeners = new HashMap<>();
   public Map<String, OnIncTavernLevel> onIncLevelListeners = new HashMap<>();
+  
+  public Map<String, OnAppearAction> onAppearListeners = new HashMap<>();
+  public Map<String, OnDisappearAction> onDisappearListeners = new HashMap<>();
+  
   public List<Map> listeners = List.of(
       onPlayedListeners,
       onHandledListeners,
@@ -39,7 +66,9 @@ public class Listener implements Serializable
       onStartFightListeners,
       onEndFightListeners,
       onResetTavernListeners,
-      onIncLevelListeners);
+      onIncLevelListeners,
+      onAppearListeners,
+      onDisappearListeners);
   
   public Listener()
   {
@@ -156,6 +185,22 @@ public class Listener implements Serializable
     onSellListeners.forEach((s, action) -> action.process(game, player1, entity));
   }
   
+  public void processOnAppearListeners(
+          Game game,
+          Player player,
+          Entity entity)
+  {
+    processPrepareListeners(onAppearListeners, game,player,entity);
+  }
+  
+  public void processOnDisappearListeners(
+          Game game,
+          Player player,
+          Entity entity)
+  {
+    processPrepareListeners(onDisappearListeners, game,player,entity);
+  }
+  
   public void processOnStartTurnListeners(
       Game game,
       Player player)
@@ -201,5 +246,10 @@ public class Listener implements Serializable
   private <T extends GlobalAction> void processGlobalListeners(Map<String, T> listeners, Game game, Player player)
   {
     listeners.forEach((s, t) -> t.process(game, player));
+  }
+  
+  private <T extends PrepareAction> void processPrepareListeners(Map<String, T> listeners, Game game, Player player, Entity entity)
+  {
+    listeners.forEach((s, t) -> t.process(game, player, entity));
   }
 }

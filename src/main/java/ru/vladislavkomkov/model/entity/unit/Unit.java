@@ -35,10 +35,22 @@ public abstract class Unit extends Entity
           player.listener.removeListener(this);
           
           player.addMoney(1);
-          player.removeFromTable(this);
+          player.removeFromTable(null, this);
           
           processListeners(player.listener.onSellListeners, (action) -> action.process(game, player, this), player);
         });
+    
+    listener.onAppearListeners.put(
+            UUIDUtils.generateKey(),
+            (game, player, entity) -> {
+              processListeners(player.listener.onAppearListeners, (action) -> action.process(game, player, this), player);
+            });
+    
+    listener.onDisappearListeners.put(
+            UUIDUtils.generateKey(),
+            (game, player, entity) -> {
+              processListeners(player.listener.onDisappearListeners, (action) -> action.process(game, player, this), player);
+            });
     
     listener.onAttackedListeners.put(
         UUIDUtils.generateKey(),
@@ -158,6 +170,26 @@ public abstract class Unit extends Entity
   public void onPlayed(Game game, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2)
   {
     super.onPlayed(game, player, index, isTavernIndex, index2, isTavernIndex2);
+  }
+  
+  public void onAppear(Game game, Player player)
+  {
+    listener.processOnAppearListeners(game, player, this);
+  }
+  
+  public void onDisappear(Game game, Player player)
+  {
+    listener.processOnDisappearListeners(game, player, this);
+  }
+  
+  public void onAppearEnemy(Game game, Player player, Player player2)
+  {
+    listener.processOnAppearListeners(game, player, this);
+  }
+  
+  public void onDisappearEnemy(Game game, Player player, Player player2)
+  {
+    listener.processOnDisappearListeners(game, player, this);
   }
   
   @Override

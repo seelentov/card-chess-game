@@ -69,7 +69,7 @@ public class Tavern
       }
       
       Unit unit = units.get(RandUtils.getRand(units.size() - 1));
-      cards.add(new Card(unit));
+      add(new Card(unit));
     }
     
     int lvl = RandUtils.getRandLvl(level);
@@ -90,7 +90,7 @@ public class Tavern
     
     Spell spell = spells.get(RandUtils.getRand(spells.size() - 1));
     
-    cards.add(new Card(spell));
+    add(new Card(spell));
   }
   
   public List<Card> getCards()
