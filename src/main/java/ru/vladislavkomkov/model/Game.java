@@ -1,20 +1,18 @@
 package ru.vladislavkomkov.model;
 
 import java.io.Serializable;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import ru.vladislavkomkov.controller.sender.Sender;
+import ru.vladislavkomkov.model.event.Event;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.ListenerUtils;
 import ru.vladislavkomkov.util.RandUtils;
+import ru.vladislavkomkov.util.UUIDUtils;
 
 public class Game implements AutoCloseable, Serializable
 {
@@ -22,9 +20,12 @@ public class Game implements AutoCloseable, Serializable
   {
     FIGHT,
     PREPARE,
-    LOBBY
+    LOBBY,
+    END
   }
-  
+
+  final String uuid;
+
   final int PLAYERS_COUNT = 8;
   final int FIGHTS_COUNT = 4;
   final Fight[] fights = new Fight[FIGHTS_COUNT];
@@ -34,20 +35,25 @@ public class Game implements AutoCloseable, Serializable
   ExecutorService executor = Executors.newFixedThreadPool(FIGHTS_COUNT);
   Map<String, Player> players;
   int turn = 1;
-  
-  public Game()
+
+  public Game(String uuid)
   {
-    this(new HashMap<>());
+    this(new HashMap<>(), uuid);
   }
   
-  public Game(Map<String, Player> players)
+  public Game(Map<String, Player> players, String uuid)
   {
     this.players = players;
+    this.uuid = uuid;
   }
   
   public void setPlayerSender(String playerUUID, Sender sender)
   {
     players.get(playerUUID).setSender(sender);
+    sender.send(new Event(
+            uuid,
+            playerUUID,
+            Event.Type.CONNECTED).getBytes());
   }
   
   public void buyTavernCard(String uuid, int index)
@@ -61,7 +67,19 @@ public class Game implements AutoCloseable, Serializable
     Player player = getPlayer(uuid);
     player.playCard(this, indexCard, indexCast, isTavernCast, indexCast2, isTavernCast2);
   }
-  
+
+  public void sellCard(String uuid, int index)
+  {
+    Player player = getPlayer(uuid);
+    player.sellCard(this, index);
+  }
+
+  public void lvlUp(String uuid)
+  {
+    Player player = getPlayer(uuid);
+    player.incLevel(this);
+  }
+
   public void resetTavern(String uuid)
   {
     Player player = getPlayer(uuid);
@@ -73,13 +91,13 @@ public class Game implements AutoCloseable, Serializable
     Player player = getPlayer(uuid);
     player.moveTable(index, index2);
   }
-  
+
   public void freezeTavern(String uuid)
   {
     Player player = getPlayer(uuid);
     player.freezeTavern();
   }
-  
+
   private Player getPlayer(String uuid)
   {
     return players.get(uuid);
@@ -215,5 +233,9 @@ public class Game implements AutoCloseable, Serializable
   public void close() throws Exception
   {
     executor.shutdown();
+  }
+
+  public String getUUID(){
+    return uuid;
   }
 }

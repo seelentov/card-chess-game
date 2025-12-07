@@ -10,6 +10,7 @@ import ru.vladislavkomkov.controller.sender.Sender;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.Listener;
 import ru.vladislavkomkov.model.card.Card;
+import ru.vladislavkomkov.model.entity.Entity;
 import ru.vladislavkomkov.model.entity.spell.impl.spellcraft.SpellCraft;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.event.Event;
@@ -39,18 +40,19 @@ public class Player implements Cloneable, Serializable
   int level = 1;
   int buyPrice = 3;
   int resetTavernPrice = 1;
-
+  
   Sender sender;
   
   public Player()
   {
     super();
   }
-
-  public void setSender(Sender sender){
+  
+  public void setSender(Sender sender)
+  {
     this.sender = sender;
   }
-
+  
   public void moveTable(int index, int index2)
   {
     if (table.size() <= index)
@@ -71,6 +73,16 @@ public class Player implements Cloneable, Serializable
   public void playCard(Game game, int indexCard)
   {
     playCard(game, indexCard, 0);
+  }
+  
+  public void sellCard(Game game, int indexCard)
+  {
+    Entity entity = hand.get(indexCard).get();
+    
+    if (entity instanceof Unit unit)
+    {
+      unit.onSell(game, this);
+    }
   }
   
   public void playCard(Game game, int indexCard, int index)
@@ -102,7 +114,7 @@ public class Player implements Cloneable, Serializable
   {
     if (money >= buyPrice && hand.size() < HAND_LIMIT)
     {
-      money -= 3;
+      money -= buyPrice;
       addToHand(tavern.buy(index));
     }
   }
@@ -122,7 +134,7 @@ public class Player implements Cloneable, Serializable
   public void resetTavern(Game game)
   {
     tavern.reset(getLevel());
-    listener.processOnResetTavernListeners(game,this);
+    listener.processOnResetTavernListeners(game, this);
   }
   
   public boolean addToTable(Game game, Unit unit, List<Unit> table, int index, boolean withoutOne)
@@ -188,7 +200,7 @@ public class Player implements Cloneable, Serializable
     return addToTable(null, unit, -1);
   }
   
-  public boolean addToTable(Unit unit,int index)
+  public boolean addToTable(Unit unit, int index)
   {
     return addToTable(null, unit, index);
   }
@@ -408,7 +420,7 @@ public class Player implements Cloneable, Serializable
     if (level < MAX_LEVEL)
     {
       level += 1;
-      listener.processOnIncTavernLevelListener(game,this);
+      listener.processOnIncTavernLevelListener(game, this);
     }
   }
   

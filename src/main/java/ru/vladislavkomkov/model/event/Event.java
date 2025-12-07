@@ -12,6 +12,15 @@ public class Event
   private final Type type;
   private final List<Integer> data;
   
+  public Event(String gameUUID, String playerUUID, Type type)
+  {
+    this(
+        gameUUID,
+        playerUUID,
+        type,
+        new ArrayList<>());
+  }
+  
   public Event(String gameUUID, String playerUUID, Type type, List<Integer> data)
   {
     this.gameUUID = gameUUID;
@@ -49,7 +58,7 @@ public class Event
   
   public byte[] getBytes()
   {
-    int size = 36 + 36 + 4 + 4 + (data.size() * 4); // UUIDs + type + dataLength + data
+    int size = 36 + 36 + 4 + 4 + (data.size() * 4);
     ByteBuffer buffer = ByteBuffer.allocate(size);
     
     writeUUIDToBuffer(buffer, gameUUID);
@@ -68,20 +77,14 @@ public class Event
   
   private void writeUUIDToBuffer(ByteBuffer buffer, String uuid)
   {
-    // Способ 1: Записываем как строку фиксированной длины
     byte[] uuidBytes = uuid.getBytes(StandardCharsets.UTF_8);
     if (uuidBytes.length != 36)
     {
       throw new IllegalArgumentException("UUID must be 36 characters long");
     }
     buffer.put(uuidBytes);
-    
-    // ИЛИ Способ 2: Записываем с указанием длины
-    // buffer.putInt(uuid.length());
-    // buffer.put(uuid.getBytes(StandardCharsets.UTF_8));
   }
   
-  // Геттеры
   public String getGameUUID()
   {
     return gameUUID;
@@ -115,6 +118,13 @@ public class Event
   
   public enum Type
   {
-    CONNECTED
+    CONNECTED,
+    BYU,
+    PLAY,
+    SELL,
+    FREEZE,
+    LVL_UP,
+    ROLL,
+    MOVE
   }
 }
