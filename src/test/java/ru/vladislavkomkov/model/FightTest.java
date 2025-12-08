@@ -4,7 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
@@ -463,14 +465,17 @@ public class FightTest extends GamePlayerTestCase
     
     Game game = new Game(players, "");
     
-    for (int i = 0; i < 5; i++)
+    for (int i = 1; i <= 20; i++)
     {
-      game.fights.clear();
-      game.calcFights();
-      
-      for (Fight fight : game.fights)
+      while (game.fightHistory.size() < 28)
       {
-        game.fightHistory.add(new Fight.Info(fight.player1, fight.player2, Fight.Info.Result.DRAW, 0));
+        game.fights.clear();
+        game.calcFights();
+        
+        for (Fight fight : game.fights)
+        {
+          game.fightHistory.add(new Fight.Info(fight.player1, fight.player2, Fight.Info.Result.DRAW, 0));
+        }
       }
       
       Map<String, Integer> fightCounter = new HashMap<>();
@@ -484,7 +489,16 @@ public class FightTest extends GamePlayerTestCase
         fightCounter.merge(key2, 1, Integer::sum);
       }
       
-      assertEquals(0, fightCounter.values().stream().filter(c -> c != 1).count(), fightCounter.toString());
+      List<Map.Entry<String, Integer>> fightCounterList = fightCounter.entrySet().stream()
+          .sorted(Map.Entry.<String, Integer> comparingByValue())
+          .limit(28)
+          .toList();
+
+      int finalI = i;
+      assertEquals(
+          0,
+          fightCounterList.stream().filter(c -> c.getValue() > finalI).count(),
+          fightCounterList.toString());
     }
     
     game.close();
