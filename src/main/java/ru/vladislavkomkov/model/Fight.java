@@ -11,6 +11,30 @@ import ru.vladislavkomkov.util.RandUtils;
 
 public class Fight implements Serializable
 {
+  public static class Info
+  {
+    public enum Result
+    {
+      PLAYER1_WIN,
+      PLAYER2_WIN,
+      DRAW
+    }
+    
+    final Player player1;
+    final Player player2;
+    
+    final Result result;
+    final int damage;
+    
+    public Info(Player player1, Player player2, Result result, int damage)
+    {
+      this.player1 = player1;
+      this.player2 = player2;
+      this.result = result;
+      this.damage = damage;
+    }
+  }
+  
   static final int TURN_LIMIT = 10000;
   final Game game;
   final Player player1;

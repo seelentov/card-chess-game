@@ -30,6 +30,8 @@ public class Game implements AutoCloseable, Serializable
   final int FIGHTS_COUNT = 4;
   final List<Fight> fights = new ArrayList<>();
   
+  final Fight.Info
+  
   public State state = State.LOBBY;
   
   ExecutorService executor = Executors.newFixedThreadPool(FIGHTS_COUNT);
