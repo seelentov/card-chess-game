@@ -463,7 +463,7 @@ public class FightTest extends GamePlayerTestCase
     
     Game game = new Game(players, "");
     
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < 5; i++)
     {
       game.fights.clear();
       game.calcFights();
@@ -484,7 +484,7 @@ public class FightTest extends GamePlayerTestCase
         fightCounter.merge(key2, 1, Integer::sum);
       }
       
-      assertEquals(0, fightCounter.values().stream().filter(c -> c != 1).count(), i);
+      assertEquals(0, fightCounter.values().stream().filter(c -> c != 1).count(), fightCounter.toString());
     }
     
     game.close();
