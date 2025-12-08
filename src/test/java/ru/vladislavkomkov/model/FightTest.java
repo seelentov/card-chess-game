@@ -4,6 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 
 import ru.vladislavkomkov.GamePlayerTestCase;
@@ -14,6 +17,7 @@ import ru.vladislavkomkov.model.entity.unit.impl.dragon.fourth.Greenskeeper;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.demon.first.Imp;
 import ru.vladislavkomkov.model.entity.unit.impl.undead.first.RisenRider;
+import ru.vladislavkomkov.model.player.Player;
 
 public class FightTest extends GamePlayerTestCase
 {
@@ -35,13 +39,13 @@ public class FightTest extends GamePlayerTestCase
     
     for (int i = 1; i <= 3; i++)
     {
-      assertFalse(fight.doTurn());
+      assertFalse(fight.doTurn().isPresent());
       
       assertEquals(unit.getMaxHealth() - (unit2.getAttack() * i), unit.getHealth());
       assertEquals(unit2.getMaxHealth() - (unit.getAttack() * i), unit2.getHealth());
     }
     
-    assertTrue(fight.doTurn());
+    assertTrue(fight.doTurn().isPresent());
   }
   
   @Test
@@ -62,13 +66,13 @@ public class FightTest extends GamePlayerTestCase
     
     for (int i = 1; i <= 2; i++)
     {
-      assertFalse(fight.doTurn());
+      assertFalse(fight.doTurn().isPresent());
       
       assertEquals(unit.getMaxHealth() - (unit2.getAttack() * i), unit.getHealth());
       assertEquals(unit2.getMaxHealth() - (unit.getAttack() * i), unit2.getHealth());
     }
     
-    assertTrue(fight.doTurn());
+    assertTrue(fight.doTurn().isPresent());
     
     assertEquals(player2.getMaxHealth() - (unit.getLevel() + player.getLevel()), player2.getHealth());
   }
@@ -90,13 +94,13 @@ public class FightTest extends GamePlayerTestCase
     
     for (int i = 2; i >= 0; i--)
     {
-      assertFalse(fight.doTurn());
+      assertFalse(fight.doTurn().isPresent());
       
       assertEquals(i, fight.player1Units.size());
       assertEquals(i, fight.player2Units.size());
     }
     
-    assertTrue(fight.doTurn());
+    assertTrue(fight.doTurn().isPresent());
   }
   
   @Test
@@ -112,7 +116,7 @@ public class FightTest extends GamePlayerTestCase
     
     Fight fight = new Fight(game, player, player2);
     
-    assertFalse(fight.doTurn());
+    assertFalse(fight.doTurn().isPresent());
     
     assertEquals(1, fight.player1Units.size());
     assertEquals(1, fight.player2Units.size());
@@ -131,12 +135,12 @@ public class FightTest extends GamePlayerTestCase
     
     Fight fight = new Fight(game, player, player2);
     
-    assertFalse(fight.doTurn());
+    assertFalse(fight.doTurn().isPresent());
     
     assertEquals(1, fight.player1Units.size());
     assertEquals(0, fight.player2Units.size());
     
-    assertTrue(fight.doTurn());
+    assertTrue(fight.doTurn().isPresent());
     
     assertEquals(player2.getMaxHealth() - (unit.getLevel() + player.getLevel()), player2.getHealth());
   }
@@ -159,19 +163,19 @@ public class FightTest extends GamePlayerTestCase
     assertEquals(1, fight.player1Units.size());
     assertEquals(2, fight.player2Units.size());
     
-    assertFalse(fight.doTurn());
+    assertFalse(fight.doTurn().isPresent());
     
     assertEquals(1, fight.player1Units.size());
     assertEquals(1, fight.player2Units.size());
     
     assertFalse(fight.player1Units.get(0).getIsRebirth());
     
-    assertFalse(fight.doTurn());
+    assertFalse(fight.doTurn().isPresent());
     
     assertEquals(0, fight.player1Units.size());
     assertEquals(0, fight.player2Units.size());
     
-    assertTrue(fight.doTurn());
+    assertTrue(fight.doTurn().isPresent());
   }
   
   @Test
@@ -188,7 +192,7 @@ public class FightTest extends GamePlayerTestCase
     assertEquals(1, fight.player1Units.size());
     assertEquals(1, fight.player2Units.size());
     
-    assertFalse(fight.doTurn());
+    assertFalse(fight.doTurn().isPresent());
     
     assertEquals(2, fight.player1Units.size());
     assertEquals(0, fight.player2Units.size());
@@ -200,7 +204,7 @@ public class FightTest extends GamePlayerTestCase
     
     assertEquals(new IckyImp().getName(), player.cloneTable().get(0).getName());
     
-    assertTrue(fight.doTurn());
+    assertTrue(fight.doTurn().isPresent());
   }
   
   @Test
@@ -225,7 +229,7 @@ public class FightTest extends GamePlayerTestCase
     
     Fight fight = new Fight(game, player, player2);
     
-    assertFalse(fight.doTurn());
+    assertFalse(fight.doTurn().isPresent());
     
     assertEquals(0, fight.player1Units.size());
     
@@ -264,7 +268,7 @@ public class FightTest extends GamePlayerTestCase
     
     Fight fight = new Fight(game, player, player2);
     
-    assertFalse(fight.doTurn());
+    assertFalse(fight.doTurn().isPresent());
     
     assertEquals(0, fight.player1Units.size());
     
@@ -307,7 +311,7 @@ public class FightTest extends GamePlayerTestCase
     
     for (int i = 0; i < tauntHealth; i++)
     {
-      assertFalse(fight.doTurn());
+      assertFalse(fight.doTurn().isPresent());
     }
     
     assertEquals(7, player.inFightTable.size());
@@ -335,7 +339,7 @@ public class FightTest extends GamePlayerTestCase
     
     Fight fight = new Fight(game, player, player2);
     
-    assertFalse(fight.doTurn());
+    assertFalse(fight.doTurn().isPresent());
     
     assertEquals(7, player.getFightUnitsCount());
     
@@ -365,7 +369,7 @@ public class FightTest extends GamePlayerTestCase
     
     Fight fight = new Fight(game, player, player2);
     
-    assertFalse(fight.doTurn());
+    assertFalse(fight.doTurn().isPresent());
     
     assertEquals(7, player.getFightUnitsCount());
     
@@ -403,11 +407,11 @@ public class FightTest extends GamePlayerTestCase
     {
       if (fight.turn >= Fight.TURN_LIMIT)
       {
-        assertTrue(fight.doTurn());
+        assertTrue(fight.doTurn().isPresent());
         break;
       }
       
-      assertFalse(fight.doTurn());
+      assertFalse(fight.doTurn().isPresent());
     }
   }
   
@@ -434,13 +438,55 @@ public class FightTest extends GamePlayerTestCase
     {
       if (fight.turn >= Fight.TURN_LIMIT)
       {
-        assertTrue(fight.doTurn());
+        assertTrue(fight.doTurn().isPresent());
         break;
       }
       
-      assertFalse(fight.doTurn());
+      assertFalse(fight.doTurn().isPresent());
     }
     
     assertEquals(player.getHealth(), player2.getHealth());
+  }
+  
+  @Test
+  void testFightsOrder() throws Exception
+  {
+    Map<String, Player> players = new HashMap<>();
+    players.put("1", new Player("1"));
+    players.put("2", new Player("2"));
+    players.put("3", new Player("3"));
+    players.put("4", new Player("4"));
+    players.put("5", new Player("5"));
+    players.put("6", new Player("6"));
+    players.put("7", new Player("7"));
+    players.put("8", new Player("8"));
+    
+    Game game = new Game(players, "");
+    
+    for (int i = 0; i < 6; i++)
+    {
+      game.fights.clear();
+      game.calcFights();
+      
+      for (Fight fight : game.fights)
+      {
+        game.fightHistory.add(new Fight.Info(fight.player1, fight.player2, Fight.Info.Result.DRAW, 0));
+      }
+      
+      Map<String, Integer> fightCounter = new HashMap<>();
+      
+      for (Fight.Info info : game.fightHistory)
+      {
+        String key = (info.player1.getUUID() + info.player2.getUUID());
+        String key2 = (info.player2.getUUID() + info.player1.getUUID());
+        
+        fightCounter.merge(key, 1, Integer::sum);
+        fightCounter.merge(key2, 1, Integer::sum);
+      }
+      
+      assertEquals(0, fightCounter.values().stream().filter(c -> c != 1).count(), i);
+    }
+    
+    game.close();
   }
 }

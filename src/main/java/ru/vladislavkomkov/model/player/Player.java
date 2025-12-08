@@ -45,6 +45,11 @@ public class Player implements Cloneable, Serializable
   
   Sender sender;
   
+  public Player()
+  {
+    this("");
+  }
+  
   public Player(String uuid)
   {
     super();

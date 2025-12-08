@@ -4,11 +4,15 @@ import java.io.Serializable;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Queue;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -37,15 +41,23 @@ public class Game implements AutoCloseable, Serializable
   final int FIGHTS_COUNT = 4;
   final List<Fight> fights = new ArrayList<>();
   
-  final Fight.Info
-  
-  final Fight.Info
+  final List<Fight.Info> fightHistory = new ArrayList<>();
   
   public State state = State.LOBBY;
   
   ExecutorService executor = Executors.newFixedThreadPool(FIGHTS_COUNT);
   Map<String, Player> players;
   int turn = 1;
+  
+  public Game()
+  {
+    this(new HashMap<>(), "");
+  }
+  
+  public Game(Map<String, Player> players)
+  {
+    this(players, "");
+  }
   
   public Game(String uuid)
   {
@@ -179,15 +191,19 @@ public class Game implements AutoCloseable, Serializable
         
         processStartFight(player, player2);
         
+        Optional<Fight.Info> result;
+        
         while (true)
         {
-          if (fight.doTurn())
+          result = fight.doTurn();
+          if (result.isPresent())
           {
             break;
           }
         }
         
-        processStartFight(player, player2);
+        fightHistory.add(result.get());
+        processEndFight(player, player2);
         
         return null;
       }, executor));
@@ -221,21 +237,99 @@ public class Game implements AutoCloseable, Serializable
       if (player != null)
       {
         player.getSender().send(new Event(
-            uuid,
-            player.getUUID(),
-            Event.Type.WIN).getBytes());
+                uuid,
+                player.getUUID(),
+                Event.Type.WIN).getBytes());
       }
       
       return true;
     }
     
     fights.clear();
-
-    // TODO:Калькуляция битв
-    // Способ добавить новый файт это сделать fights.add(new Fight(player, player2))
-    // Уникальный идентификатор пользователя player.getUUID()
-
+    
+    List<Player> players = new ArrayList<>(alive);
+    
+    Map<String, Map<String, Integer>> fightCounts = new HashMap<>();
+    
+    for (Player player : players) {
+      fightCounts.put(player.getUUID(), new HashMap<>());
+    }
+    
+    for (Fight.Info fightInfo : fightHistory) {
+      String p1 = fightInfo.player1.getUUID();
+      String p2 = fightInfo.player2.getUUID();
+      
+      fightCounts.get(p1).put(p2, fightCounts.get(p1).getOrDefault(p2, 0) + 1);
+      fightCounts.get(p2).put(p1, fightCounts.get(p2).getOrDefault(p1, 0) + 1);
+    }
+    
+    List<Player> availablePlayers = new ArrayList<>(players);
+    Collections.shuffle(availablePlayers);
+    
+    while (availablePlayers.size() >= 2) {
+      Player player1 = availablePlayers.remove(0);
+      
+      Player player2 = findOpponent(player1, availablePlayers, fightCounts, players);
+      
+      if (player2 != null) {
+        availablePlayers.remove(player2);
+        fights.add(new Fight(this, player1, player2));
+      } else if (!availablePlayers.isEmpty()) {
+        player2 = availablePlayers.remove(0);
+        fights.add(new Fight(this, player1, player2));
+      }
+    }
+    
+    if (!availablePlayers.isEmpty()) {
+      Player lonelyPlayer = availablePlayers.get(0);
+      lonelyPlayer.getSender().send(new Event(
+              uuid,
+              lonelyPlayer.getUUID(),
+              Event.Type.WIN).getBytes());
+    }
+    
     return false;
+  }
+  
+  private Player findOpponent(Player player, List<Player> availablePlayers,
+                              Map<String, Map<String, Integer>> fightCounts,
+                              List<Player> allPlayers) {
+    
+    String playerId = player.getUUID();
+    Map<String, Integer> playerFights = fightCounts.get(playerId);
+    
+    boolean foughtWithAll = true;
+    for (Player other : allPlayers) {
+      if (playerFights.getOrDefault(other.getUUID(), 0) == 0) {
+        foughtWithAll = false;
+        break;
+      }
+    }
+    
+    if (!foughtWithAll) {
+      for (Player opponent : availablePlayers) {
+        if (playerFights.getOrDefault(opponent.getUUID(), 0) == 0) {
+          return opponent;
+        }
+      }
+    }
+    
+    if (!availablePlayers.isEmpty()) {
+      Player bestOpponent = null;
+      int minFights = Integer.MAX_VALUE;
+      
+      for (Player opponent : availablePlayers) {
+          int fightsWithOpponent = playerFights.getOrDefault(opponent.getUUID(), 0);
+          if (fightsWithOpponent < minFights) {
+            minFights = fightsWithOpponent;
+            bestOpponent = opponent;
+          }
+      }
+      
+      return bestOpponent;
+    }
+    
+    return null;
   }
   
   private Queue<Player> newPlayerQueue(boolean isAlive)

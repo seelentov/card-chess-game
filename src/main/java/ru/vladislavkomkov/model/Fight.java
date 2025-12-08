@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.swing.text.html.Option;
+
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.RandUtils;
@@ -57,20 +59,20 @@ public class Fight implements Serializable
     setup();
   }
   
-  public boolean doTurn()
+  public Optional<Fight.Info> doTurn()
   {
     if (turn >= TURN_LIMIT)
     {
-      clearFightUnitList();
-      return true;
+      afterFight();
+      return Optional.of(new Info(player1, player2, Info.Result.DRAW, 0));
     }
     
     if (player1Units.isEmpty() || player2Units.isEmpty())
     {
       if (player1Units.isEmpty() && player2Units.isEmpty())
       {
-        clearFightUnitList();
-        return true;
+        afterFight();
+        return Optional.of(new Info(player1, player2, Info.Result.DRAW, 0));
       }
       
       boolean isPlayer1Win = player2Units.isEmpty();
@@ -85,8 +87,8 @@ public class Fight implements Serializable
       
       loser.applyDamage(dmg);
       
-      clearFightUnitList();
-      return true;
+      afterFight();
+      return Optional.of(new Info(player1, player2, isPlayer1Win ? Info.Result.PLAYER1_WIN : Info.Result.PLAYER2_WIN, dmg));
     }
     
     boolean isPlayer1Turn = turn % 2 == 0;
@@ -156,7 +158,7 @@ public class Fight implements Serializable
     incTurn(isPlayer1Turn);
     
     turn++;
-    return false;
+    return Optional.empty();
   }
   
   void setup()
@@ -252,7 +254,7 @@ public class Fight implements Serializable
     return player2;
   }
   
-  void clearFightUnitList()
+  void afterFight()
   {
     player1.inFightTable = null;
     player2.inFightTable = null;
