@@ -23,19 +23,19 @@ public class Game implements AutoCloseable, Serializable
     LOBBY,
     END
   }
-
+  
   final String uuid;
-
+  
   final int PLAYERS_COUNT = 8;
   final int FIGHTS_COUNT = 4;
-  final Fight[] fights = new Fight[FIGHTS_COUNT];
+  final List<Fight> fights = new ArrayList<>();
   
   public State state = State.LOBBY;
   
   ExecutorService executor = Executors.newFixedThreadPool(FIGHTS_COUNT);
   Map<String, Player> players;
   int turn = 1;
-
+  
   public Game(String uuid)
   {
     this(new HashMap<>(), uuid);
@@ -51,9 +51,14 @@ public class Game implements AutoCloseable, Serializable
   {
     players.get(playerUUID).setSender(sender);
     sender.send(new Event(
-            uuid,
-            playerUUID,
-            Event.Type.CONNECTED).getBytes());
+        uuid,
+        playerUUID,
+        Event.Type.CONNECTED).getBytes());
+  }
+  
+  public void sendPreFightTimer(long ms)
+  {
+    players.forEach((key, player) -> player.getSender().send(new Event(uuid, key, Event.Type.PRE_FIGHT_TIMER).getBytes()));
   }
   
   public void buyTavernCard(String uuid, int index)
@@ -67,19 +72,19 @@ public class Game implements AutoCloseable, Serializable
     Player player = getPlayer(uuid);
     player.playCard(this, indexCard, indexCast, isTavernCast, indexCast2, isTavernCast2);
   }
-
+  
   public void sellCard(String uuid, int index)
   {
     Player player = getPlayer(uuid);
     player.sellCard(this, index);
   }
-
+  
   public void lvlUp(String uuid)
   {
     Player player = getPlayer(uuid);
     player.incLevel(this);
   }
-
+  
   public void resetTavern(String uuid)
   {
     Player player = getPlayer(uuid);
@@ -91,13 +96,13 @@ public class Game implements AutoCloseable, Serializable
     Player player = getPlayer(uuid);
     player.moveTable(index, index2);
   }
-
+  
   public void freezeTavern(String uuid)
   {
     Player player = getPlayer(uuid);
     player.freezeTavern();
   }
-
+  
   private Player getPlayer(String uuid)
   {
     return players.get(uuid);
@@ -106,7 +111,6 @@ public class Game implements AutoCloseable, Serializable
   public void doPreFight()
   {
     state = State.PREPARE;
-    calcFights();
     
     for (Player player : players.values())
     {
@@ -194,48 +198,60 @@ public class Game implements AutoCloseable, Serializable
     turn++;
   }
   
-  void calcFights()
+  public boolean calcFights()
   {
-    Queue<Player> alive = players.values().stream().filter(Player::isAlive).collect(Collectors.toCollection(ArrayDeque::new));
-    Queue<Player> dead = players.values().stream().filter(player -> !player.isAlive()).collect(Collectors.toCollection(ArrayDeque::new));
+    Queue<Player> alive = newPlayerQueue(true);
+    Queue<Player> dead = newPlayerQueue(false);
     
-    if ((alive.size() + dead.size()) != PLAYERS_COUNT)
+    if (alive.size() < 2)
     {
-      throw new IllegalArgumentException("Players count is " + (alive.size() + dead.size()) + " but expected " + PLAYERS_COUNT);
-    }
-    
-    for (int i = 0; i < fights.length; i++)
-    {
-      if (!dead.isEmpty())
+      Player player = alive.peek();
+      
+      if (player != null)
       {
-        fights[i] = new Fight(this, alive.peek(), dead.peek());
-        continue;
+        player.getSender().send(new Event(
+            uuid,
+            player.getUUID(),
+            Event.Type.WIN).getBytes());
       }
       
-      if (!alive.isEmpty())
-      {
-        fights[i] = new Fight(this, alive.peek(), alive.peek());
-      }
+      return true;
     }
-  }
+    
+    fights.clear();
 
-  public String addPlayer(){
+    // TODO:Калькуляция битв
+    // Способ добавить новый файт это сделать fights.add(new Fight(player, player2))
+    // Уникальный идентификатор пользователя player.getUUID()
+
+    return false;
+  }
+  
+  private Queue<Player> newPlayerQueue(boolean isAlive)
+  {
+    return players.values().stream().filter(player -> isAlive == player.isAlive()).collect(Collectors.toCollection(ArrayDeque::new));
+  }
+  
+  public String addPlayer()
+  {
     String key = UUIDUtils.generateKey();
-    players.put(key, new Player());
+    players.put(key, new Player(key));
     return key;
   }
-
-  public void removePlayer(String key){
+  
+  public void removePlayer(String key)
+  {
     players.remove(key);
   }
-
+  
   @Override
   public void close() throws Exception
   {
     executor.shutdown();
   }
-
-  public String getUUID(){
+  
+  public String getUUID()
+  {
     return uuid;
   }
 }

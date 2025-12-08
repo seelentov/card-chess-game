@@ -32,6 +32,8 @@ public class Player implements Cloneable, Serializable
   public Statistic statistic = new Statistic();
   public List<Unit> inFightTable = null;
   
+  String uuid;
+  
   int health = 30;
   int maxHealth = 30;
   int armor = 0;
@@ -43,9 +45,20 @@ public class Player implements Cloneable, Serializable
   
   Sender sender;
   
-  public Player()
+  public Player(String uuid)
   {
     super();
+    this.uuid = uuid;
+  }
+  
+  public String getUUID()
+  {
+    return uuid;
+  }
+  
+  public Sender getSender()
+  {
+    return sender;
   }
   
   public void setSender(Sender sender)

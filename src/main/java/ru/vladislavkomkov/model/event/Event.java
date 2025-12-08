@@ -11,14 +11,23 @@ public class Event
   private final String playerUUID;
   private final Type type;
   private final List<Integer> data;
-  
+
   public Event(String gameUUID, String playerUUID, Type type)
   {
     this(
-        gameUUID,
-        playerUUID,
-        type,
-        new ArrayList<>());
+            gameUUID,
+            playerUUID,
+            type,
+            new ArrayList<>());
+  }
+
+  public Event(String gameUUID, String playerUUID, Type type, int data)
+  {
+    this(
+            gameUUID,
+            playerUUID,
+            type,
+            List.of(data));
   }
   
   public Event(String gameUUID, String playerUUID, Type type, List<Integer> data)
@@ -118,6 +127,8 @@ public class Event
   
   public enum Type
   {
+    PRE_FIGHT_TIMER,
+    WIN,
     CONNECTED,
     BYU,
     PLAY,
