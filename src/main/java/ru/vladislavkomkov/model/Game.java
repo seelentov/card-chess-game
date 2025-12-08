@@ -1,7 +1,14 @@
 package ru.vladislavkomkov.model;
 
 import java.io.Serializable;
-import java.util.*;
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -29,6 +36,8 @@ public class Game implements AutoCloseable, Serializable
   final int PLAYERS_COUNT = 8;
   final int FIGHTS_COUNT = 4;
   final List<Fight> fights = new ArrayList<>();
+  
+  final Fight.Info
   
   final Fight.Info
   
