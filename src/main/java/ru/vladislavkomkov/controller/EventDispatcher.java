@@ -1,25 +1,26 @@
 package ru.vladislavkomkov.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import org.java_websocket.WebSocket;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ru.vladislavkomkov.controller.sender.WebSocketSender;
-import ru.vladislavkomkov.model.Game;
-import ru.vladislavkomkov.model.event.Event;
-
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.java_websocket.WebSocket;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+
+import ru.vladislavkomkov.controller.sender.WebSocketSender;
+import ru.vladislavkomkov.model.Game;
+import ru.vladislavkomkov.model.event.Event;
+import ru.vladislavkomkov.model.event.data.SenderWaiterData;
+
 public class EventDispatcher
 {
+  static final Integer QUEUE_LENGTH = 1_000;
   private static final Logger log = LoggerFactory.getLogger(EventDispatcher.class);
-  
-  static final Integer QUEUE_LENGTH = 100;
-  
   ExecutorService executor = Executors.newSingleThreadExecutor();
   BlockingQueue<Event> queue = new ArrayBlockingQueue<>(QUEUE_LENGTH);
   
@@ -37,6 +38,11 @@ public class EventDispatcher
         
         try
         {
+          if (!game.state.equals(Game.State.PREPARE))
+          {
+            Thread.sleep(1000);
+            continue;
+          }
           ev = queue.take();
           
           log.info("PROCESS {}", ev);
@@ -125,6 +131,10 @@ public class EventDispatcher
       }
       case ROLL -> {
         game.resetTavern(playerUUID);
+      }
+      case RES -> {
+        SenderWaiterData data = event.getData(SenderWaiterData.class);
+        game.doSenderWaiter(playerUUID, data.getKey(), data.getParam());
       }
       default -> throw new RuntimeException("Unexpected event type: " + event.getType());
     }

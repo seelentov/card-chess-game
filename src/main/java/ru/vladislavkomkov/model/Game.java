@@ -1,18 +1,7 @@
 package ru.vladislavkomkov.model;
 
 import java.io.Serializable;
-
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Queue;
-
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,28 +16,15 @@ import ru.vladislavkomkov.util.UUIDUtils;
 
 public class Game implements AutoCloseable, Serializable
 {
-  public enum State
-  {
-    FIGHT,
-    PREPARE,
-    LOBBY,
-    END
-  }
-  
   final String uuid;
-  
   final int PLAYERS_COUNT = 8;
   final int FIGHTS_COUNT = 4;
   final List<Fight> fights = new ArrayList<>();
-  
   final List<Fight.Info> fightHistory = new ArrayList<>();
-  
   public State state = State.LOBBY;
-  
   ExecutorService executor = Executors.newFixedThreadPool(FIGHTS_COUNT);
   Map<String, Player> players;
   int turn = 1;
-  
   public Game()
   {
     this(new HashMap<>(), UUIDUtils.generateKey());
@@ -87,6 +63,12 @@ public class Game implements AutoCloseable, Serializable
   public void sendStartGame()
   {
     players.forEach((key, player) -> player.getSender().send(new Event(uuid, key, Event.Type.START).getBytes()));
+  }
+  
+  public void doSenderWaiter(String uuid, String key, Integer param)
+  {
+    Player player = getPlayer(uuid);
+    player.doSenderWaiter(key, param);
   }
   
   public void buyTavernCard(String uuid, int index)
@@ -136,10 +118,17 @@ public class Game implements AutoCloseable, Serializable
     return players.get(uuid);
   }
   
+  private void clearSenderWaiters()
+  {
+    players.values().forEach(Player::clearSenderWaiters);
+    players.values().forEach(player -> player.getSender().send(new Event(getUUID(), player.getUUID(), Event.Type.CLEAR_WAITERS).getBytes()));
+  }
+  
   public void doPreFight()
   {
+    clearSenderWaiters();
     state = State.PREPARE;
-    
+
     for (Player player : players.values())
     {
       player.resetMoney(this);
@@ -152,7 +141,7 @@ public class Game implements AutoCloseable, Serializable
   public void processStartTurn(Player player)
   {
     ListenerUtils.processGlobalActionListeners(player.listener.onStartTurnListeners, this, player);
-    
+
     player.doForAll(unit -> unit.onStartTurn(this, player));
     player.removeTempBuffs();
     player.calcTriplets();
@@ -162,61 +151,58 @@ public class Game implements AutoCloseable, Serializable
   {
     ListenerUtils.processGlobalActionListeners(player.listener.onEndTurnListeners, this, player);
     player.clearSpellCraft();
-    
+
     player.doForAll(unit -> unit.onEndTurn(this, player));
   }
   
   public void processStartFight(Player player, Player player2)
   {
     ListenerUtils.processGlobalActionListeners(player.listener.onStartFightListeners, this, player);
-    
+
     player.doForAll(unit -> unit.onStartFight(this, player, player2));
   }
   
   public void processEndFight(Player player, Player player2)
   {
     ListenerUtils.processGlobalActionListeners(player.listener.onEndFightListeners, this, player);
-    
+
     player.doForAll(unit -> unit.onEndFight(this, player, player2));
   }
   
   public void doFight()
   {
     state = State.FIGHT;
-    
+
     List<CompletableFuture<?>> fightFutures = new ArrayList<>();
-    
+
     for (Fight fight : fights)
     {
       fightFutures.add(CompletableFuture.supplyAsync(() -> {
         boolean isPlayerFirst = RandUtils.getRand(1) == 0;
-        
+
         Player player = isPlayerFirst ? fight.getPlayer1() : fight.getPlayer2();
         Player player2 = isPlayerFirst ? fight.getPlayer2() : fight.getPlayer1();
-        
+
         processStartFight(player, player2);
-        
+
         Optional<Fight.Info> result;
-        
-        while (true)
+
+        do
         {
           result = fight.doTurn();
-          if (result.isPresent())
-          {
-            break;
-          }
         }
-        
+        while (result.isEmpty());
+
         fightHistory.add(result.get());
         processEndFight(player, player2);
-        
+
         return null;
       }, executor));
     }
-    
+
     CompletableFuture<Void> allOf = CompletableFuture.allOf(
         fightFutures.toArray(new CompletableFuture[0]));
-    
+
     allOf.join();
   }
   
@@ -234,11 +220,11 @@ public class Game implements AutoCloseable, Serializable
   {
     Queue<Player> alive = newPlayerQueue(true);
     Queue<Player> dead = newPlayerQueue(false);
-    
+
     if (alive.size() < 2)
     {
       Player player = alive.peek();
-      
+
       if (player != null)
       {
         player.getSender().send(new Event(
@@ -246,39 +232,39 @@ public class Game implements AutoCloseable, Serializable
             player.getUUID(),
             Event.Type.WIN).getBytes());
       }
-      
+
       return true;
     }
-    
+
     fights.clear();
-    
+
     List<Player> players = new ArrayList<>(alive);
-    
+
     Map<String, Map<String, Integer>> fightCounts = new HashMap<>();
-    
+
     for (Player player : players)
     {
       fightCounts.put(player.getUUID(), new HashMap<>());
     }
-    
+
     for (Fight.Info fightInfo : fightHistory)
     {
       String p1 = fightInfo.player1.getUUID();
       String p2 = fightInfo.player2.getUUID();
-      
+
       fightCounts.get(p1).put(p2, fightCounts.get(p1).getOrDefault(p2, 0) + 1);
       fightCounts.get(p2).put(p1, fightCounts.get(p2).getOrDefault(p1, 0) + 1);
     }
-    
+
     List<Player> availablePlayers = new ArrayList<>(players);
     Collections.shuffle(availablePlayers);
-    
+
     while (availablePlayers.size() >= 2)
     {
       Player player1 = availablePlayers.remove(0);
-      
+
       Player player2 = findOpponent(player1, availablePlayers, fightCounts, players);
-      
+
       if (player2 != null)
       {
         availablePlayers.remove(player2);
@@ -290,7 +276,7 @@ public class Game implements AutoCloseable, Serializable
         fights.add(new Fight(this, player1, player2));
       }
     }
-    
+
     if (!availablePlayers.isEmpty())
     {
       Player lonelyPlayer = availablePlayers.get(0);
@@ -299,7 +285,7 @@ public class Game implements AutoCloseable, Serializable
           lonelyPlayer.getUUID(),
           Event.Type.WIN).getBytes());
     }
-    
+
     return false;
   }
   
@@ -307,10 +293,10 @@ public class Game implements AutoCloseable, Serializable
       Map<String, Map<String, Integer>> fightCounts,
       List<Player> allPlayers)
   {
-    
+
     String playerId = player.getUUID();
     Map<String, Integer> playerFights = fightCounts.get(playerId);
-    
+
     boolean foughtWithAll = true;
     for (Player other : allPlayers)
     {
@@ -320,7 +306,7 @@ public class Game implements AutoCloseable, Serializable
         break;
       }
     }
-    
+
     if (!foughtWithAll)
     {
       for (Player opponent : availablePlayers)
@@ -331,12 +317,12 @@ public class Game implements AutoCloseable, Serializable
         }
       }
     }
-    
+
     if (!availablePlayers.isEmpty())
     {
       Player bestOpponent = null;
       int minFights = Integer.MAX_VALUE;
-      
+
       for (Player opponent : availablePlayers)
       {
         int fightsWithOpponent = playerFights.getOrDefault(opponent.getUUID(), 0);
@@ -346,10 +332,10 @@ public class Game implements AutoCloseable, Serializable
           bestOpponent = opponent;
         }
       }
-      
+
       return bestOpponent;
     }
-    
+
     return null;
   }
   
@@ -379,5 +365,13 @@ public class Game implements AutoCloseable, Serializable
   public String getUUID()
   {
     return uuid;
+  }
+  
+  public enum State
+  {
+    FIGHT,
+    PREPARE,
+    LOBBY,
+    END
   }
 }

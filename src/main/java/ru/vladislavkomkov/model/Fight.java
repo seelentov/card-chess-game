@@ -5,39 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.text.html.Option;
-
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.RandUtils;
 
 public class Fight implements Serializable
 {
-  public static class Info
-  {
-    public enum Result
-    {
-      PLAYER1_WIN,
-      PLAYER2_WIN,
-      DRAW
-    }
-    
-    final Player player1;
-    final Player player2;
-    
-    final Result result;
-    final int damage;
-    
-    public Info(Player player1, Player player2, Result result, int damage)
-    {
-      this.player1 = player1;
-      this.player2 = player2;
-      this.result = result;
-      this.damage = damage;
-    }
-  }
-  
-  static final int TURN_LIMIT = 10000;
+atic final int TURN_LIMIT = 10000;
   final Game game;
   final Player player1;
   final Player player2;
@@ -254,7 +228,30 @@ public class Fight implements Serializable
     return player2;
   }
   
-  void afterFight()
+  void a
+  public static class Info
+  {
+    final Player player1;
+    final Player player2;
+    final Result result;
+    final int damage;
+    public Info(Player player1, Player player2, Result result, int damage)
+    {
+      this.player1 = player1;
+      this.player2 = player2;
+      this.result = result;
+      this.damage = damage;
+    }
+
+    public enum Result
+    {
+      PLAYER1_WIN,
+      PLAYER2_WIN,
+      DRAW
+    }
+  }
+
+  stfterFight()
   {
     player1.inFightTable = null;
     player2.inFightTable = null;

@@ -41,16 +41,16 @@ public abstract class Unit extends Entity
         });
     
     listener.onAppearListeners.put(
-            UUIDUtils.generateKey(),
-            (game, player, entity) -> {
-              processListeners(player.listener.onAppearListeners, (action) -> action.process(game, player, this), player);
-            });
+        UUIDUtils.generateKey(),
+        (game, player, entity) -> {
+          processListeners(player.listener.onAppearListeners, (action) -> action.process(game, player, this), player);
+        });
     
     listener.onDisappearListeners.put(
-            UUIDUtils.generateKey(),
-            (game, player, entity) -> {
-              processListeners(player.listener.onDisappearListeners, (action) -> action.process(game, player, this), player);
-            });
+        UUIDUtils.generateKey(),
+        (game, player, entity) -> {
+          processListeners(player.listener.onDisappearListeners, (action) -> action.process(game, player, this), player);
+        });
     
     listener.onAttackedListeners.put(
         UUIDUtils.generateKey(),

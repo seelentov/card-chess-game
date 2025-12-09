@@ -1,6 +1,17 @@
 package ru.vladislavkomkov.model.entity.spell.impl;
 
+import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.spell.Spell;
+import ru.vladislavkomkov.model.entity.unit.Unit;
+import ru.vladislavkomkov.model.event.Event;
+import ru.vladislavkomkov.util.RandUtils;
+import ru.vladislavkomkov.util.UnitUtils;
 
 public class TripleReward extends Spell
 {
@@ -21,6 +32,37 @@ public class TripleReward extends Spell
   @Override
   public void build()
   {
-    
+    listener.onPlayedListeners.put(
+        KEY_CORE,
+        (game, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto) -> {
+          List<Unit> allUnits = UnitUtils.getUnitsByTavern(player.getLevel());
+          Set<Integer> setInts = new HashSet<>();
+          while (setInts.size() < 3)
+          {
+            setInts.add(RandUtils.getRand(allUnits.size()));
+          }
+          
+          List<Integer> ints = setInts.stream().toList();
+          
+          List<Unit> units = List.of(
+              allUnits.get(ints.get(0)),
+              allUnits.get(ints.get(1)),
+              allUnits.get(ints.get(2)));
+          
+          player.putSenderWaiter((param) -> {
+            if (param < 0 || param > 3)
+            {
+              param = RandUtils.getRand(1, 3);
+            }
+            
+            player.addToHand(game, Card.of(units.get(param)));
+          });
+          
+          player.getSender().send(new Event(
+              game.getUUID(),
+              player.getUUID(),
+              Event.Type.WAIT_REQ,
+              units).getBytes());
+        });
   }
 }

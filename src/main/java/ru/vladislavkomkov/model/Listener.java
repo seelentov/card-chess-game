@@ -7,25 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ru.vladislavkomkov.consts.Listeners;
-import ru.vladislavkomkov.model.action.GlobalAction;
-import ru.vladislavkomkov.model.action.OnAppearAction;
-import ru.vladislavkomkov.model.action.OnAppearEnemyAction;
-import ru.vladislavkomkov.model.action.OnAttackAction;
-import ru.vladislavkomkov.model.action.OnAttackedAction;
-import ru.vladislavkomkov.model.action.OnDeadAction;
-import ru.vladislavkomkov.model.action.OnDisappearAction;
-import ru.vladislavkomkov.model.action.OnDisappearEnemyAction;
-import ru.vladislavkomkov.model.action.OnEndFightAction;
-import ru.vladislavkomkov.model.action.OnEndTurnAction;
-import ru.vladislavkomkov.model.action.OnHandledAction;
-import ru.vladislavkomkov.model.action.OnIncTavernLevel;
-import ru.vladislavkomkov.model.action.OnPlayedAction;
-import ru.vladislavkomkov.model.action.OnResetTavernAction;
-import ru.vladislavkomkov.model.action.OnSellAction;
-import ru.vladislavkomkov.model.action.OnStartFightAction;
-import ru.vladislavkomkov.model.action.OnStartTurnAction;
-import ru.vladislavkomkov.model.action.PrepareAction;
+import ru.vladislavkomkov.model.action.*;
 import ru.vladislavkomkov.model.entity.Entity;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.player.Player;
@@ -140,8 +122,7 @@ public class Listener implements Serializable
     ListenerUtils.processActionListeners(
         onPlayedListeners,
         player,
-        (action) -> action.process(game, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto)
-    );
+        (action) -> action.process(game, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto));
   }
   
   public void processOnHandledListeners(
@@ -150,10 +131,9 @@ public class Listener implements Serializable
       Entity entity)
   {
     ListenerUtils.processActionListeners(
-            onHandledListeners,
-            player,
-            (action) -> action.process(game, player, entity)
-    );
+        onHandledListeners,
+        player,
+        (action) -> action.process(game, player, entity));
   }
   
   public void processOnAttackListeners(
@@ -164,10 +144,9 @@ public class Listener implements Serializable
       Unit attacked)
   {
     ListenerUtils.processActionListeners(
-            onAttackListeners,
-            player1,
-            (action) -> action.process(game, player1, player2, unit, attacked)
-    );
+        onAttackListeners,
+        player1,
+        (action) -> action.process(game, player1, player2, unit, attacked));
   }
   
   public void processOnAttackedListeners(
@@ -178,10 +157,9 @@ public class Listener implements Serializable
       Unit attacker)
   {
     ListenerUtils.processActionListeners(
-            onAttackedListeners,
-            player1,
-            (action) -> action.process(game, player1, player2, unit, attacker)
-    );
+        onAttackedListeners,
+        player1,
+        (action) -> action.process(game, player1, player2, unit, attacker));
   }
   
   public void processOnDeadListeners(
@@ -192,10 +170,9 @@ public class Listener implements Serializable
       Unit attacker)
   {
     ListenerUtils.processActionListeners(
-            onDeadListeners,
-            player1,
-            (action) -> action.process(game, player1, player2, unit, attacker)
-    );
+        onDeadListeners,
+        player1,
+        (action) -> action.process(game, player1, player2, unit, attacker));
   }
   
   public void processOnSellListeners(
@@ -204,10 +181,9 @@ public class Listener implements Serializable
       Entity entity)
   {
     ListenerUtils.processActionListeners(
-            onSellListeners,
-            player,
-            (action) -> action.process(game, player, entity)
-    );
+        onSellListeners,
+        player,
+        (action) -> action.process(game, player, entity));
   }
   
   public void processOnAppearListeners(
@@ -271,18 +247,16 @@ public class Listener implements Serializable
   private <T extends GlobalAction> void processGlobalListeners(Map<String, T> listeners, Game game, Player player)
   {
     ListenerUtils.processActionListeners(
-            listeners,
-            player,
-            (action) -> action.process(game, player)
-    );
+        listeners,
+        player,
+        (action) -> action.process(game, player));
   }
   
   private <T extends PrepareAction> void processPrepareListeners(Map<String, T> listeners, Game game, Player player, Entity entity)
   {
     ListenerUtils.processActionListeners(
-            listeners,
-            player,
-            (action) -> action.process(game, player, entity)
-    );
+        listeners,
+        player,
+        (action) -> action.process(game, player, entity));
   }
 }

@@ -6,7 +6,6 @@ import java.util.List;
 import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.spell.Spell;
 import ru.vladislavkomkov.model.entity.unit.Unit;
-import ru.vladislavkomkov.model.event.Event;
 import ru.vladislavkomkov.util.RandUtils;
 import ru.vladislavkomkov.util.SpellUtils;
 import ru.vladislavkomkov.util.UnitUtils;

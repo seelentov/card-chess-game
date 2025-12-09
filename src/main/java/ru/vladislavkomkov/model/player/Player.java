@@ -1,7 +1,10 @@
 package ru.vladislavkomkov.model.player;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -14,8 +17,7 @@ import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.Entity;
 import ru.vladislavkomkov.model.entity.spell.impl.spellcraft.SpellCraft;
 import ru.vladislavkomkov.model.entity.unit.Unit;
-import ru.vladislavkomkov.model.event.Event;
-import ru.vladislavkomkov.util.ListenerUtils;
+import ru.vladislavkomkov.util.RandUtils;
 import ru.vladislavkomkov.util.SerializationUtils;
 import ru.vladislavkomkov.util.UUIDUtils;
 
@@ -46,6 +48,7 @@ public class Player implements Cloneable, Serializable
   int resetTavernPrice = 1;
   
   Sender sender = new MockSender();
+  Map<String, Consumer<Integer>> senderWaiters = new HashMap<>();
   
   public Player()
   {
@@ -56,6 +59,23 @@ public class Player implements Cloneable, Serializable
   {
     super();
     this.uuid = uuid;
+  }
+  
+  public void putSenderWaiter(Consumer<Integer> consumer)
+  {
+    String key = UUIDUtils.generateKey();
+    senderWaiters.put(key, consumer);
+  }
+  
+  public void doSenderWaiter(String key, Integer param)
+  {
+    senderWaiters.get(key).accept(param);
+    senderWaiters.remove(key);
+  }
+  
+  public void clearSenderWaiters()
+  {
+    senderWaiters.forEach((key, action) -> action.accept(RandUtils.getRand()));
   }
   
   public String getUUID()
@@ -82,7 +102,7 @@ public class Player implements Cloneable, Serializable
     
     Unit unit = table.get(index);
     table.remove(index);
-    table.add(index2,unit);
+    table.add(index2, unit);
   }
   
   public void freezeTavern(Game game)
@@ -147,7 +167,7 @@ public class Player implements Cloneable, Serializable
     }
     
     tavern.freeze = false;
-
+    
     resetTavern(game);
   }
   
@@ -179,7 +199,7 @@ public class Player implements Cloneable, Serializable
     {
       table.add(index, unit);
     }
-
+    
     unit.onAppear(game, this);
     
     return true;

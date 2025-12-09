@@ -31,7 +31,7 @@ public class IckyImp extends Unit
             int index = player.getFightIndex(this);
             for (int i = 0; i < 2; i++)
             {
-              player.addToFightTable(game,new Imp(), index + 1, true);
+              player.addToFightTable(game, new Imp(), index + 1, true);
             }
           }
           else
@@ -39,7 +39,7 @@ public class IckyImp extends Unit
             int index = player.getIndex(this);
             for (int i = 0; i < 2; i++)
             {
-              player.addToTable(game,new Imp(), index + 1);
+              player.addToTable(game, new Imp(), index + 1);
             }
           }
         });
@@ -58,7 +58,7 @@ public class IckyImp extends Unit
             int index = player.getFightIndex(gold);
             for (int i = 0; i < 2; i++)
             {
-              player.addToFightTable(game,new Imp().newGold(), index + 1, true);
+              player.addToFightTable(game, new Imp().newGold(), index + 1, true);
             }
           }
           else
@@ -66,7 +66,7 @@ public class IckyImp extends Unit
             int index = player.getIndex(gold);
             for (int i = 0; i < 2; i++)
             {
-              player.addToTable(game,new Imp().newGold(), index + 1);
+              player.addToTable(game, new Imp().newGold(), index + 1);
             }
           }
         });

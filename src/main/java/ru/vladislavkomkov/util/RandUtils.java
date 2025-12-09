@@ -12,6 +12,11 @@ public class RandUtils
       5, new Integer[] { 20, 25, 30, 20, 5, 0 },
       6, new Integer[] { 15, 20, 25, 25, 10, 5 });
   
+  public static int getRand()
+  {
+    return getRand(Integer.MAX_VALUE);
+  }
+  
   public static int getRand(int max)
   {
     return getRand(0, max);

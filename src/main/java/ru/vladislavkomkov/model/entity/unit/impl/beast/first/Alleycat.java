@@ -31,12 +31,12 @@ public class Alleycat extends Unit
           if (player.inFight())
           {
             int indexParent = player.getFightIndex(this);
-            player.addToFightTable(game,new Cat(), indexParent + 1);
+            player.addToFightTable(game, new Cat(), indexParent + 1);
           }
           else
           {
             int indexParent = player.getIndex(this);
-            player.addToTable(game,new Cat(), indexParent + 1);
+            player.addToTable(game, new Cat(), indexParent + 1);
           }
         });
   }
@@ -53,12 +53,12 @@ public class Alleycat extends Unit
           if (player.inFight())
           {
             int indexParent = player.getFightIndex(gold);
-            player.addToFightTable(game,new Cat().newGold(), indexParent + 1);
+            player.addToFightTable(game, new Cat().newGold(), indexParent + 1);
           }
           else
           {
             int indexParent = player.getIndex(gold);
-            player.addToTable(game,new Cat().newGold(), indexParent + 1);
+            player.addToTable(game, new Cat().newGold(), indexParent + 1);
           }
         });
     

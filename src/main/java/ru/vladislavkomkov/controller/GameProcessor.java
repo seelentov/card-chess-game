@@ -1,12 +1,13 @@
 package ru.vladislavkomkov.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ru.vladislavkomkov.model.Game;
-
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ru.vladislavkomkov.model.Game;
 
 public class GameProcessor
 {

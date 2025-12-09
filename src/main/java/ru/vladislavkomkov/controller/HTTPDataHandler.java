@@ -1,17 +1,17 @@
 package ru.vladislavkomkov.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.vladislavkomkov.model.Game;
 
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
+import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.util.JWTUtils;
 import ru.vladislavkomkov.util.UUIDUtils;
-
-import java.util.Map;
-import java.util.HashMap;
 
 public class HTTPDataHandler
 {

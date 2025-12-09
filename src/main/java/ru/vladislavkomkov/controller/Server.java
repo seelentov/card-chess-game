@@ -1,11 +1,11 @@
 package ru.vladislavkomkov.controller;
 
-import ru.vladislavkomkov.model.Game;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import ru.vladislavkomkov.model.Game;
 
 public class Server
 {
@@ -25,9 +25,9 @@ public class Server
     {
       portWS = Integer.parseInt(args[1]);
     }
-
+    
     GameProcessor processor = new GameProcessor(games);
-    HTTPDataHandler httpDataHandler = new HTTPDataHandler(portHttp, games,processor);
+    HTTPDataHandler httpDataHandler = new HTTPDataHandler(portHttp, games, processor);
     WSEventHandler wsEventHandler = new WSEventHandler(portWS, games);
     
     ExecutorService executor = Executors.newFixedThreadPool(2);

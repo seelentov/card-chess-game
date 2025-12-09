@@ -1,10 +1,7 @@
 package ru.vladislavkomkov.model;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -493,7 +490,7 @@ public class FightTest extends GamePlayerTestCase
           .sorted(Map.Entry.<String, Integer> comparingByValue())
           .limit(28)
           .toList();
-
+      
       int finalI = i;
       assertEquals(
           0,

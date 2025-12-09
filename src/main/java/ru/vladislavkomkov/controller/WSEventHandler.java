@@ -1,23 +1,23 @@
 package ru.vladislavkomkov.controller;
 
-import org.java_websocket.server.WebSocketServer;
+import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
+import org.java_websocket.server.WebSocketServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.event.Event;
 
-import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.Map;
-
 public class WSEventHandler extends WebSocketServer
 {
   private static final Logger log = LoggerFactory.getLogger(WSEventHandler.class);
-
+  
   private final Map<String, Game> games;
   private final Map<String, EventDispatcher> eventDispatchers = new HashMap<>();
   
@@ -26,7 +26,7 @@ public class WSEventHandler extends WebSocketServer
     super(new InetSocketAddress(port));
     this.games = games;
   }
-
+  
   @Override
   public void onOpen(WebSocket conn, ClientHandshake handshake)
   {

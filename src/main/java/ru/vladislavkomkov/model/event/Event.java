@@ -1,11 +1,12 @@
 package ru.vladislavkomkov.model.event;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import ru.vladislavkomkov.util.ObjectUtils;
-
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+
+import ru.vladislavkomkov.util.ObjectUtils;
 
 public class Event
 {
@@ -153,10 +154,13 @@ public class Event
     LVL_UP, // Подьем уровня таверны
     ROLL, // Ролл таверны
     MOVE, // Перемещение карты на столе
-    MONEY, // Перемещение карты на столе
+    RES, // Получение ответа на ивенты типа WAIT_REQ
     
     // Исходящие
     PRE_FIGHT_TIMER, // Таймер начала боя
+    WAIT_REQ,
+    CLEAR_WAITERS,
+    MONEY, // Изменение кол-ва золота
     WIN, // Конец игры - победа
     LOSE, // Конец игры - поражение
     START, // Старт игры
