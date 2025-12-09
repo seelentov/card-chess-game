@@ -186,7 +186,6 @@ public class Game implements AutoCloseable, Serializable
         processStartFight(player, player2);
 
         Optional<Fight.Info> result;
-
         do
         {
           result = fight.doTurn();

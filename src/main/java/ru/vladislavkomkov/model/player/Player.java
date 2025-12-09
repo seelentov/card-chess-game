@@ -17,6 +17,8 @@ import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.Entity;
 import ru.vladislavkomkov.model.entity.spell.impl.spellcraft.SpellCraft;
 import ru.vladislavkomkov.model.entity.unit.Unit;
+import ru.vladislavkomkov.model.event.Event;
+import ru.vladislavkomkov.model.event.data.SenderWaiterDataReq;
 import ru.vladislavkomkov.util.RandUtils;
 import ru.vladislavkomkov.util.SerializationUtils;
 import ru.vladislavkomkov.util.UUIDUtils;
@@ -61,10 +63,17 @@ public class Player implements Cloneable, Serializable
     this.uuid = uuid;
   }
   
-  public void putSenderWaiter(Consumer<Integer> consumer)
+  public void putSenderWaiter(Consumer<Integer> consumer, Game game, Object data)
   {
     String key = UUIDUtils.generateKey();
+
     senderWaiters.put(key, consumer);
+
+    getSender().send(new Event(
+        game.getUUID(),
+        getUUID(),
+        Event.Type.WAIT_REQ,
+        new SenderWaiterDataReq(key, data)).getBytes());
   }
   
   public void doSenderWaiter(String key, Integer param)

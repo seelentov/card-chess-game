@@ -15,7 +15,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import ru.vladislavkomkov.controller.sender.WebSocketSender;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.event.Event;
-import ru.vladislavkomkov.model.event.data.SenderWaiterData;
+import ru.vladislavkomkov.model.event.data.SenderWaiterDataRes;
 
 public class EventDispatcher
 {
@@ -133,7 +133,7 @@ public class EventDispatcher
         game.resetTavern(playerUUID);
       }
       case RES -> {
-        SenderWaiterData data = event.getData(SenderWaiterData.class);
+        SenderWaiterDataRes data = event.getData(SenderWaiterDataRes.class);
         game.doSenderWaiter(playerUUID, data.getKey(), data.getParam());
       }
       default -> throw new RuntimeException("Unexpected event type: " + event.getType());

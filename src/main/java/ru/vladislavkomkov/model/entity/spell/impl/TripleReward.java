@@ -56,13 +56,7 @@ public class TripleReward extends Spell
             }
             
             player.addToHand(game, Card.of(units.get(param)));
-          });
-          
-          player.getSender().send(new Event(
-              game.getUUID(),
-              player.getUUID(),
-              Event.Type.WAIT_REQ,
-              units).getBytes());
+          }, game, units);
         });
   }
 }

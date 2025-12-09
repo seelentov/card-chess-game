@@ -1,11 +1,11 @@
 package ru.vladislavkomkov.model.event.data;
 
-public class SenderWaiterData
+public class SenderWaiterDataRes
 {
   private String key;
   private int param;
   
-  public SenderWaiterData(String key, int param)
+  public SenderWaiterDataRes(String key, int param)
   {
     this.key = key;
     this.param = param;

@@ -11,7 +11,7 @@ import ru.vladislavkomkov.util.RandUtils;
 
 public class Fight implements Serializable
 {
-atic final int TURN_LIMIT = 10000;
+  static final int TURN_LIMIT = 10000;
   final Game game;
   final Player player1;
   final Player player2;
@@ -228,7 +228,6 @@ atic final int TURN_LIMIT = 10000;
     return player2;
   }
   
-  void a
   public static class Info
   {
     final Player player1;
@@ -251,7 +250,7 @@ atic final int TURN_LIMIT = 10000;
     }
   }
 
-  stfterFight()
+  void afterFight()
   {
     player1.inFightTable = null;
     player2.inFightTable = null;
