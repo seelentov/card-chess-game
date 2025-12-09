@@ -51,12 +51,12 @@ public class Game implements AutoCloseable, Serializable
   
   public Game()
   {
-    this(new HashMap<>(), "");
+    this(new HashMap<>(), UUIDUtils.generateKey());
   }
   
   public Game(Map<String, Player> players)
   {
-    this(players, "");
+    this(players, UUIDUtils.generateKey());
   }
   
   public Game(String uuid)
@@ -79,9 +79,14 @@ public class Game implements AutoCloseable, Serializable
         Event.Type.CONNECTED).getBytes());
   }
   
-  public void sendPreFightTimer(long ms)
+  public void sendPreFightTimer(int ms)
   {
-    players.forEach((key, player) -> player.getSender().send(new Event(uuid, key, Event.Type.PRE_FIGHT_TIMER).getBytes()));
+    players.forEach((key, player) -> player.getSender().send(new Event(uuid, key, Event.Type.PRE_FIGHT_TIMER, ms).getBytes()));
+  }
+  
+  public void sendStartGame()
+  {
+    players.forEach((key, player) -> player.getSender().send(new Event(uuid, key, Event.Type.START).getBytes()));
   }
   
   public void buyTavernCard(String uuid, int index)
@@ -117,13 +122,13 @@ public class Game implements AutoCloseable, Serializable
   public void moveTable(String uuid, int index, int index2)
   {
     Player player = getPlayer(uuid);
-    player.moveTable(index, index2);
+    player.moveTable(this, index, index2);
   }
   
   public void freezeTavern(String uuid)
   {
     Player player = getPlayer(uuid);
-    player.freezeTavern();
+    player.freezeTavern(this);
   }
   
   private Player getPlayer(String uuid)
@@ -137,7 +142,7 @@ public class Game implements AutoCloseable, Serializable
     
     for (Player player : players.values())
     {
-      player.resetMoney();
+      player.resetMoney(this);
       player.resetTavern(this);
       processStartTurn(player);
       processEndTurn(player);
@@ -237,9 +242,9 @@ public class Game implements AutoCloseable, Serializable
       if (player != null)
       {
         player.getSender().send(new Event(
-                uuid,
-                player.getUUID(),
-                Event.Type.WIN).getBytes());
+            uuid,
+            player.getUUID(),
+            Event.Type.WIN).getBytes());
       }
       
       return true;
@@ -251,11 +256,13 @@ public class Game implements AutoCloseable, Serializable
     
     Map<String, Map<String, Integer>> fightCounts = new HashMap<>();
     
-    for (Player player : players) {
+    for (Player player : players)
+    {
       fightCounts.put(player.getUUID(), new HashMap<>());
     }
     
-    for (Fight.Info fightInfo : fightHistory) {
+    for (Fight.Info fightInfo : fightHistory)
+    {
       String p1 = fightInfo.player1.getUUID();
       String p2 = fightInfo.player2.getUUID();
       
@@ -266,64 +273,78 @@ public class Game implements AutoCloseable, Serializable
     List<Player> availablePlayers = new ArrayList<>(players);
     Collections.shuffle(availablePlayers);
     
-    while (availablePlayers.size() >= 2) {
+    while (availablePlayers.size() >= 2)
+    {
       Player player1 = availablePlayers.remove(0);
       
       Player player2 = findOpponent(player1, availablePlayers, fightCounts, players);
       
-      if (player2 != null) {
+      if (player2 != null)
+      {
         availablePlayers.remove(player2);
         fights.add(new Fight(this, player1, player2));
-      } else if (!availablePlayers.isEmpty()) {
+      }
+      else if (!availablePlayers.isEmpty())
+      {
         player2 = availablePlayers.remove(0);
         fights.add(new Fight(this, player1, player2));
       }
     }
     
-    if (!availablePlayers.isEmpty()) {
+    if (!availablePlayers.isEmpty())
+    {
       Player lonelyPlayer = availablePlayers.get(0);
       lonelyPlayer.getSender().send(new Event(
-              uuid,
-              lonelyPlayer.getUUID(),
-              Event.Type.WIN).getBytes());
+          uuid,
+          lonelyPlayer.getUUID(),
+          Event.Type.WIN).getBytes());
     }
     
     return false;
   }
   
   private Player findOpponent(Player player, List<Player> availablePlayers,
-                              Map<String, Map<String, Integer>> fightCounts,
-                              List<Player> allPlayers) {
+      Map<String, Map<String, Integer>> fightCounts,
+      List<Player> allPlayers)
+  {
     
     String playerId = player.getUUID();
     Map<String, Integer> playerFights = fightCounts.get(playerId);
     
     boolean foughtWithAll = true;
-    for (Player other : allPlayers) {
-      if (playerFights.getOrDefault(other.getUUID(), 0) == 0) {
+    for (Player other : allPlayers)
+    {
+      if (playerFights.getOrDefault(other.getUUID(), 0) == 0)
+      {
         foughtWithAll = false;
         break;
       }
     }
     
-    if (!foughtWithAll) {
-      for (Player opponent : availablePlayers) {
-        if (playerFights.getOrDefault(opponent.getUUID(), 0) == 0) {
+    if (!foughtWithAll)
+    {
+      for (Player opponent : availablePlayers)
+      {
+        if (playerFights.getOrDefault(opponent.getUUID(), 0) == 0)
+        {
           return opponent;
         }
       }
     }
     
-    if (!availablePlayers.isEmpty()) {
+    if (!availablePlayers.isEmpty())
+    {
       Player bestOpponent = null;
       int minFights = Integer.MAX_VALUE;
       
-      for (Player opponent : availablePlayers) {
-          int fightsWithOpponent = playerFights.getOrDefault(opponent.getUUID(), 0);
-          if (fightsWithOpponent < minFights) {
-            minFights = fightsWithOpponent;
-            bestOpponent = opponent;
-          }
+      for (Player opponent : availablePlayers)
+      {
+        int fightsWithOpponent = playerFights.getOrDefault(opponent.getUUID(), 0);
+        if (fightsWithOpponent < minFights)
+        {
+          minFights = fightsWithOpponent;
+          bestOpponent = opponent;
+        }
       }
       
       return bestOpponent;

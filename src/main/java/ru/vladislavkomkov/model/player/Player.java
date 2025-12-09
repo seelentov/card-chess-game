@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import javafx.util.Pair;
+import ru.vladislavkomkov.controller.sender.MockSender;
 import ru.vladislavkomkov.controller.sender.Sender;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.Listener;
@@ -16,6 +17,7 @@ import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.event.Event;
 import ru.vladislavkomkov.util.ListenerUtils;
 import ru.vladislavkomkov.util.SerializationUtils;
+import ru.vladislavkomkov.util.UUIDUtils;
 
 public class Player implements Cloneable, Serializable
 {
@@ -43,11 +45,11 @@ public class Player implements Cloneable, Serializable
   int buyPrice = 3;
   int resetTavernPrice = 1;
   
-  Sender sender;
+  Sender sender = new MockSender();
   
   public Player()
   {
-    this("");
+    this(UUIDUtils.generateKey());
   }
   
   public Player(String uuid)
@@ -71,7 +73,7 @@ public class Player implements Cloneable, Serializable
     this.sender = sender;
   }
   
-  public void moveTable(int index, int index2)
+  public void moveTable(Game game, int index, int index2)
   {
     if (table.size() <= index)
     {
@@ -80,12 +82,12 @@ public class Player implements Cloneable, Serializable
     
     Unit unit = table.get(index);
     table.remove(index);
-    addToTable(null, unit, index2);
+    table.add(index2,unit);
   }
   
-  public void freezeTavern()
+  public void freezeTavern(Game game)
   {
-    tavern.freeze = true;
+    tavern.freeze = !tavern.freeze;
   }
   
   public void playCard(Game game, int indexCard)
@@ -145,7 +147,7 @@ public class Player implements Cloneable, Serializable
     }
     
     tavern.freeze = false;
-    
+
     resetTavern(game);
   }
   
@@ -177,7 +179,7 @@ public class Player implements Cloneable, Serializable
     {
       table.add(index, unit);
     }
-    
+
     unit.onAppear(game, this);
     
     return true;
@@ -215,12 +217,12 @@ public class Player implements Cloneable, Serializable
   
   public boolean addToTable(Unit unit)
   {
-    return addToTable(null, unit, -1);
+    return addToTable(new Game(), unit, -1);
   }
   
   public boolean addToTable(Unit unit, int index)
   {
-    return addToTable(null, unit, index);
+    return addToTable(new Game(), unit, index);
   }
   
   public boolean addToTable(Game game, Unit unit)
@@ -460,17 +462,12 @@ public class Player implements Cloneable, Serializable
     return health > 0;
   }
   
-  public void resetMoney()
+  public void resetMoney(Game game)
   {
     money = maxMoney;
   }
   
-  public void incMaxMoney()
-  {
-    incMaxMoney(1);
-  }
-  
-  public void incMaxMoney(int i)
+  public void incMaxMoney(Game game, int i)
   {
     maxMoney += i;
   }

@@ -1,36 +1,47 @@
 package ru.vladislavkomkov.model.event;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import ru.vladislavkomkov.util.ObjectUtils;
+
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 public class Event
 {
   private final String gameUUID;
   private final String playerUUID;
   private final Type type;
-  private final List<Integer> data;
-
+  private final byte[] data;
+  
   public Event(String gameUUID, String playerUUID, Type type)
   {
     this(
-            gameUUID,
-            playerUUID,
-            type,
-            new ArrayList<>());
+        gameUUID,
+        playerUUID,
+        type,
+        new byte[0]);
   }
-
+  
   public Event(String gameUUID, String playerUUID, Type type, int data)
   {
     this(
-            gameUUID,
-            playerUUID,
-            type,
-            List.of(data));
+        gameUUID,
+        playerUUID,
+        type,
+        ByteBuffer.allocate(4).putInt(data).array());
   }
   
-  public Event(String gameUUID, String playerUUID, Type type, List<Integer> data)
+  public Event(String gameUUID, String playerUUID, Type type, Object data)
+  {
+    this(
+        gameUUID,
+        playerUUID,
+        type,
+        ObjectUtils.writeValue(data));
+  }
+  
+  public Event(String gameUUID, String playerUUID, Type type, byte[] data)
   {
     this.gameUUID = gameUUID;
     this.playerUUID = playerUUID;
@@ -50,12 +61,8 @@ public class Event
     
     this.type = Type.values()[buffer.getInt()];
     
-    int dataLength = buffer.getInt();
-    this.data = new ArrayList<>();
-    for (int i = 0; i < dataLength; i++)
-    {
-      data.add(buffer.getInt());
-    }
+    this.data = new byte[buffer.getInt()];
+    buffer.get(this.data);
   }
   
   private String readUUIDFromBuffer(ByteBuffer buffer)
@@ -67,19 +74,17 @@ public class Event
   
   public byte[] getBytes()
   {
-    int size = 36 + 36 + 4 + 4 + (data.size() * 4);
+    int size = 36 + 36 + 4 + 4 + data.length;
     ByteBuffer buffer = ByteBuffer.allocate(size);
     
     writeUUIDToBuffer(buffer, gameUUID);
     writeUUIDToBuffer(buffer, playerUUID);
     
     buffer.putInt(type.ordinal());
-    buffer.putInt(data.size());
     
-    for (Integer value : data)
-    {
-      buffer.putInt(value);
-    }
+    buffer.putInt(data.length);
+    
+    buffer.put(data);
     
     return buffer.array();
   }
@@ -109,9 +114,19 @@ public class Event
     return type;
   }
   
-  public List<Integer> getData()
+  public byte[] getData()
   {
-    return new ArrayList<>(data);
+    return data;
+  }
+  
+  public <T> T getData(Class<T> clazz)
+  {
+    return ObjectUtils.readValue(data, clazz);
+  }
+  
+  public <T> T getData(TypeReference<T> typeReference)
+  {
+    return ObjectUtils.readValue(data, typeReference);
   }
   
   @Override
@@ -121,21 +136,31 @@ public class Event
         "gameUUID='" + gameUUID + '\'' +
         ", playerUUID='" + playerUUID + '\'' +
         ", type=" + type +
-        ", data=" + data +
+        ", data=" + Arrays.toString(data) +
         '}';
   }
   
   public enum Type
   {
-    PRE_FIGHT_TIMER,
-    WIN,
-    CONNECTED,
-    BYU,
-    PLAY,
-    SELL,
-    FREEZE,
-    LVL_UP,
-    ROLL,
-    MOVE
+    // В обе стороны
+    CONNECTED, // Подключение к игре
+    
+    // Входящие
+    BYU, // Покупка карты
+    PLAY, // Разыгровка карты
+    SELL, // Продажа карты
+    FREEZE, // Заморозка таверны
+    LVL_UP, // Подьем уровня таверны
+    ROLL, // Ролл таверны
+    MOVE, // Перемещение карты на столе
+    MONEY, // Перемещение карты на столе
+    
+    // Исходящие
+    PRE_FIGHT_TIMER, // Таймер начала боя
+    WIN, // Конец игры - победа
+    LOSE, // Конец игры - поражение
+    START, // Старт игры
+    ADD_TO_TABLE, // Добавление на стол
+    ADD_TO_HAND, // Добавление в руку
   }
 }

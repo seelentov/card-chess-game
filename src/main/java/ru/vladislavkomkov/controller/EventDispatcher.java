@@ -1,5 +1,6 @@
 package ru.vladislavkomkov.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.java_websocket.WebSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,13 +73,16 @@ public class EventDispatcher
           throw new RuntimeException("WenSocketClient is null");
         }
         
+        playerUUID = game.addPlayer();
         game.setPlayerSender(playerUUID, new WebSocketSender(conn));
       }
       case BYU -> {
-        game.buyTavernCard(playerUUID, event.getData().get(0));
+        game.buyTavernCard(playerUUID, event.getData(Integer.class));
       }
       case PLAY -> {
-        List<Integer> data = event.getData();
+        List<Integer> data = event.getData(new TypeReference<List<Integer>>()
+        {
+        });
         
         if (data.size() < 5)
         {
@@ -104,7 +108,7 @@ public class EventDispatcher
             data.get(4) == 1);
       }
       case SELL -> {
-        game.sellCard(playerUUID, event.getData().get(0));
+        game.sellCard(playerUUID, event.getData(Integer.class));
       }
       case FREEZE -> {
         game.freezeTavern(playerUUID);
@@ -113,7 +117,11 @@ public class EventDispatcher
         game.lvlUp(playerUUID);
       }
       case MOVE -> {
-        game.moveTable(playerUUID, event.getData().get(0), event.getData().get(1));
+        List<Integer> data = event.getData(new TypeReference<List<Integer>>()
+        {
+        });
+        
+        game.moveTable(playerUUID, data.get(0), data.get(1));
       }
       case ROLL -> {
         game.resetTavern(playerUUID);

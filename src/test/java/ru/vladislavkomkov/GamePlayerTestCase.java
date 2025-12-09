@@ -34,7 +34,7 @@ public abstract class GamePlayerTestCase
         "7", new Player(),
         "8", new Player());
     game = new Game(players);
-    player.resetMoney();
+    player.resetMoney(game);
   }
   
   @AfterEach

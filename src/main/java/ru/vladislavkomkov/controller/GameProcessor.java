@@ -20,14 +20,10 @@ public class GameProcessor
     this.games = games;
   }
   
-  public void append(Game game)
-  {
-    games.put(game.getUUID(), game);
-  }
-  
   public void start(String uuid)
   {
     Game game = games.get(uuid);
+    game.sendStartGame();
     
     executor.submit(() -> {
       while (true)
@@ -41,7 +37,7 @@ public class GameProcessor
           
           game.doPreFight();
           
-          long preFightTimer = (game.getTurn() * 5000L) + 30000;
+          int preFightTimer = (game.getTurn() * 5000) + 30000;
           
           game.sendPreFightTimer(preFightTimer);
           Thread.sleep(preFightTimer);
