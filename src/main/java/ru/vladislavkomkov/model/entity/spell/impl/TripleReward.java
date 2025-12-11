@@ -9,7 +9,6 @@ import java.util.Set;
 import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.spell.Spell;
 import ru.vladislavkomkov.model.entity.unit.Unit;
-import ru.vladislavkomkov.model.event.Event;
 import ru.vladislavkomkov.util.RandUtils;
 import ru.vladislavkomkov.util.UnitUtils;
 
@@ -55,8 +54,8 @@ public class TripleReward extends Spell
               param = RandUtils.getRand(1, 3);
             }
             
-            player.addToHand(game, Card.of(units.get(param)));
-          }, game, units);
+            player.addToHand(Card.of(units.get(param)));
+          }, units);
         });
   }
 }

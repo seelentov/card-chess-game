@@ -1,7 +1,5 @@
 package ru.vladislavkomkov.controller.sender;
 
-import java.util.function.Consumer;
-
 import org.java_websocket.WebSocket;
 
 public class WebSocketSender implements Sender
@@ -17,11 +15,5 @@ public class WebSocketSender implements Sender
   public void send(byte[] data)
   {
     conn.send(data);
-  }
-  
-  @Override
-  public void sendWithResponse(byte[] data, Consumer<byte[]> consumer)
-  {
-    consumer.accept(data);
   }
 }

@@ -155,16 +155,24 @@ public class Event
     ROLL, // Ролл таверны
     MOVE, // Перемещение карты на столе
     RES, // Получение ответа на ивенты типа WAIT_REQ
+    RESET_TAVERN,  // Ролл таверны
+    APPLY_DAMAGE,
+    
     
     // Исходящие
     PRE_FIGHT_TIMER, // Таймер начала боя
     WAIT_REQ,
     CLEAR_WAITERS,
+    ARMOR, // Изменение щита
     MONEY, // Изменение кол-ва золота
+    MAX_MONEY, // Изменение макс. кол-ва золота
     WIN, // Конец игры - победа
     LOSE, // Конец игры - поражение
     START, // Старт игры
     ADD_TO_TABLE, // Добавление на стол
+    ADD_TO_FIGHT_TABLE, // Добавление на стол
+    REMOVE_FROM_TABLE,
     ADD_TO_HAND, // Добавление в руку
+    REMOVE_FROM_HAND
   }
 }

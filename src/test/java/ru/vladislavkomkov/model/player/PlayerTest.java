@@ -1,6 +1,9 @@
 package ru.vladislavkomkov.model.player;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Objects;
@@ -22,7 +25,7 @@ public class PlayerTest extends GamePlayerTestCase
   @Test
   void testResetTavern()
   {
-    player.resetTavern(game);
+    player.resetTavern();
     
     assertEquals(
         Tavern.getCountByLvl(player.getLevel()),
@@ -62,7 +65,7 @@ public class PlayerTest extends GamePlayerTestCase
     
     assertEquals(1, player.cloneHand().size());
     
-    player.playCard(game, 0, 0);
+    player.playCard(0, 0);
     
     assertTrue(player.cloneHand().isEmpty());
     
@@ -85,7 +88,7 @@ public class PlayerTest extends GamePlayerTestCase
     
     assertEquals(1, player.cloneHand().size());
     
-    player.playCard(game, 0, 0);
+    player.playCard(0, 0);
     
     assertTrue(player.cloneHand().isEmpty());
     
@@ -130,7 +133,7 @@ public class PlayerTest extends GamePlayerTestCase
   @Test
   void testAddSingleToHand()
   {
-    player = new Player();
+    player = new Player(game);
     player.addToHand(new Card(new TavernCoin()));
     
     assertEquals(1, player.cloneHand().stream().filter(Objects::nonNull).count());
@@ -140,7 +143,7 @@ public class PlayerTest extends GamePlayerTestCase
   @Test
   void testAddManyToHand()
   {
-    player = new Player();
+    player = new Player(game);
     for (int i = 0; i < 20; i++)
     {
       if (i % 2 == 0)
@@ -177,7 +180,7 @@ public class PlayerTest extends GamePlayerTestCase
   void testBuyCard()
   {
     player.getTavern().add(Card.of(new Alleycat()));
-    player.buyCard(game, 0);
+    player.buyCard(0);
     assertEquals(new Alleycat().getName(), player.cloneHand().get(0).get().getName());
   }
   
@@ -188,7 +191,7 @@ public class PlayerTest extends GamePlayerTestCase
     
     player.addToHand(Card.of(new TavernCoin()));
     
-    player.playCard(game, 0, 0);
+    player.playCard(0, 0);
     
     assertEquals(4, player.getMoney());
     assertEquals(0, player.cloneHand().stream().filter(Objects::nonNull).count());
@@ -199,7 +202,7 @@ public class PlayerTest extends GamePlayerTestCase
   {
     player.addToHand(Card.of(new Alleycat()));
     
-    player.playCard(game, 0, 0);
+    player.playCard(0, 0);
     
     assertEquals(0, player.cloneHand().stream().filter(Objects::nonNull).count());
     
@@ -279,7 +282,7 @@ public class PlayerTest extends GamePlayerTestCase
     for (int i = 1; i < 10; i++)
     {
       assertEquals(Math.min(i, Player.MAX_LEVEL), player.getLevel());
-      player.incLevel(game);
+      player.incLevel();
     }
   }
   

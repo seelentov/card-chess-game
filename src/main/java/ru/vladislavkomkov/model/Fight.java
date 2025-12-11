@@ -228,12 +228,19 @@ public class Fight implements Serializable
     return player2;
   }
   
+  void afterFight()
+  {
+    player1.inFightTable = null;
+    player2.inFightTable = null;
+  }
+  
   public static class Info
   {
     final Player player1;
     final Player player2;
     final Result result;
     final int damage;
+    
     public Info(Player player1, Player player2, Result result, int damage)
     {
       this.player1 = player1;
@@ -241,18 +248,12 @@ public class Fight implements Serializable
       this.result = result;
       this.damage = damage;
     }
-
+    
     public enum Result
     {
       PLAYER1_WIN,
       PLAYER2_WIN,
       DRAW
     }
-  }
-
-  void afterFight()
-  {
-    player1.inFightTable = null;
-    player2.inFightTable = null;
   }
 }

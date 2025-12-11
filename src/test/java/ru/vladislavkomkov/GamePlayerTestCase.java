@@ -22,19 +22,21 @@ public abstract class GamePlayerTestCase
   @BeforeEach
   protected void setUp()
   {
-    player = new Player();
-    player2 = new Player();
+    game = new Game(players);
+    
+    player = new Player(game);
+    player2 = new Player(game);
     players = Map.of(
         "1", player,
         "2", player2,
-        "3", new Player(),
-        "4", new Player(),
-        "5", new Player(),
-        "6", new Player(),
-        "7", new Player(),
-        "8", new Player());
-    game = new Game(players);
-    player.resetMoney(game);
+        "3", new Player(game),
+        "4", new Player(game),
+        "5", new Player(game),
+        "6", new Player(game),
+        "7", new Player(game),
+        "8", new Player(game));
+    
+    player.resetMoney();
   }
   
   @AfterEach

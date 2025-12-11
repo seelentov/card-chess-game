@@ -44,6 +44,6 @@ public abstract class SpellCrafter extends Unit
       spellcraft.build();
     }
     
-    player.addToHand(Card.of(spellcraft.newThis()), true);
+    player.addToHand(Card.of(spellcraft));
   }
 }

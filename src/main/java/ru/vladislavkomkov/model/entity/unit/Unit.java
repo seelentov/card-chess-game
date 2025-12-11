@@ -35,7 +35,7 @@ public abstract class Unit extends Entity
           player.listener.removeListener(this);
           
           player.addMoney(1);
-          player.removeFromTable(null, this);
+          player.removeFromTable(this);
           
           processListeners(player.listener.onSellListeners, (action) -> action.process(game, player, this), player);
         });

@@ -362,7 +362,7 @@ public class ListenerTest extends GamePlayerTestCase
   {
     testListener(
         player.listener.onResetTavernListeners,
-        () -> player.resetTavern(game),
+        () -> player.resetTavern(),
         (game1, player1) -> testAction(),
         once);
   }
@@ -383,7 +383,7 @@ public class ListenerTest extends GamePlayerTestCase
   {
     testListener(
         player.listener.onIncLevelListeners,
-        () -> player.incLevel(game),
+        () -> player.incLevel(),
         (game1, player1) -> testAction(),
         once);
   }

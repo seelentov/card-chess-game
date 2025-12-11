@@ -1,6 +1,8 @@
 package ru.vladislavkomkov.model;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
 import java.util.List;
@@ -451,14 +453,14 @@ public class FightTest extends GamePlayerTestCase
   void testFightsOrder() throws Exception
   {
     Map<String, Player> players = new HashMap<>();
-    players.put("1", new Player("1"));
-    players.put("2", new Player("2"));
-    players.put("3", new Player("3"));
-    players.put("4", new Player("4"));
-    players.put("5", new Player("5"));
-    players.put("6", new Player("6"));
-    players.put("7", new Player("7"));
-    players.put("8", new Player("8"));
+    players.put("1", new Player("1",game));
+    players.put("2", new Player("2",game));
+    players.put("3", new Player("3",game));
+    players.put("4", new Player("4",game));
+    players.put("5", new Player("5",game));
+    players.put("6", new Player("6",game));
+    players.put("7", new Player("7",game));
+    players.put("8", new Player("8",game));
     
     Game game = new Game(players, "");
     

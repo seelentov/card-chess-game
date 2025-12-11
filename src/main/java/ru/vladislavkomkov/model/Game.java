@@ -1,7 +1,14 @@
 package ru.vladislavkomkov.model;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -25,6 +32,7 @@ public class Game implements AutoCloseable, Serializable
   ExecutorService executor = Executors.newFixedThreadPool(FIGHTS_COUNT);
   Map<String, Player> players;
   int turn = 1;
+  
   public Game()
   {
     this(new HashMap<>(), UUIDUtils.generateKey());
@@ -74,43 +82,43 @@ public class Game implements AutoCloseable, Serializable
   public void buyTavernCard(String uuid, int index)
   {
     Player player = getPlayer(uuid);
-    player.buyCard(this, index);
+    player.buyCard(index);
   }
   
   public void playCard(String uuid, int indexCard, int indexCast, boolean isTavernCast, int indexCast2, boolean isTavernCast2)
   {
     Player player = getPlayer(uuid);
-    player.playCard(this, indexCard, indexCast, isTavernCast, indexCast2, isTavernCast2);
+    player.playCard(indexCard, indexCast, isTavernCast, indexCast2, isTavernCast2);
   }
   
   public void sellCard(String uuid, int index)
   {
     Player player = getPlayer(uuid);
-    player.sellCard(this, index);
+    player.sellCard(index);
   }
   
   public void lvlUp(String uuid)
   {
     Player player = getPlayer(uuid);
-    player.incLevel(this);
+    player.incLevel();
   }
   
   public void resetTavern(String uuid)
   {
     Player player = getPlayer(uuid);
-    player.resetTavernManual(this);
+    player.resetTavernManual();
   }
   
   public void moveTable(String uuid, int index, int index2)
   {
     Player player = getPlayer(uuid);
-    player.moveTable(this, index, index2);
+    player.moveTable(index, index2);
   }
   
   public void freezeTavern(String uuid)
   {
     Player player = getPlayer(uuid);
-    player.freezeTavern(this);
+    player.freezeTavern();
   }
   
   private Player getPlayer(String uuid)
@@ -128,11 +136,11 @@ public class Game implements AutoCloseable, Serializable
   {
     clearSenderWaiters();
     state = State.PREPARE;
-
+    
     for (Player player : players.values())
     {
-      player.resetMoney(this);
-      player.resetTavern(this);
+      player.resetMoney();
+      player.resetTavern();
       processStartTurn(player);
       processEndTurn(player);
     }
@@ -141,7 +149,7 @@ public class Game implements AutoCloseable, Serializable
   public void processStartTurn(Player player)
   {
     ListenerUtils.processGlobalActionListeners(player.listener.onStartTurnListeners, this, player);
-
+    
     player.doForAll(unit -> unit.onStartTurn(this, player));
     player.removeTempBuffs();
     player.calcTriplets();
@@ -151,57 +159,57 @@ public class Game implements AutoCloseable, Serializable
   {
     ListenerUtils.processGlobalActionListeners(player.listener.onEndTurnListeners, this, player);
     player.clearSpellCraft();
-
+    
     player.doForAll(unit -> unit.onEndTurn(this, player));
   }
   
   public void processStartFight(Player player, Player player2)
   {
     ListenerUtils.processGlobalActionListeners(player.listener.onStartFightListeners, this, player);
-
+    
     player.doForAll(unit -> unit.onStartFight(this, player, player2));
   }
   
   public void processEndFight(Player player, Player player2)
   {
     ListenerUtils.processGlobalActionListeners(player.listener.onEndFightListeners, this, player);
-
+    
     player.doForAll(unit -> unit.onEndFight(this, player, player2));
   }
   
   public void doFight()
   {
     state = State.FIGHT;
-
+    
     List<CompletableFuture<?>> fightFutures = new ArrayList<>();
-
+    
     for (Fight fight : fights)
     {
       fightFutures.add(CompletableFuture.supplyAsync(() -> {
         boolean isPlayerFirst = RandUtils.getRand(1) == 0;
-
+        
         Player player = isPlayerFirst ? fight.getPlayer1() : fight.getPlayer2();
         Player player2 = isPlayerFirst ? fight.getPlayer2() : fight.getPlayer1();
-
+        
         processStartFight(player, player2);
-
+        
         Optional<Fight.Info> result;
         do
         {
           result = fight.doTurn();
         }
         while (result.isEmpty());
-
+        
         fightHistory.add(result.get());
         processEndFight(player, player2);
-
+        
         return null;
       }, executor));
     }
-
+    
     CompletableFuture<Void> allOf = CompletableFuture.allOf(
         fightFutures.toArray(new CompletableFuture[0]));
-
+    
     allOf.join();
   }
   
@@ -219,11 +227,11 @@ public class Game implements AutoCloseable, Serializable
   {
     Queue<Player> alive = newPlayerQueue(true);
     Queue<Player> dead = newPlayerQueue(false);
-
+    
     if (alive.size() < 2)
     {
       Player player = alive.peek();
-
+      
       if (player != null)
       {
         player.getSender().send(new Event(
@@ -231,39 +239,39 @@ public class Game implements AutoCloseable, Serializable
             player.getUUID(),
             Event.Type.WIN).getBytes());
       }
-
+      
       return true;
     }
-
+    
     fights.clear();
-
+    
     List<Player> players = new ArrayList<>(alive);
-
+    
     Map<String, Map<String, Integer>> fightCounts = new HashMap<>();
-
+    
     for (Player player : players)
     {
       fightCounts.put(player.getUUID(), new HashMap<>());
     }
-
+    
     for (Fight.Info fightInfo : fightHistory)
     {
       String p1 = fightInfo.player1.getUUID();
       String p2 = fightInfo.player2.getUUID();
-
+      
       fightCounts.get(p1).put(p2, fightCounts.get(p1).getOrDefault(p2, 0) + 1);
       fightCounts.get(p2).put(p1, fightCounts.get(p2).getOrDefault(p1, 0) + 1);
     }
-
+    
     List<Player> availablePlayers = new ArrayList<>(players);
     Collections.shuffle(availablePlayers);
-
+    
     while (availablePlayers.size() >= 2)
     {
       Player player1 = availablePlayers.remove(0);
-
+      
       Player player2 = findOpponent(player1, availablePlayers, fightCounts, players);
-
+      
       if (player2 != null)
       {
         availablePlayers.remove(player2);
@@ -275,7 +283,7 @@ public class Game implements AutoCloseable, Serializable
         fights.add(new Fight(this, player1, player2));
       }
     }
-
+    
     if (!availablePlayers.isEmpty())
     {
       Player lonelyPlayer = availablePlayers.get(0);
@@ -284,7 +292,7 @@ public class Game implements AutoCloseable, Serializable
           lonelyPlayer.getUUID(),
           Event.Type.WIN).getBytes());
     }
-
+    
     return false;
   }
   
@@ -292,10 +300,10 @@ public class Game implements AutoCloseable, Serializable
       Map<String, Map<String, Integer>> fightCounts,
       List<Player> allPlayers)
   {
-
+    
     String playerId = player.getUUID();
     Map<String, Integer> playerFights = fightCounts.get(playerId);
-
+    
     boolean foughtWithAll = true;
     for (Player other : allPlayers)
     {
@@ -305,7 +313,7 @@ public class Game implements AutoCloseable, Serializable
         break;
       }
     }
-
+    
     if (!foughtWithAll)
     {
       for (Player opponent : availablePlayers)
@@ -316,12 +324,12 @@ public class Game implements AutoCloseable, Serializable
         }
       }
     }
-
+    
     if (!availablePlayers.isEmpty())
     {
       Player bestOpponent = null;
       int minFights = Integer.MAX_VALUE;
-
+      
       for (Player opponent : availablePlayers)
       {
         int fightsWithOpponent = playerFights.getOrDefault(opponent.getUUID(), 0);
@@ -331,10 +339,10 @@ public class Game implements AutoCloseable, Serializable
           bestOpponent = opponent;
         }
       }
-
+      
       return bestOpponent;
     }
-
+    
     return null;
   }
   
@@ -346,7 +354,7 @@ public class Game implements AutoCloseable, Serializable
   public String addPlayer()
   {
     String key = UUIDUtils.generateKey();
-    players.put(key, new Player(key));
+    players.put(key, new Player(key, this));
     return key;
   }
   

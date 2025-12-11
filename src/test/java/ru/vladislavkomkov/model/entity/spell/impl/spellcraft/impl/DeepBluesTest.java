@@ -56,7 +56,7 @@ public class DeepBluesTest extends SpellCraftTestCase
       String description = player.cloneHand().get(0).get().getDescription(player);
       assertTrue(description.contains("+" + (attack * i) + "/+" + (health * i)));
       
-      player.playCard(game, 0, unitIndex);
+      player.playCard(0, unitIndex);
       assertEquals(tempAttack + (attack * i), unit.getAttack());
       assertEquals(tempHealth + (health * i), unit.getHealth());
     }
@@ -78,7 +78,7 @@ public class DeepBluesTest extends SpellCraftTestCase
     int tempAttack = unit.getAttack();
     int tempHealth = unit.getHealth();
     
-    player.playCard(game, 0, unitIndex);
+    player.playCard(0, unitIndex);
     
     assertEquals(tempAttack + (DeepBlues.ATTACK_BOOST), unit.getAttack());
     assertEquals(tempHealth + (DeepBlues.HEALTH_BOOST), unit.getHealth());
