@@ -36,7 +36,7 @@ public abstract class SpellCrafter extends Unit
     return spellcraft;
   }
   
-  private void addSpellCraft(Player player)
+  void addSpellCraft(Player player)
   {
     if (this.isGold())
     {

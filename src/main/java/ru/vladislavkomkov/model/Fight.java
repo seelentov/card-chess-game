@@ -1,6 +1,5 @@
 package ru.vladislavkomkov.model;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -9,31 +8,31 @@ import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.RandUtils;
 
-public class Fight implements Serializable
+public class Fight
 {
   static final int TURN_LIMIT = 10000;
+  
   final Game game;
   final Player player1;
   final Player player2;
+  
   List<Unit> player1Units;
   List<Unit> player2Units;
   
   int player1Turn = 0;
   int player2Turn = 0;
-  
-  int turn;
+  int turn = 0;
   
   public Fight(Game game, Player player1, Player player2)
   {
+    this.game = game;
     this.player1 = player1;
     this.player2 = player2;
-    
-    this.game = game;
     
     setup();
   }
   
-  public Optional<Fight.Info> doTurn()
+  public Optional<Info> doTurn()
   {
     if (turn >= TURN_LIMIT)
     {
@@ -43,96 +42,11 @@ public class Fight implements Serializable
     
     if (player1Units.isEmpty() || player2Units.isEmpty())
     {
-      if (player1Units.isEmpty() && player2Units.isEmpty())
-      {
-        afterFight();
-        return Optional.of(new Info(player1, player2, Info.Result.DRAW, 0));
-      }
-      
-      boolean isPlayer1Win = player2Units.isEmpty();
-      Player loser = isPlayer1Win ? player2 : player1;
-      
-      int dmg;
-      
-      if (isPlayer1Win)
-        dmg = calcPlayerDamage(player1, player1Units);
-      else
-        dmg = calcPlayerDamage(player2, player2Units);
-      
-      loser.applyDamage(dmg);
-      
-      afterFight();
-      return Optional.of(new Info(player1, player2, isPlayer1Win ? Info.Result.PLAYER1_WIN : Info.Result.PLAYER2_WIN, dmg));
+      return handleFightEnd();
     }
     
     boolean isPlayer1Turn = turn % 2 == 0;
-    
-    Optional<Unit> attackerOpt = Optional.empty();
-    
-    int startTurn = isPlayer1Turn ? player1Turn : player2Turn;
-    
-    while (true)
-    {
-      Unit attacker = isPlayer1Turn ? player1Units.get(player1Turn) : player2Units.get(player2Turn);
-      
-      if (checkAttacker(attacker))
-      {
-        attackerOpt = Optional.of(attacker);
-        break;
-      }
-      
-      incTurn(isPlayer1Turn);
-      turn += 2;
-      
-      if ((isPlayer1Turn ? player1Turn : player2Turn) == startTurn)
-      {
-        break;
-      }
-    }
-    
-    Optional<Unit> attackedOpt = isPlayer1Turn ? getRandAttackedUnit(player2Units) : getRandAttackedUnit(player1Units);
-    
-    if (attackedOpt.isPresent() && attackerOpt.isPresent())
-    {
-      Unit attacker = attackerOpt.get();
-      Unit attacked = attackedOpt.get();
-      
-      Player turnPlayer1 = isPlayer1Turn ? player1 : player2;
-      Player turnPlayer2 = isPlayer1Turn ? player2 : player1;
-      
-      attacker.onAttack(game, turnPlayer1, turnPlayer2, attacked);
-      
-      attacked.onAttacked(game, turnPlayer2, turnPlayer1, attacker);
-      
-      if (attacker.isDead())
-      {
-        attacker.onDead(game, turnPlayer1, turnPlayer2, attacked);
-        if (attacker.isDead())
-        {
-          if (isPlayer1Turn)
-            player1Units.removeIf(o -> o == attacker);
-          else
-            player2Units.removeIf(o -> o == attacker);
-        }
-      }
-      
-      if (attacked.isDead())
-      {
-        attacked.onDead(game, turnPlayer2, turnPlayer1, attacker);
-        if (attacked.isDead())
-        {
-          if (isPlayer1Turn)
-            player2Units.removeIf(o -> o == attacked);
-          else
-            player1Units.removeIf(o -> o == attacked);
-        }
-      }
-    }
-    
-    incTurn(isPlayer1Turn);
-    
-    turn++;
-    return Optional.empty();
+    return processTurn(isPlayer1Turn);
   }
   
   void setup()
@@ -159,63 +73,190 @@ public class Fight implements Serializable
     int player1Attack = calcAttack(this.player1Units);
     int player2Attack = calcAttack(this.player2Units);
     
-    turn = player1Attack > player2Attack ? 0 : player1Attack < player2Attack ? 1 : RandUtils.getRand(1);
+    if (player1Attack > player2Attack)
+    {
+      turn = 0;
+    }
+    else if (player1Attack < player2Attack)
+    {
+      turn = 1;
+    }
+    else
+    {
+      turn = RandUtils.getRand(1);
+    }
     
     player1.inFightTable = player1Units;
     player2.inFightTable = player2Units;
   }
   
+  Optional<Info> handleFightEnd()
+  {
+    if (player1Units.isEmpty() && player2Units.isEmpty())
+    {
+      afterFight();
+      return Optional.of(new Info(player1, player2, Info.Result.DRAW, 0));
+    }
+    
+    boolean isPlayer1Win = player2Units.isEmpty();
+    Player winner = isPlayer1Win ? player1 : player2;
+    Player loser = isPlayer1Win ? player2 : player1;
+    List<Unit> winnerUnits = isPlayer1Win ? player1Units : player2Units;
+    
+    int damage = calcPlayerDamage(winner, winnerUnits);
+    loser.applyDamage(damage);
+    
+    afterFight();
+    
+    Info.Result result = isPlayer1Win ? Info.Result.PLAYER1_WIN : Info.Result.PLAYER2_WIN;
+    return Optional.of(new Info(player1, player2, result, damage));
+  }
+  
+  Optional<Info> processTurn(boolean isPlayer1Turn)
+  {
+    Optional<Unit> attackerOpt = findAttacker(isPlayer1Turn);
+    Optional<Unit> attackedOpt = getRandAttackedUnit(isPlayer1Turn ? player2Units : player1Units);
+    
+    if (attackerOpt.isPresent() && attackedOpt.isPresent())
+    {
+      executeAttack(isPlayer1Turn, attackerOpt.get(), attackedOpt.get());
+    }
+    
+    incTurn(isPlayer1Turn);
+    turn++;
+    
+    return Optional.empty();
+  }
+  
+  Optional<Unit> findAttacker(boolean isPlayer1Turn)
+  {
+    List<Unit> units = isPlayer1Turn ? player1Units : player2Units;
+    int currentTurn = isPlayer1Turn ? player1Turn : player2Turn;
+    int startTurn = currentTurn;
+    
+    while (true)
+    {
+      Unit attacker = units.get(currentTurn);
+      
+      if (checkAttacker(attacker))
+      {
+        return Optional.of(attacker);
+      }
+      
+      incTurn(isPlayer1Turn);
+      turn += 2;
+      
+      int newTurn = isPlayer1Turn ? player1Turn : player2Turn;
+      if (newTurn == startTurn)
+      {
+        break;
+      }
+      currentTurn = newTurn;
+    }
+    
+    return Optional.empty();
+  }
+  
+  void executeAttack(boolean isPlayer1Turn, Unit attacker, Unit attacked)
+  {
+    Player turnPlayer1 = isPlayer1Turn ? player1 : player2;
+    Player turnPlayer2 = isPlayer1Turn ? player2 : player1;
+    
+    attacker.onAttack(game, turnPlayer1, turnPlayer2, attacked);
+    attacked.onAttacked(game, turnPlayer2, turnPlayer1, attacker);
+    
+    handleUnitDeath(isPlayer1Turn, attacker, turnPlayer1, turnPlayer2, attacked);
+    handleUnitDeath(!isPlayer1Turn, attacked, turnPlayer2, turnPlayer1, attacker);
+  }
+  
+  void handleUnitDeath(boolean isPlayer1Unit, Unit unit, Player unitOwner, Player opponent, Unit otherUnit)
+  {
+    if (unit.isDead())
+    {
+      unit.onDead(game, unitOwner, opponent, otherUnit);
+      
+      if (unit.isDead())
+      {
+        if (isPlayer1Unit)
+        {
+          player1Units.removeIf(o -> o == unit);
+        }
+        else
+        {
+          player2Units.removeIf(o -> o == unit);
+        }
+      }
+    }
+  }
+  
   int calcAttack(List<Unit> units)
   {
-    return units.stream().reduce(0, (total, unit) -> total + unit.getAttack(), Integer::sum);
+    return units.stream()
+        .mapToInt(Unit::getAttack)
+        .sum();
   }
   
   Optional<Unit> getRandAttackedUnit(List<Unit> units)
   {
-    units = units.stream().filter(this::filterAttacked).toList();
-    units = units.stream().noneMatch(Unit::getIsTaunt)
-        ? units
-        : units.stream().filter(Unit::getIsTaunt).toList();
+    List<Unit> eligibleUnits = units.stream()
+        .filter(this::filterAttacked)
+        .toList();
     
-    if (units.isEmpty())
+    if (eligibleUnits.isEmpty())
     {
       return Optional.empty();
     }
     
-    int i = RandUtils.getRand(units.size() - 1);
-    return Optional.of(units.get(i));
+    List<Unit> tauntUnits = eligibleUnits.stream()
+        .filter(Unit::getIsTaunt)
+        .toList();
+    
+    List<Unit> targetUnits = tauntUnits.isEmpty() ? eligibleUnits : tauntUnits;
+    
+    if (targetUnits.isEmpty())
+    {
+      return Optional.empty();
+    }
+    
+    int index = RandUtils.getRand(targetUnits.size() - 1);
+    return Optional.of(targetUnits.get(index));
   }
   
   boolean filterAttacked(Unit unit)
   {
-    boolean isNotDisguise = !unit.getIsDisguise();
-    return isNotDisguise;
+    return !unit.getIsDisguise();
   }
   
   boolean checkAttacker(Unit unit)
   {
-    boolean attackMoreThanZero = unit.getAttack() > 0;
-    return attackMoreThanZero;
+    return unit.getAttack() > 0;
   }
   
   void incTurn(boolean isPlayer1Turn)
   {
     if (isPlayer1Turn)
-      player1Turn++;
-    if (player1Turn >= player1Units.size())
-      player1Turn = 0;
-    
+    {
+      player1Turn = (player1Turn + 1) % player1Units.size();
+    }
     else
-      player2Turn++;
-    if (player2Turn >= player2Units.size())
-      player2Turn = 0;
+    {
+      player2Turn = (player2Turn + 1) % player2Units.size();
+    }
   }
   
   int calcPlayerDamage(Player player, List<Unit> units)
   {
-    int unitsDmg = units.stream().reduce(0, (total, unit) -> total + unit.getLevel(), Integer::sum);
-    int playerDmg = player.getLevel();
-    return playerDmg + unitsDmg;
+    int unitsDamage = units.stream()
+        .mapToInt(Unit::getLevel)
+        .sum();
+    int playerDamage = player.getLevel();
+    return playerDamage + unitsDamage;
+  }
+  
+  void afterFight()
+  {
+    player1.inFightTable = null;
+    player2.inFightTable = null;
   }
   
   public Player getPlayer1()
@@ -228,18 +269,12 @@ public class Fight implements Serializable
     return player2;
   }
   
-  void afterFight()
-  {
-    player1.inFightTable = null;
-    player2.inFightTable = null;
-  }
-  
   public static class Info
   {
-    final Player player1;
-    final Player player2;
-    final Result result;
-    final int damage;
+    public final Player player1;
+    public final Player player2;
+    public final Result result;
+    public final int damage;
     
     public Info(Player player1, Player player2, Result result, int damage)
     {

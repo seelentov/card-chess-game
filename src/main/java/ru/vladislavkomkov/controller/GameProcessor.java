@@ -11,7 +11,7 @@ import ru.vladislavkomkov.model.Game;
 
 public class GameProcessor
 {
-  private static final Logger log = LoggerFactory.getLogger(GameProcessor.class);
+  static final Logger log = LoggerFactory.getLogger(GameProcessor.class);
   
   final Map<String, Game> games;
   final ExecutorService executor = Executors.newCachedThreadPool();

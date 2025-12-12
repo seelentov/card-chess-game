@@ -36,7 +36,7 @@ public abstract class UnitTestCase extends GamePlayerTestCase
     setUp();
     
     player.addToTable(unit, 0);
-    Unit unit2 = (Unit) unit.clone();
+    Unit unit2 = (Unit) unit.newThis();
     player2.addToTable(unit2, 0);
     
     if (unit.isRebirth)
@@ -67,7 +67,7 @@ public abstract class UnitTestCase extends GamePlayerTestCase
     assertEquals(1, player.cloneHand().size());
     assertEquals(0, player.getUnitsCount());
     
-    Unit gold = (Unit) player.cloneHand().get(0).get();
+    Unit gold = (Unit) player.cloneHand().get(0).getEntity();
     assertEquals(unit.getName(), gold.getName());
     assertEquals(unit.getAttack() * 2, gold.getAttack());
     assertEquals(unit.getHealth() * 2, gold.getHealth());

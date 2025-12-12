@@ -29,16 +29,16 @@ public class PlayerTest extends GamePlayerTestCase
     
     assertEquals(
         Tavern.getCountByLvl(player.getLevel()),
-        player.getTavern().cards.stream().filter(card1 -> card1.get() instanceof Unit).count());
+        player.getTavern().cards.stream().filter(card1 -> card1.getEntity() instanceof Unit).count());
     
     for (Card card : player.getTavern().cards)
     {
-      assertEquals(player.getLevel(), card.get().getLevel());
+      assertEquals(player.getLevel(), card.getEntity().getLevel());
     }
     
     assertEquals(
         1,
-        player.getTavern().cards.stream().filter(card1 -> card1.get() instanceof Spell).count());
+        player.getTavern().cards.stream().filter(card1 -> card1.getEntity() instanceof Spell).count());
   }
   
   @Test
@@ -105,8 +105,8 @@ public class PlayerTest extends GamePlayerTestCase
     
     List<Card> hand = player.cloneHand();
     
-    assertEquals(new Cat().getName(), hand.get(0).get().getName());
-    assertEquals(new Cat().getName(), hand.get(1).get().getName());
+    assertEquals(new Cat().getName(), hand.get(0).getEntity().getName());
+    assertEquals(new Cat().getName(), hand.get(1).getEntity().getName());
     
     for (int i = 2; i < 10; i++)
     {
@@ -137,7 +137,7 @@ public class PlayerTest extends GamePlayerTestCase
     player.addToHand(new Card(new TavernCoin()));
     
     assertEquals(1, player.cloneHand().stream().filter(Objects::nonNull).count());
-    assertEquals(player.cloneHand().get(0).get().getName(), new TavernCoin().getName());
+    assertEquals(player.cloneHand().get(0).getEntity().getName(), new TavernCoin().getName());
   }
   
   @Test
@@ -164,7 +164,7 @@ public class PlayerTest extends GamePlayerTestCase
     
     for (int i = 0; i < 10; i++)
     {
-      String cardName = cards.get(i).get().getName();
+      String cardName = cards.get(i).getEntity().getName();
       if (i % 2 == 0)
       {
         assertEquals(cardName, new TavernCoin().getName());
@@ -181,7 +181,7 @@ public class PlayerTest extends GamePlayerTestCase
   {
     player.getTavern().add(Card.of(new Alleycat()));
     player.buyCard(0);
-    assertEquals(new Alleycat().getName(), player.cloneHand().get(0).get().getName());
+    assertEquals(new Alleycat().getName(), player.cloneHand().get(0).getEntity().getName());
   }
   
   @Test
@@ -255,10 +255,10 @@ public class PlayerTest extends GamePlayerTestCase
       assertEquals(player.maxHealth, player.getHealth());
     }
     
-    for (int i = 1; i <= player.maxHealth; i++)
+    for (int i = 1; i <= player.getMaxHealth(); i++)
     {
       player.applyDamage(1);
-      assertEquals(player.maxHealth - i, player.getHealth());
+      assertEquals(player.getMaxHealth() - i, player.getHealth());
     }
     
     assertFalse(player.isAlive());
@@ -298,7 +298,7 @@ public class PlayerTest extends GamePlayerTestCase
     player.addToHand(Card.of(new Cat()));
     assertEquals(1, player.hand.size());
     
-    Unit goldUnit = (Unit) player.hand.get(0).get();
+    Unit goldUnit = (Unit) player.hand.get(0).getEntity();
     assertEquals(new Cat().getName(), goldUnit.getName());
     assertEquals(new Cat().getAttack() * 2, goldUnit.getAttack());
     assertEquals(new Cat().getHealth() * 2, goldUnit.getHealth());
@@ -318,14 +318,14 @@ public class PlayerTest extends GamePlayerTestCase
     player.addToHand(Card.of(new Cat()));
     assertEquals(1, player.hand.size());
     
-    Unit goldUnit = (Unit) player.hand.get(0).get();
+    Unit goldUnit = (Unit) player.hand.get(0).getEntity();
     assertEquals(new Cat().getName(), goldUnit.getName());
     assertEquals(new Cat().getAttack() * 2 + (DeepBlues.ATTACK_BOOST), goldUnit.getAttack());
     assertEquals(new Cat().getHealth() * 2 + (DeepBlues.HEALTH_BOOST), goldUnit.getHealth());
     
     game.processStartTurn(player);
     
-    goldUnit = (Unit) player.hand.get(0).get();
+    goldUnit = (Unit) player.hand.get(0).getEntity();
     assertEquals(new Cat().getName(), goldUnit.getName());
     assertEquals(new Cat().getAttack() * 2, goldUnit.getAttack());
     assertEquals(new Cat().getHealth() * 2, goldUnit.getHealth());

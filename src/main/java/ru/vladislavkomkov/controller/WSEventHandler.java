@@ -16,10 +16,10 @@ import ru.vladislavkomkov.model.event.Event;
 
 public class WSEventHandler extends WebSocketServer
 {
-  private static final Logger log = LoggerFactory.getLogger(WSEventHandler.class);
+  static final Logger log = LoggerFactory.getLogger(WSEventHandler.class);
   
-  private final Map<String, Game> games;
-  private final Map<String, EventDispatcher> eventDispatchers = new HashMap<>();
+  final Map<String, Game> games;
+  final Map<String, EventDispatcher> eventDispatchers = new HashMap<>();
   
   public WSEventHandler(int port, Map<String, Game> games)
   {

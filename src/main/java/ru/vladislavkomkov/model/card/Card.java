@@ -1,16 +1,14 @@
 package ru.vladislavkomkov.model.card;
 
-import java.io.Serializable;
-
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.entity.Entity;
 import ru.vladislavkomkov.model.entity.spell.Spell;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.player.Player;
 
-public class Card<T extends Entity> implements Serializable
+public class Card<T extends Entity>
 {
-  private final T entity;
+  final T entity;
   
   public Card(T entity)
   {
@@ -31,7 +29,7 @@ public class Card<T extends Entity> implements Serializable
     entity.onPlayed(game, player, index, isTavernIndex, index2, isTavernIndex2, false);
   }
   
-  public Entity get()
+  public T getEntity()
   {
     return entity;
   }

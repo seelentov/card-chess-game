@@ -2,7 +2,6 @@ package ru.vladislavkomkov.model;
 
 import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,27 +28,20 @@ import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.ListenerUtils;
 import ru.vladislavkomkov.util.UUIDUtils;
 
-public class Listener implements Serializable
+public class Listener
 {
   public Map<String, OnPlayedAction> onPlayedListeners = new HashMap<>();
   public Map<String, OnHandledAction> onHandledListeners = new HashMap<>();
-  
   public Map<String, OnAttackAction> onAttackListeners = new HashMap<>();
-  
   public Map<String, OnAttackedAction> onAttackedListeners = new HashMap<>();
   public Map<String, OnDeadAction> onDeadListeners = new HashMap<>();
-  
   public Map<String, OnSellAction> onSellListeners = new HashMap<>();
-  
   public Map<String, OnStartTurnAction> onStartTurnListeners = new HashMap<>();
   public Map<String, OnEndTurnAction> onEndTurnListeners = new HashMap<>();
-  
   public Map<String, OnStartFightAction> onStartFightListeners = new HashMap<>();
   public Map<String, OnEndFightAction> onEndFightListeners = new HashMap<>();
-  
   public Map<String, OnResetTavernAction> onResetTavernListeners = new HashMap<>();
   public Map<String, OnIncTavernLevel> onIncLevelListeners = new HashMap<>();
-  
   public Map<String, OnAppearAction> onAppearListeners = new HashMap<>();
   public Map<String, OnDisappearAction> onDisappearListeners = new HashMap<>();
   
@@ -73,34 +65,6 @@ public class Listener implements Serializable
   {
   }
   
-  public void removeCoreListener()
-  {
-    listeners.forEach(listener -> {
-      listener.remove(KEY_CORE);
-    });
-  }
-  
-  public Listener newCoreListener()
-  {
-    return newCoreListener(true);
-  }
-  
-  public Listener newCoreListener(boolean isDeduplication)
-  {
-    Listener listener = new Listener();
-    
-    for (int i = 0; i < listeners.size(); i++)
-    {
-      Map l = listeners.get(i);
-      if (l.containsKey(KEY_CORE))
-      {
-        listener.listeners.get(i).put(isDeduplication ? KEY_CORE : UUIDUtils.generateKeyCore(), l.get(KEY_CORE));
-      }
-    }
-    
-    return listener;
-  }
-  
   public void push(Listener listener)
   {
     push(listener, false);
@@ -119,9 +83,37 @@ public class Listener implements Serializable
     removeListener(UUIDUtils.generateKeyTemp(unit.getID()));
   }
   
-  public void removeListener(String i)
+  public void removeListener(String id)
   {
-    listeners.forEach(listener -> listener.remove(i));
+    listeners.forEach(listener -> listener.remove(id));
+  }
+  
+  public void removeCoreListener()
+  {
+    listeners.forEach(listener -> listener.remove(KEY_CORE));
+  }
+  
+  public Listener newCoreListener()
+  {
+    return newCoreListener(true);
+  }
+  
+  public Listener newCoreListener(boolean isDeduplication)
+  {
+    Listener listener = new Listener();
+    
+    for (int i = 0; i < listeners.size(); i++)
+    {
+      Map l = listeners.get(i);
+      if (l.containsKey(KEY_CORE))
+      {
+        listener.listeners.get(i).put(
+            isDeduplication ? KEY_CORE : UUIDUtils.generateKeyCore(),
+            l.get(KEY_CORE));
+      }
+    }
+    
+    return listener;
   }
   
   public void processOnPlayedListeners(
@@ -140,10 +132,7 @@ public class Listener implements Serializable
         (action) -> action.process(game, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto));
   }
   
-  public void processOnHandledListeners(
-      Game game,
-      Player player,
-      Entity entity)
+  public void processOnHandledListeners(Game game, Player player, Entity entity)
   {
     ListenerUtils.processActionListeners(
         onHandledListeners,
@@ -190,10 +179,7 @@ public class Listener implements Serializable
         (action) -> action.process(game, player1, player2, unit, attacker));
   }
   
-  public void processOnSellListeners(
-      Game game,
-      Player player,
-      Entity entity)
+  public void processOnSellListeners(Game game, Player player, Entity entity)
   {
     ListenerUtils.processActionListeners(
         onSellListeners,
@@ -201,65 +187,50 @@ public class Listener implements Serializable
         (action) -> action.process(game, player, entity));
   }
   
-  public void processOnAppearListeners(
-      Game game,
-      Player player,
-      Entity entity)
-  {
-    processPrepareListeners(onAppearListeners, game, player, entity);
-  }
-  
-  public void processOnDisappearListeners(
-      Game game,
-      Player player,
-      Entity entity)
-  {
-    processPrepareListeners(onDisappearListeners, game, player, entity);
-  }
-  
-  public void processOnStartTurnListeners(
-      Game game,
-      Player player)
+  public void processOnStartTurnListeners(Game game, Player player)
   {
     processGlobalListeners(onStartTurnListeners, game, player);
   }
   
-  public void processOnEndTurnListeners(
-      Game game,
-      Player player)
+  public void processOnEndTurnListeners(Game game, Player player)
   {
     processGlobalListeners(onEndTurnListeners, game, player);
   }
   
-  public void processOnStartFightListeners(
-      Game game,
-      Player player)
+  public void processOnStartFightListeners(Game game, Player player)
   {
     processGlobalListeners(onStartFightListeners, game, player);
   }
   
-  public void processOnEndFightListeners(
-      Game game,
-      Player player)
+  public void processOnEndFightListeners(Game game, Player player)
   {
     processGlobalListeners(onEndFightListeners, game, player);
   }
   
-  public void processOnResetTavernListeners(
-      Game game,
-      Player player)
+  public void processOnResetTavernListeners(Game game, Player player)
   {
     processGlobalListeners(onResetTavernListeners, game, player);
   }
   
-  public void processOnIncTavernLevelListener(
-      Game game,
-      Player player)
+  public void processOnIncTavernLevelListener(Game game, Player player)
   {
     processGlobalListeners(onIncLevelListeners, game, player);
   }
   
-  private <T extends GlobalAction> void processGlobalListeners(Map<String, T> listeners, Game game, Player player)
+  public void processOnAppearListeners(Game game, Player player, Entity entity)
+  {
+    processPrepareListeners(onAppearListeners, game, player, entity);
+  }
+  
+  public void processOnDisappearListeners(Game game, Player player, Entity entity)
+  {
+    processPrepareListeners(onDisappearListeners, game, player, entity);
+  }
+  
+  <T extends GlobalAction> void processGlobalListeners(
+      Map<String, T> listeners,
+      Game game,
+      Player player)
   {
     ListenerUtils.processActionListeners(
         listeners,
@@ -267,7 +238,11 @@ public class Listener implements Serializable
         (action) -> action.process(game, player));
   }
   
-  private <T extends PrepareAction> void processPrepareListeners(Map<String, T> listeners, Game game, Player player, Entity entity)
+  <T extends PrepareAction> void processPrepareListeners(
+      Map<String, T> listeners,
+      Game game,
+      Player player,
+      Entity entity)
   {
     ListenerUtils.processActionListeners(
         listeners,

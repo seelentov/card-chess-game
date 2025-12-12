@@ -2,9 +2,11 @@ package ru.vladislavkomkov.controller.sender;
 
 import org.java_websocket.WebSocket;
 
+import ru.vladislavkomkov.model.event.Event;
+
 public class WebSocketSender implements Sender
 {
-  private WebSocket conn;
+  WebSocket conn;
   
   public WebSocketSender(WebSocket conn)
   {
@@ -14,6 +16,13 @@ public class WebSocketSender implements Sender
   @Override
   public void send(byte[] data)
   {
-    conn.send(data);
+    try
+    {
+      conn.send(data);
+    }
+    catch (Exception ex)
+    {
+      conn.send(new Event(null, null, Event.Type.ERROR, ex.getMessage()).getBytes());
+    }
   }
 }

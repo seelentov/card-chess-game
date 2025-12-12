@@ -1,15 +1,14 @@
 package ru.vladislavkomkov.model.entity.unit;
 
-import java.io.Serializable;
 import java.util.function.Consumer;
 
-public class Buff implements Serializable
+public class Buff
 {
-  private final String description;
+  final String description;
   
-  private transient Consumer<Unit> upgrade = unit -> {
+  Consumer<Unit> upgrade = unit -> {
   };
-  private transient Consumer<Unit> rollback = unit -> {
+  Consumer<Unit> rollback = unit -> {
   };
   
   public Buff(Consumer<Unit> upgrade, Consumer<Unit> rollback)

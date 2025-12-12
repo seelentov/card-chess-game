@@ -47,7 +47,7 @@ public class DeepBlues extends SpellCraft
           }
           else
           {
-            unit = (Unit) player.getTavern().getCards().get(index).get();
+            unit = (Unit) player.getTavern().getCards().get(index).getEntity();
           }
           
           unit.addBuff(
@@ -91,12 +91,12 @@ public class DeepBlues extends SpellCraft
     return String.format(description, getAttackBoost(multi), getHealthBoost(multi));
   }
   
-  private int getAttackBoost(int multi)
+  int getAttackBoost(int multi)
   {
     return (isGold ? ATTACK_BOOST_GOLD : ATTACK_BOOST) * multi;
   }
   
-  private int getHealthBoost(int multi)
+  int getHealthBoost(int multi)
   {
     return (isGold ? HEALTH_BOOST_GOLD : HEALTH_BOOST) * multi;
   }

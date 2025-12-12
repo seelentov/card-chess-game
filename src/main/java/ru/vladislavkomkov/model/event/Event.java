@@ -10,10 +10,11 @@ import ru.vladislavkomkov.util.ObjectUtils;
 
 public class Event
 {
-  private final String gameUUID;
-  private final String playerUUID;
-  private final Type type;
-  private final byte[] data;
+  final static String EMPTY_UUID = "00000000-0000-0000-0000-000000000000";
+  final String gameUUID;
+  final String playerUUID;
+  final Type type;
+  final byte[] data;
   
   public Event(String gameUUID, String playerUUID, Type type)
   {
@@ -44,8 +45,8 @@ public class Event
   
   public Event(String gameUUID, String playerUUID, Type type, byte[] data)
   {
-    this.gameUUID = gameUUID;
-    this.playerUUID = playerUUID;
+    this.gameUUID = gameUUID == null ? EMPTY_UUID : gameUUID;
+    this.playerUUID = playerUUID == null ? EMPTY_UUID : playerUUID;
     this.type = type;
     this.data = data;
   }
@@ -66,7 +67,7 @@ public class Event
     buffer.get(this.data);
   }
   
-  private String readUUIDFromBuffer(ByteBuffer buffer)
+  String readUUIDFromBuffer(ByteBuffer buffer)
   {
     byte[] uuidBytes = new byte[36];
     buffer.get(uuidBytes);
@@ -90,7 +91,7 @@ public class Event
     return buffer.array();
   }
   
-  private void writeUUIDToBuffer(ByteBuffer buffer, String uuid)
+  void writeUUIDToBuffer(ByteBuffer buffer, String uuid)
   {
     byte[] uuidBytes = uuid.getBytes(StandardCharsets.UTF_8);
     if (uuidBytes.length != 36)
@@ -145,6 +146,7 @@ public class Event
   {
     // В обе стороны
     CONNECTED, // Подключение к игре
+    ERROR, // Ошибка
     
     // Входящие
     BYU, // Покупка карты
@@ -155,9 +157,8 @@ public class Event
     ROLL, // Ролл таверны
     MOVE, // Перемещение карты на столе
     RES, // Получение ответа на ивенты типа WAIT_REQ
-    RESET_TAVERN,  // Ролл таверны
+    RESET_TAVERN, // Ролл таверны
     APPLY_DAMAGE,
-    
     
     // Исходящие
     PRE_FIGHT_TIMER, // Таймер начала боя

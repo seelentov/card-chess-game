@@ -19,7 +19,7 @@ public class SpellCrafterTestCase extends UnitTestCase
     
     player.addToTable(spellCrafter, 0);
     game.processStartTurn(player);
-    assertEquals(player.cloneHand().get(0).get().getName(), spellCrafter.getSpellcraft().getName());
+    assertEquals(player.cloneHand().get(0).getEntity().getName(), spellCrafter.getSpellcraft().getName());
     
     tearDown();
   }
@@ -29,7 +29,7 @@ public class SpellCrafterTestCase extends UnitTestCase
     setUp();
     
     spellCrafter.onPlayed(game, player, 0);
-    assertEquals(player.cloneHand().get(0).get().getName(), spellCrafter.getSpellcraft().getName());
+    assertEquals(player.cloneHand().get(0).getEntity().getName(), spellCrafter.getSpellcraft().getName());
     
     tearDown();
   }

@@ -8,8 +8,6 @@ import org.junit.jupiter.api.Test;
 
 import ru.vladislavkomkov.GamePlayerTestCase;
 import ru.vladislavkomkov.model.Game;
-import ru.vladislavkomkov.model.entity.unit.impl.beast.first.Alleycat;
-import ru.vladislavkomkov.model.entity.unit.impl.mech.fourth.AccordoTron;
 import ru.vladislavkomkov.model.player.Player;
 
 public class UnitTest extends GamePlayerTestCase
@@ -174,19 +172,6 @@ public class UnitTest extends GamePlayerTestCase
   }
   
   @Test
-  void testClone()
-  {
-    Unit unit = new AccordoTron();
-    Alleycat enemy = new Alleycat();
-    unit.onAttacked(game, player, player2, enemy);
-    
-    assertEquals(unit.maxHealth - enemy.getAttack(), unit.getHealth());
-    
-    Unit unitClone = unit.clone();
-    assertEquals(unit.getHealth(), unitClone.getHealth());
-  }
-  
-  @Test
   void testIsDead()
   {
     Unit unit = new Unit()
@@ -196,7 +181,7 @@ public class UnitTest extends GamePlayerTestCase
     
     Unit unit2 = new Unit()
     {
-      private int attack = health;
+      int attack = health;
       
       @Override
       public int getAttack()

@@ -2,8 +2,8 @@ package ru.vladislavkomkov.model.event.data;
 
 public class SenderWaiterDataRes
 {
-  private String key;
-  private int param;
+  String key;
+  int param;
   
   public SenderWaiterDataRes(String key, int param)
   {

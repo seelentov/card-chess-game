@@ -453,14 +453,14 @@ public class FightTest extends GamePlayerTestCase
   void testFightsOrder() throws Exception
   {
     Map<String, Player> players = new HashMap<>();
-    players.put("1", new Player("1",game));
-    players.put("2", new Player("2",game));
-    players.put("3", new Player("3",game));
-    players.put("4", new Player("4",game));
-    players.put("5", new Player("5",game));
-    players.put("6", new Player("6",game));
-    players.put("7", new Player("7",game));
-    players.put("8", new Player("8",game));
+    players.put("1", new Player("1", game));
+    players.put("2", new Player("2", game));
+    players.put("3", new Player("3", game));
+    players.put("4", new Player("4", game));
+    players.put("5", new Player("5", game));
+    players.put("6", new Player("6", game));
+    players.put("7", new Player("7", game));
+    players.put("8", new Player("8", game));
     
     Game game = new Game(players, "");
     

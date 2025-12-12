@@ -1,6 +1,5 @@
 package ru.vladislavkomkov.model.player;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
@@ -19,7 +18,7 @@ public class TavernTest
       assertEquals(Tavern.getCountByLvl(i), tavern.cards.size() - 1);
       for (Card card : tavern.cards)
       {
-        assertTrue(card.get().getLevel() <= i);
+        assertTrue(card.getEntity().getLevel() <= i);
       }
     }
   }

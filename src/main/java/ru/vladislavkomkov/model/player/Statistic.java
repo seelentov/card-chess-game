@@ -1,34 +1,79 @@
 package ru.vladislavkomkov.model.player;
 
-import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Statistic implements Serializable
+public class Statistic
 {
-  public Played played = new Played();
-  public Counters counters = new Counters();
+  public final Played played = new Played();
+  public final Counters counters = new Counters();
   
   public Statistic()
   {
   }
   
+  public void reset()
+  {
+    played.resetOnlyBluesPlayed();
+    counters.resetFreeTavern();
+  }
+  
+  public int getFreeTavernCount()
+  {
+    return counters.getFreeTavernCount();
+  }
+  
+  public int useFreeTavern()
+  {
+    return counters.useFreeTavern();
+  }
+  
+  public int addFreeTavern()
+  {
+    return counters.incrementFreeTavern();
+  }
+  
   public static class Played
   {
     public int onlyBluesPlayed = 0;
+    
+    public void incrementOnlyBluesPlayed()
+    {
+      onlyBluesPlayed++;
+    }
+    
+    public void resetOnlyBluesPlayed()
+    {
+      onlyBluesPlayed = 0;
+    }
   }
   
-  static class Counters
+  public static class Counters
   {
-    private final AtomicInteger freeTavernCounter = new AtomicInteger(0);
+    final AtomicInteger freeTavernCounter = new AtomicInteger(0);
     
-    public int freeTavernCounter()
+    public int useFreeTavern()
     {
       return freeTavernCounter.getAndUpdate(i -> i > 0 ? i - 1 : i);
     }
     
-    public int freeTavernCounterInc()
+    public int incrementFreeTavern()
     {
       return freeTavernCounter.incrementAndGet();
+    }
+    
+    public int getFreeTavernCount()
+    {
+      return freeTavernCounter.get();
+    }
+    
+    public void setFreeTavernCount(int count)
+    {
+      freeTavernCounter.set(Math.max(0, count));
+    }
+    
+    public void resetFreeTavern()
+    {
+      freeTavernCounter.set(0);
     }
   }
 }

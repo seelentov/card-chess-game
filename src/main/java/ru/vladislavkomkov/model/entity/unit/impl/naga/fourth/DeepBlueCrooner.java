@@ -2,16 +2,10 @@ package ru.vladislavkomkov.model.entity.unit.impl.naga.fourth;
 
 import ru.vladislavkomkov.model.entity.spell.impl.spellcraft.impl.DeepBlues;
 import ru.vladislavkomkov.model.entity.unit.impl.naga.SpellCrafter;
-import ru.vladislavkomkov.model.player.Player;
 
 public class DeepBlueCrooner extends SpellCrafter
 {
   public DeepBlueCrooner()
-  {
-    this(null);
-  }
-  
-  public DeepBlueCrooner(Player player)
   {
     super(new DeepBlues());
     

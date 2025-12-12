@@ -9,7 +9,6 @@ import java.io.Serializable;
 
 public class SerializationUtils
 {
-  @SuppressWarnings("unchecked")
   public static <T extends Serializable> T deepCopy(T object)
   {
     try

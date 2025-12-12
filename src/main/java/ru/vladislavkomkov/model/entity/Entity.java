@@ -1,6 +1,5 @@
 package ru.vladislavkomkov.model.entity;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -9,15 +8,15 @@ import java.util.function.Supplier;
 import ru.vladislavkomkov.consts.Listeners;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.Listener;
-import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.player.Player;
-import ru.vladislavkomkov.util.SerializationUtils;
 import ru.vladislavkomkov.util.UUIDUtils;
 
-public abstract class Entity implements Serializable, Cloneable
+public abstract class Entity
 {
   protected final Listener listener = new Listener();
+  
   protected int ID = System.identityHashCode(this);
+  
   protected String name = this.getClass().getSimpleName();
   protected String description = "";
   protected int level = 1;
@@ -145,20 +144,6 @@ public abstract class Entity implements Serializable, Cloneable
     };
     
     return supplier.get();
-  }
-  
-  @Override
-  public Unit clone()
-  {
-    try
-    {
-      Unit unit = (Unit) super.clone();
-      return SerializationUtils.deepCopy(unit);
-    }
-    catch (CloneNotSupportedException e)
-    {
-      throw new RuntimeException(e);
-    }
   }
   
   public boolean isGold()

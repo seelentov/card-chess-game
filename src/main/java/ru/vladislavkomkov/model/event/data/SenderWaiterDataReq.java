@@ -2,8 +2,8 @@ package ru.vladislavkomkov.model.event.data;
 
 public class SenderWaiterDataReq
 {
-  private String key;
-  private Object data;
+  String key;
+  Object data;
   
   public SenderWaiterDataReq(String key, Object data)
   {

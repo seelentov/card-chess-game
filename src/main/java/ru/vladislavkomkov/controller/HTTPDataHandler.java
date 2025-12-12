@@ -15,8 +15,8 @@ import ru.vladislavkomkov.util.UUIDUtils;
 
 public class HTTPDataHandler
 {
-  private static final String UUID_KEY = "UUID";
-  private static final Logger log = LoggerFactory.getLogger(HTTPDataHandler.class);
+  static final String UUID_KEY = "UUID";
+  static final Logger log = LoggerFactory.getLogger(HTTPDataHandler.class);
   
   final Map<String, Game> games;
   
@@ -50,7 +50,7 @@ public class HTTPDataHandler
     app.stop();
   }
   
-  private void index(Context context)
+  void index(Context context)
   {
     Map<String, Object> response = new HashMap<>();
     response.put("message", "Game Server API");
@@ -62,12 +62,12 @@ public class HTTPDataHandler
     context.json(response);
   }
   
-  private void getAllGames(Context context)
+  void getAllGames(Context context)
   {
     context.json(games);
   }
   
-  private void getGameByKey(Context context)
+  void getGameByKey(Context context)
   {
     String key = context.pathParam("key");
     log.debug("Getting game with key: {}", key);
@@ -82,7 +82,7 @@ public class HTTPDataHandler
     context.json(game);
   }
   
-  private void createGame(Context context)
+  void createGame(Context context)
   {
     String key = UUIDUtils.generateKey();
     
@@ -104,7 +104,7 @@ public class HTTPDataHandler
     context.json(response);
   }
   
-  private void startGame(Context context)
+  void startGame(Context context)
   {
     String key = context.pathParam("key");
     KeyRequest req = context.bodyAsClass(KeyRequest.class);
@@ -127,7 +127,7 @@ public class HTTPDataHandler
   
   public class KeyRequest
   {
-    private String key;
+    String key;
     
     public String getKey()
     {

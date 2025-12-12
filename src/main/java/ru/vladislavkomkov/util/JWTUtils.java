@@ -13,11 +13,11 @@ import io.jsonwebtoken.security.Keys;
 
 public class JWTUtils
 {
-  private static final Map<String, SecretKey> KEY_CACHE = new ConcurrentHashMap<>();
+  static final Map<String, SecretKey> KEY_CACHE = new ConcurrentHashMap<>();
   
-  private static final long DEFAULT_EXPIRATION_TIME = 3600000L;
+  static final long DEFAULT_EXPIRATION_TIME = 3600000L;
   
-  private static SecretKey defaultSecretKey = generateSecretKey();
+  static SecretKey defaultSecretKey = generateSecretKey();
   
   public static SecretKey generateSecretKey(SignatureAlgorithm algorithm)
   {

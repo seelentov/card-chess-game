@@ -15,7 +15,7 @@ public class Tavern
   final List<Card> cards = new ArrayList<>();
   boolean freeze = false;
   
-  static int getCountByLvl(int level)
+  public static int getCountByLevel(int level)
   {
     return switch (level)
     {
@@ -23,8 +23,18 @@ public class Tavern
       case 2, 3 -> 4;
       case 4, 5 -> 5;
       case 6 -> 6;
-      default -> throw new RuntimeException("Wrong level");
+      default -> throw new IllegalArgumentException("Wrong tavern level: " + level);
     };
+  }
+  
+  public List<Card> getCards()
+  {
+    return cards;
+  }
+  
+  public boolean isFreeze()
+  {
+    return freeze;
   }
   
   public Card buy(int index)
@@ -37,6 +47,11 @@ public class Tavern
     cards.add(card);
   }
   
+  public void setFreeze(boolean freeze)
+  {
+    this.freeze = freeze;
+  }
+  
   public void reset(int level)
   {
     if (freeze)
@@ -46,55 +61,74 @@ public class Tavern
     }
     
     cards.clear();
-    
-    int count = getCountByLvl(level);
+    fillWithUnits(level);
+    addRandomSpell(level);
+  }
+  
+  void fillWithUnits(int level)
+  {
+    int count = getCountByLevel(level);
     
     for (int i = 0; i < count; i++)
     {
-      int lvl = RandUtils.getRandLvl(level);
-      List<Unit> units = UnitUtils.getUnitsByTavern(lvl);
-      
-      while (units.isEmpty())
-      {
-        if (lvl > 1)
-        {
-          lvl--;
-        }
-        else if (lvl == 1)
-        {
-          lvl = level;
-        }
-        
-        units = UnitUtils.getUnitsByTavern(lvl);
-      }
-      
-      Unit unit = units.get(RandUtils.getRand(units.size() - 1));
-      add(new Card(unit));
+      Card unitCard = generateUnitCard(level);
+      add(unitCard);
     }
+  }
+  
+  Card generateUnitCard(int level)
+  {
+    int targetLevel = RandUtils.getRandLvl(level);
+    List<Unit> units = getAvailableUnitsWithFallback(targetLevel, level);
     
-    int lvl = RandUtils.getRandLvl(level);
-    List<Spell> spells = SpellUtils.getByTavern(lvl);
-    while (spells.isEmpty())
-    {
-      if (lvl > 1)
-      {
-        lvl--;
-      }
-      else if (lvl == 1)
-      {
-        lvl = level;
-      }
-      
-      spells = SpellUtils.getByTavern(lvl);
-    }
+    Unit unit = units.get(RandUtils.getRand(units.size() - 1));
+    return new Card(unit);
+  }
+  
+  void addRandomSpell(int level)
+  {
+    int targetLevel = RandUtils.getRandLvl(level);
+    List<Spell> spells = getAvailableSpellsWithFallback(targetLevel, level);
     
     Spell spell = spells.get(RandUtils.getRand(spells.size() - 1));
-    
     add(new Card(spell));
   }
   
-  public List<Card> getCards()
+  List<Unit> getAvailableUnitsWithFallback(int targetLevel, int maxLevel)
   {
-    return cards;
+    List<Unit> units = UnitUtils.getUnitsByTavern(targetLevel);
+    
+    while (units.isEmpty())
+    {
+      targetLevel = getNextFallbackLevel(targetLevel, maxLevel);
+      units = UnitUtils.getUnitsByTavern(targetLevel);
+    }
+    
+    return units;
+  }
+  
+  List<Spell> getAvailableSpellsWithFallback(int targetLevel, int maxLevel)
+  {
+    List<Spell> spells = SpellUtils.getByTavern(targetLevel);
+    
+    while (spells.isEmpty())
+    {
+      targetLevel = getNextFallbackLevel(targetLevel, maxLevel);
+      spells = SpellUtils.getByTavern(targetLevel);
+    }
+    
+    return spells;
+  }
+  
+  int getNextFallbackLevel(int currentLevel, int maxLevel)
+  {
+    if (currentLevel > 1)
+    {
+      return currentLevel - 1;
+    }
+    else
+    {
+      return maxLevel;
+    }
   }
 }

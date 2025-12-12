@@ -1,15 +1,12 @@
 package ru.vladislavkomkov.model.player;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import javafx.util.Pair;
-import ru.vladislavkomkov.controller.sender.MockSender;
 import ru.vladislavkomkov.controller.sender.Sender;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.Listener;
@@ -20,25 +17,23 @@ import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.event.Event;
 import ru.vladislavkomkov.model.event.data.SenderWaiterDataReq;
 import ru.vladislavkomkov.util.RandUtils;
-import ru.vladislavkomkov.util.SerializationUtils;
 import ru.vladislavkomkov.util.UUIDUtils;
 
-public class Player implements Cloneable, Serializable
+public class Player
 {
   public static final int MAX_LEVEL = 6;
   public static final int TABLE_LIMIT = 7;
   public static final int HAND_LIMIT = 10;
   
-  final List<Unit> table = new ArrayList<>(TABLE_LIMIT);
-  
-  final List<Card> hand = new ArrayList<>();
+  final String uuid;
   
   final Tavern tavern = new Tavern();
   public Listener listener = new Listener();
   public Statistic statistic = new Statistic();
-  public List<Unit> inFightTable = null;
   
-  String uuid;
+  final List<Unit> table = new ArrayList<>(TABLE_LIMIT);
+  final List<Card> hand = new ArrayList<>();
+  public List<Unit> inFightTable = null;
   
   int health = 30;
   int maxHealth = 30;
@@ -49,10 +44,9 @@ public class Player implements Cloneable, Serializable
   int buyPrice = 3;
   int resetTavernPrice = 1;
   
-  Sender sender = new MockSender();
-  Map<String, Consumer<Integer>> senderWaiters = new HashMap<>();
-  
   Game game;
+  final Map<String, Consumer<Integer>> senderWaiters = new HashMap<>();
+  Sender sender;
   
   public Player(Game game)
   {
@@ -61,34 +55,65 @@ public class Player implements Cloneable, Serializable
   
   public Player(String uuid, Game game)
   {
-    super();
     this.uuid = uuid;
     this.game = game;
-    
+  }
+  
+  public void sendMessage(String gameUUID, String playerUUID, Event.Type type)
+  {
+    if (sender != null)
+    {
+      sender.send(new Event(gameUUID, playerUUID, type).getBytes());
+    }
+  }
+  
+  public void sendMessage(String gameUUID, String playerUUID, Event.Type type, int data)
+  {
+    if (sender != null)
+    {
+      sender.send(new Event(gameUUID, playerUUID, type, data).getBytes());
+    }
+  }
+  
+  public void sendMessage(String gameUUID, String playerUUID, Event.Type type, Object data)
+  {
+    if (sender != null)
+    {
+      sender.send(new Event(gameUUID, playerUUID, type, data).getBytes());
+    }
+  }
+  
+  public void sendMessage(String gameUUID, String playerUUID, Event.Type type, byte[] data)
+  {
+    if (sender != null)
+    {
+      sender.send(new Event(gameUUID, playerUUID, type, data).getBytes());
+    }
   }
   
   public void putSenderWaiter(Consumer<Integer> consumer, Object data)
   {
     String key = UUIDUtils.generateKey();
-    
     senderWaiters.put(key, consumer);
     
-    sender.send(new Event(
-        game.getUUID(),
-        getUUID(),
-        Event.Type.WAIT_REQ,
-        new SenderWaiterDataReq(key, data)).getBytes());
+    sendMessage(game.getUUID(), getUUID(), Event.Type.WAIT_REQ,
+        new SenderWaiterDataReq(key, data));
   }
   
   public void doSenderWaiter(String key, Integer param)
   {
-    senderWaiters.get(key).accept(param);
-    senderWaiters.remove(key);
+    Consumer<Integer> waiter = senderWaiters.get(key);
+    if (waiter != null)
+    {
+      waiter.accept(param);
+      senderWaiters.remove(key);
+    }
   }
   
   public void clearSenderWaiters()
   {
     senderWaiters.forEach((key, action) -> action.accept(RandUtils.getRand()));
+    senderWaiters.clear();
   }
   
   public String getUUID()
@@ -106,146 +131,37 @@ public class Player implements Cloneable, Serializable
     this.sender = sender;
   }
   
-  public void moveTable(int index, int index2)
+  public Game getGame()
   {
-    if (table.size() <= index)
+    return game;
+  }
+  
+  public void setGame(Game game)
+  {
+    this.game = game;
+  }
+  
+  public void moveTable(int fromIndex, int toIndex)
+  {
+    if (fromIndex < 0 || fromIndex >= table.size() || toIndex < 0 || toIndex >= table.size())
     {
       return;
     }
     
-    Unit unit = table.get(index);
-    table.remove(index);
-    table.add(index2, unit);
+    Unit unit = table.remove(fromIndex);
+    table.add(toIndex, unit);
     
-    sender.send(new Event(
-        game.getUUID(),
-        getUUID(),
-        Event.Type.MOVE,
-        table).getBytes());
+    sendMessage(game.getUUID(), getUUID(), Event.Type.MOVE, table);
   }
   
-  public void freezeTavern()
+  public boolean addToTable(Unit unit, int index)
   {
-    tavern.freeze = !tavern.freeze;
-    
-    sender.send(new Event(
-        game.getUUID(),
-        getUUID(),
-        Event.Type.FREEZE,
-        tavern.freeze).getBytes());
-  }
-  
-  public void playCard(int indexCard)
-  {
-    playCard(indexCard, 0);
-  }
-  
-  public void sellCard(int indexCard)
-  {
-    Entity entity = hand.get(indexCard).get();
-    
-    if (entity instanceof Unit unit)
-    {
-      unit.onSell(game, this);
-      
-      sender.send(new Event(
-          game.getUUID(),
-          getUUID(),
-          Event.Type.SELL,
-          hand).getBytes());
-    }
-  }
-  
-  public void playCard(int indexCard, int index)
-  {
-    playCard(indexCard, index, false);
-  }
-  
-  public void playCard(int indexCard, int index, boolean isTavernIndex)
-  {
-    playCard(indexCard, index, isTavernIndex, 0);
-  }
-  
-  public void playCard(int indexCard, int index, boolean isTavernIndex, int index2)
-  {
-    playCard(indexCard, index, isTavernIndex, index2, false);
-  }
-  
-  public void playCard(int indexCard, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2)
-  {
-    if (indexCard < 0 || indexCard >= hand.size())
-    {
-      throw new IndexOutOfBoundsException("Index " + indexCard + " not existed in hand with length " + hand.size());
-    }
-    hand.get(indexCard).play(game, this, index, isTavernIndex, index2, isTavernIndex2);
-    hand.remove(indexCard);
-    
-    sender.send(new Event(
-        game.getUUID(),
-        getUUID(),
-        Event.Type.PLAY,
-        hand).getBytes());
-  }
-  
-  public void buyCard(int index)
-  {
-    if (money >= buyPrice && hand.size() < HAND_LIMIT)
-    {
-      money -= buyPrice;
-      addToHand(tavern.buy(index));
-      
-      sender.send(new Event(
-          game.getUUID(),
-          getUUID(),
-          Event.Type.BYU,
-          hand).getBytes());
-    }
-  }
-  
-  public void resetTavernManual()
-  {
-    if (statistic.counters.freeTavernCounter() <= 0)
-    {
-      this.money -= resetTavernPrice;
-    }
-    
-    tavern.freeze = false;
-    resetTavern();
-    
-    sender.send(new Event(
-        game.getUUID(),
-        getUUID(),
-        Event.Type.RESET_TAVERN,
-        tavern.cards).getBytes());
-    
-    sender.send(new Event(
-        game.getUUID(),
-        getUUID(),
-        Event.Type.FREEZE,
-        tavern.freeze).getBytes());
-  }
-  
-  public void resetTavern()
-  {
-    tavern.reset(getLevel());
-    listener.processOnResetTavernListeners(game, this);
-  }
-  
-  public boolean addToTable(Unit unit, List<Unit> table, int index, boolean withoutOne)
-  {
-    int size = table.size();
-    
-    if (withoutOne)
-    {
-      size--;
-    }
-    
-    if (size >= TABLE_LIMIT)
+    if (table.size() >= TABLE_LIMIT)
     {
       return false;
     }
     
-    if (index < 0 || index >= size)
+    if (index < 0 || index >= table.size())
     {
       table.add(unit);
     }
@@ -255,56 +171,9 @@ public class Player implements Cloneable, Serializable
     }
     
     unit.onAppear(game, this);
+    sendMessage(game.getUUID(), getUUID(), Event.Type.ADD_TO_TABLE, table);
     
     return true;
-  }
-  
-  public boolean addToFightTable(Unit unit, int index, boolean withoutOne)
-  {
-    boolean added = addToTable(unit, inFightTable, index, withoutOne);
-    if (added)
-    {
-      sender.send(new Event(
-          game.getUUID(),
-          getUUID(),
-          Event.Type.ADD_TO_FIGHT_TABLE,
-          table).getBytes());
-    }
-    return added;
-  }
-  
-  public boolean addToTable(Unit unit, int index)
-  {
-    boolean added = addToTable(unit, table, index, false);
-    if (added)
-    {
-      sender.send(new Event(
-          game.getUUID(),
-          getUUID(),
-          Event.Type.ADD_TO_TABLE,
-          table).getBytes());
-    }
-    return added;
-  }
-  
-  public void addToFightTable(List<Unit> units, int index, boolean withoutOne)
-  {
-    units.forEach(unit -> addToFightTable(unit, index, withoutOne));
-  }
-  
-  public void addToTable(List<Unit> units, int index)
-  {
-    units.forEach(unit -> addToTable(unit, index));
-  }
-  
-  public boolean addToFightTable(Unit unit, int index)
-  {
-    return addToTable(unit, inFightTable, index, false);
-  }
-  
-  public void addToFightTable(List<Unit> units, int index)
-  {
-    units.forEach(unit -> addToFightTable(unit, index, false));
   }
   
   public boolean addToTable(Unit unit)
@@ -312,9 +181,9 @@ public class Player implements Cloneable, Serializable
     return addToTable(unit, -1);
   }
   
-  public boolean addToFightTable(Unit unit)
+  public void addToTable(List<Unit> units, int index)
   {
-    return addToFightTable(unit, -1, false);
+    units.forEach(unit -> addToTable(unit, index));
   }
   
   public void removeFromTable(Unit unit)
@@ -323,29 +192,84 @@ public class Player implements Cloneable, Serializable
     {
       unit.onDisappear(game, this);
     }
-    table.removeIf(unit1 -> unit == unit1);
-    sender.send(new Event(
-        game.getUUID(),
-        getUUID(),
-        Event.Type.REMOVE_FROM_TABLE,
-        table).getBytes());
+    table.removeIf(unit1 -> unit1 == unit);
+    sendMessage(game.getUUID(), getUUID(), Event.Type.REMOVE_FROM_TABLE, table);
   }
   
   public void removeFromTable(int index)
   {
-    table.get(index).onAppear(game, this);
-    table.remove(index);
+    if (index >= 0 && index < table.size())
+    {
+      table.get(index).onDisappear(game, this);
+      table.remove(index);
+    }
   }
   
-  public void clearSpellCraft()
+  public int getIndex(Unit unit)
   {
-    hand.removeIf(card -> card.get() instanceof SpellCraft);
-    sender.send(new Event(
-        game.getUUID(),
-        getUUID(),
-        Event.Type.REMOVE_FROM_HAND,
-        hand).getBytes());
+    return table.indexOf(unit);
+  }
+  
+  public int getFightIndex(Unit unit)
+  {
+    return inFightTable != null ? inFightTable.indexOf(unit) : -1;
+  }
+  
+  public boolean addToFightTable(Unit unit, int index, boolean withoutOne)
+  {
+    if (inFightTable == null)
+    {
+      return false;
+    }
     
+    int size = withoutOne ? inFightTable.size() - 1 : inFightTable.size();
+    if (size >= TABLE_LIMIT)
+    {
+      return false;
+    }
+    
+    if (index < 0 || index >= inFightTable.size())
+    {
+      inFightTable.add(unit);
+    }
+    else
+    {
+      inFightTable.add(index, unit);
+    }
+    
+    unit.onAppear(game, this);
+    
+    if (game != null)
+    {
+      sendMessage(game.getUUID(), getUUID(), Event.Type.ADD_TO_FIGHT_TABLE, table);
+    }
+    
+    return true;
+  }
+  
+  public boolean addToFightTable(Unit unit, int index)
+  {
+    return addToFightTable(unit, index, false);
+  }
+  
+  public boolean addToFightTable(Unit unit)
+  {
+    return addToFightTable(unit, -1, false);
+  }
+  
+  public void addToFightTable(List<Unit> units, int index, boolean withoutOne)
+  {
+    units.forEach(unit -> addToFightTable(unit, index, withoutOne));
+  }
+  
+  public void addToFightTable(List<Unit> units, int index)
+  {
+    units.forEach(unit -> addToFightTable(unit, index, false));
+  }
+  
+  public boolean inFight()
+  {
+    return inFightTable != null;
   }
   
   public void addToHand(Card card)
@@ -357,24 +281,132 @@ public class Player implements Cloneable, Serializable
   {
     if (force || hand.size() < HAND_LIMIT)
     {
-      card.get().onHandled(game, this);
+      card.getEntity().onHandled(game, this);
       hand.add(card);
     }
     
     calcTriplets();
+    sendMessage(game.getUUID(), getUUID(), Event.Type.ADD_TO_HAND, hand);
+  }
+  
+  public void clearSpellCraft()
+  {
+    hand.removeIf(card -> card.getEntity() instanceof SpellCraft);
+    sendMessage(game.getUUID(), getUUID(), Event.Type.REMOVE_FROM_HAND, hand);
+  }
+  
+  public void playCard(int indexCard)
+  {
+    playCard(indexCard, 0, false, 0, false);
+  }
+  
+  public void playCard(int indexCard, int index)
+  {
+    playCard(indexCard, index, false, 0, false);
+  }
+  
+  public void playCard(int indexCard, int index, boolean isTavernIndex)
+  {
+    playCard(indexCard, index, isTavernIndex, 0, false);
+  }
+  
+  public void playCard(int indexCard, int index, boolean isTavernIndex, int index2)
+  {
+    playCard(indexCard, index, isTavernIndex, index2, false);
+  }
+  
+  public void playCard(int indexCard, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2)
+  {
+    if (indexCard < 0 || indexCard >= hand.size())
+    {
+      throw new IndexOutOfBoundsException(
+          "Index " + indexCard + " not existed in hand with length " + hand.size());
+    }
     
-    sender.send(new Event(
-        game.getUUID(),
-        getUUID(),
-        Event.Type.ADD_TO_HAND,
-        hand).getBytes());
+    hand.get(indexCard).play(game, this, index, isTavernIndex, index2, isTavernIndex2);
+    hand.remove(indexCard);
+    
+    sendMessage(game.getUUID(), getUUID(), Event.Type.PLAY, hand);
+  }
+  
+  public void buyCard(int index)
+  {
+    if (money >= buyPrice && hand.size() < HAND_LIMIT)
+    {
+      money -= buyPrice;
+      addToHand(tavern.buy(index));
+      
+      sendMessage(game.getUUID(), getUUID(), Event.Type.BYU, hand);
+    }
+  }
+  
+  public void sellCard(int index)
+  {
+    if (index < 0 || index >= hand.size())
+    {
+      return;
+    }
+    
+    Entity entity = hand.get(index).getEntity();
+    if (entity instanceof Unit unit)
+    {
+      unit.onSell(game, this);
+      sendMessage(game.getUUID(), getUUID(), Event.Type.SELL, hand);
+    }
+  }
+  
+  public void freezeTavern()
+  {
+    tavern.setFreeze(!tavern.isFreeze());
+    sendMessage(game.getUUID(), getUUID(), Event.Type.FREEZE, tavern.isFreeze());
+  }
+  
+  public void resetTavernManual()
+  {
+    if (statistic.counters.getFreeTavernCount() <= 0)
+    {
+      money -= resetTavernPrice;
+    }
+    
+    tavern.setFreeze(false);
+    resetTavern();
+    
+    sendMessage(game.getUUID(), getUUID(), Event.Type.RESET_TAVERN, tavern.getCards());
+    sendMessage(game.getUUID(), getUUID(), Event.Type.FREEZE, tavern.isFreeze());
+  }
+  
+  public void resetTavern()
+  {
+    tavern.reset(level);
+    listener.processOnResetTavernListeners(game, this);
   }
   
   public void calcTriplets()
   {
-    Supplier<Map<String, List<Pair<Boolean, Integer>>>> calc = () -> {
-      Map<String, List<Pair<Boolean, Integer>>> indexCountMap = new HashMap<>();
+    boolean foundTriplets;
+    
+    do
+    {
+      foundTriplets = false;
+      Map<String, List<Pair<Boolean, Integer>>> indexCountMap = calculateCardIndexes();
       
+      for (List<Pair<Boolean, Integer>> cardList : indexCountMap.values())
+      {
+        if (cardList.size() >= 3)
+        {
+          foundTriplets = true;
+          processTriplets(cardList);
+          break;
+        }
+      }
+    }
+    while (foundTriplets);
+  }
+  
+  Map<String, List<Pair<Boolean, Integer>>> calculateCardIndexes()
+  {
+    Map<String, List<Pair<Boolean, Integer>>> indexCountMap = new HashMap<>();
+    
       for (int i = 0; i < hand.size(); i++)
       {
         Card card = hand.get(i);
@@ -402,77 +434,134 @@ public class Player implements Cloneable, Serializable
       }
       
       return indexCountMap;
-    };
+    }
     
-    boolean foundTriplets;
-    
-    do
+    void processTriplets(List<Pair<Boolean, Integer>> triplets)
     {
-      foundTriplets = false;
-      Map<String, List<Pair<Boolean, Integer>>> indexCountMap = calc.get();
+      List<Unit> unitsForGold = new ArrayList<>();
+      List<Pair<Boolean, Integer>> tripletsToRemove = triplets.subList(0, 3);
       
-      for (List<Pair<Boolean, Integer>> cardList : indexCountMap.values())
+      for (Pair<Boolean, Integer> pair : tripletsToRemove)
       {
-        if (cardList.size() >= 3)
+        boolean isOnTable = pair.getKey();
+        int index = pair.getValue();
+        
+        if (isOnTable)
         {
-          foundTriplets = true;
-          
-          List<Pair<Boolean, Integer>> triplets = cardList.subList(0, 3);
-          
-          List<Card> removedCards = new ArrayList<>();
-          
-          List<Unit> unitsForGold = new ArrayList<>();
-          for (Pair<Boolean, Integer> pair : triplets)
-          {
-            boolean isOnTable = pair.getKey();
-            int index = pair.getValue();
-            
-            if (isOnTable)
-            {
-              unitsForGold.add(table.get(index));
-            }
-            else
-            {
-              unitsForGold.add((Unit) hand.get(index).get());
-            }
-          }
-          
-          triplets.sort((p1, p2) -> Boolean.compare(p2.getKey(), p1.getKey())); // сначала стол, потом рука
-          triplets.sort((p1, p2) -> Integer.compare(p2.getValue(), p1.getValue())); // с конца
-          
-          for (Pair<Boolean, Integer> pair : triplets)
-          {
-            boolean isOnTable = pair.getKey();
-            int index = pair.getValue();
-            
-            if (isOnTable)
-            {
-              table.remove(index);
-            }
-            else
-            {
-              hand.remove(index);
-            }
-          }
-          
-          Card goldCard = Card.of(unitsForGold.get(0).buildGold(unitsForGold));
-          addToHand(goldCard);
-          break;
+          unitsForGold.add(table.get(index));
+        }
+        else
+        {
+          unitsForGold.add((Unit) hand.get(index).getEntity());
         }
       }
       
+      tripletsToRemove.sort((p1, p2) -> Boolean.compare(p2.getKey(), p1.getKey()));
+      tripletsToRemove.sort((p1, p2) -> Integer.compare(p2.getValue(), p1.getValue()));
+      
+      for (Pair<Boolean, Integer> pair : tripletsToRemove)
+      {
+        boolean isOnTable = pair.getKey();
+        int index = pair.getValue();
+        
+        if (isOnTable)
+        {
+          table.remove(index);
+        }
+        else
+        {
+          hand.remove(index);
+        }
+      }
+      
+      Card goldCard = Card.of(unitsForGold.get(0).buildGold(unitsForGold));
+      addToHand(goldCard);
+  }
+  
+  public int getLevel()
+  {
+    return level;
+  }
+  
+  public void incLevel()
+  {
+    if (level < MAX_LEVEL)
+    {
+      level++;
+      listener.processOnIncTavernLevelListener(game, this);
+      sendMessage(game.getUUID(), getUUID(), Event.Type.LVL_UP, level);
     }
-    while (foundTriplets);
   }
   
-  public int getIndex(Unit unit)
+  public int getHealth()
   {
-    return table.indexOf(unit);
+    return health;
   }
   
-  public int getFightIndex(Unit unit)
+  public int getMaxHealth()
   {
-    return inFightTable.indexOf(unit);
+    return maxHealth;
+  }
+  
+  public int getArmor()
+  {
+    return armor;
+  }
+  
+  public void setArmor(int armor)
+  {
+    this.armor = Math.max(armor, 0);
+    sendMessage(game.getUUID(), getUUID(), Event.Type.ARMOR, this.armor);
+  }
+  
+  public void addArmor(int amount)
+  {
+    this.armor += amount;
+    sendMessage(game.getUUID(), getUUID(), Event.Type.ARMOR, this.armor);
+  }
+  
+  public void applyDamage(int damage)
+  {
+    int piercingDamage = Math.max(damage - armor, 0);
+    
+    armor = Math.max(armor - damage, 0);
+    health -= piercingDamage;
+    
+    sendMessage(game.getUUID(), getUUID(), Event.Type.APPLY_DAMAGE, health);
+  }
+  
+  public int getMoney()
+  {
+    return money;
+  }
+  
+  public void resetMoney()
+  {
+    money = maxMoney;
+    sendMessage(game.getUUID(), getUUID(), Event.Type.MONEY, money);
+  }
+  
+  public void addMoney()
+  {
+    addMoney(1);
+  }
+  
+  public void addMoney(int amount)
+  {
+    money += amount;
+    sendMessage(game.getUUID(), getUUID(), Event.Type.MONEY, money);
+  }
+  
+  public void decMoney(int amount)
+  {
+    money = Math.max(money - amount, 0);
+    sendMessage(game.getUUID(), getUUID(), Event.Type.MONEY, money);
+  }
+  
+  public void incMaxMoney(int amount)
+  {
+    maxMoney += amount;
+    sendMessage(game.getUUID(), getUUID(), Event.Type.MAX_MONEY, maxMoney);
   }
   
   public void doForAll(Consumer<Unit> consumer)
@@ -482,7 +571,10 @@ public class Player implements Cloneable, Serializable
   
   public void doFor(Consumer<Unit> consumer, int index)
   {
-    consumer.accept(table.get(index));
+    if (index >= 0 && index < table.size())
+    {
+      consumer.accept(table.get(index));
+    }
   }
   
   public void removeTempBuffs()
@@ -490,65 +582,10 @@ public class Player implements Cloneable, Serializable
     doForAll(Unit::removeTempBuffs);
     
     hand.stream()
-        .map(Card::get)
-        .forEach(entity -> {
-          if (entity instanceof Unit)
-          {
-            ((Unit) entity).removeTempBuffs();
-          }
-        });
-  }
-  
-  public List<Unit> cloneTable()
-  {
-    return table.stream().toList();
-  }
-  
-  public List<Card> cloneHand()
-  {
-    return new ArrayList<>(hand);
-  }
-  
-  public int getLevel()
-  {
-    return level;
-  }
-  
-  public int getHealth()
-  {
-    return health;
-  }
-  
-  public void incLevel()
-  {
-    if (level < MAX_LEVEL)
-    {
-      level += 1;
-      listener.processOnIncTavernLevelListener(game, this);
-      sender.send(new Event(
-          game.getUUID(),
-          getUUID(),
-          Event.Type.LVL_UP,
-          level).getBytes());
-    }
-  }
-  
-  public void applyDamage(int damage)
-  {
-    int piercing = Math.max(damage - armor, 0);
-    
-    armor = Math.max(armor - damage, 0);
-    health -= piercing;
-    sender.send(new Event(
-        game.getUUID(),
-        getUUID(),
-        Event.Type.APPLY_DAMAGE,
-        money).getBytes());
-  }
-  
-  public Tavern getTavern()
-  {
-    return tavern;
+        .map(Card::getEntity)
+        .filter(entity -> entity instanceof Unit)
+        .map(entity -> (Unit) entity)
+        .forEach(Unit::removeTempBuffs);
   }
   
   public boolean isAlive()
@@ -556,85 +593,19 @@ public class Player implements Cloneable, Serializable
     return health > 0;
   }
   
-  public void resetMoney()
+  public List<Unit> cloneTable()
   {
-    money = maxMoney;
-    sender.send(new Event(
-        game.getUUID(),
-        getUUID(),
-        Event.Type.MONEY,
-        money).getBytes());
+    return new ArrayList<>(table);
   }
   
-  public void incMaxMoney(int i)
+  public List<Card> cloneHand()
   {
-    maxMoney += i;
-    sender.send(new Event(
-        game.getUUID(),
-        getUUID(),
-        Event.Type.MAX_MONEY,
-        maxMoney).getBytes());
+    return new ArrayList<>(hand);
   }
   
-  public int getMoney()
+  public List<Unit> getTable()
   {
-    return money;
-  }
-  
-  public void addMoney()
-  {
-    addMoney(1);
-    
-  }
-  
-  public void addMoney(int i)
-  {
-    money += i;
-    sender.send(new Event(
-        game.getUUID(),
-        getUUID(),
-        Event.Type.MONEY,
-        money).getBytes());
-  }
-  
-  public void decMoney(int i)
-  {
-    money -= i;
-    sender.send(new Event(
-        game.getUUID(),
-        getUUID(),
-        Event.Type.MONEY,
-        money).getBytes());
-  }
-  
-  public int getArmor()
-  {
-    return armor;
-  }
-  
-  public void setArmor(int i)
-  {
-    armor = i;
-    sender.send(new Event(
-        game.getUUID(),
-        getUUID(),
-        Event.Type.ARMOR,
-        armor).getBytes());
-  }
-  
-  public void addArmor(int i)
-  {
-    armor += i;
-    sender.send(new Event(
-        game.getUUID(),
-        getUUID(),
-        Event.Type.ARMOR,
-        money).getBytes());
-  }
-  
-  public int getMaxHealth()
-  {
-    return maxHealth;
+    return table;
   }
   
   public int getUnitsCount()
@@ -644,30 +615,11 @@ public class Player implements Cloneable, Serializable
   
   public int getFightUnitsCount()
   {
-    return inFightTable.size();
+    return inFightTable != null ? inFightTable.size() : 0;
   }
   
-  @Override
-  public Player clone()
+  public Tavern getTavern()
   {
-    try
-    {
-      Player player = (Player) super.clone();
-      return SerializationUtils.deepCopy(player);
-    }
-    catch (CloneNotSupportedException e)
-    {
-      throw new RuntimeException(e);
-    }
-  }
-  
-  public List<Unit> getTable()
-  {
-    return table;
-  }
-  
-  public boolean inFight()
-  {
-    return inFightTable != null;
+    return tavern;
   }
 }

@@ -20,7 +20,7 @@ import ru.vladislavkomkov.model.event.data.SenderWaiterDataRes;
 public class EventDispatcher
 {
   static final Integer QUEUE_LENGTH = 1_000;
-  private static final Logger log = LoggerFactory.getLogger(EventDispatcher.class);
+  static final Logger log = LoggerFactory.getLogger(EventDispatcher.class);
   ExecutorService executor = Executors.newSingleThreadExecutor();
   BlockingQueue<Event> queue = new ArrayBlockingQueue<>(QUEUE_LENGTH);
   
@@ -38,7 +38,7 @@ public class EventDispatcher
         
         try
         {
-          if (!game.state.equals(Game.State.PREPARE))
+          if (!game.getState().equals(Game.State.PREPARE))
           {
             Thread.sleep(1000);
             continue;
@@ -62,12 +62,12 @@ public class EventDispatcher
     queue.put(event);
   }
   
-  private void process(Game game, Event event)
+  void process(Game game, Event event)
   {
     process(game, event, null);
   }
   
-  private void process(Game game, Event event, WebSocket conn)
+  void process(Game game, Event event, WebSocket conn)
   {
     String playerUUID = event.getPlayerUUID();
     
