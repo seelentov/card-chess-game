@@ -13,10 +13,10 @@ import ru.vladislavkomkov.util.UUIDUtils;
 
 public abstract class Entity
 {
+  
   protected final Listener listener = new Listener();
   
   protected int ID = System.identityHashCode(this);
-  
   protected String name = this.getClass().getSimpleName();
   protected String description = "";
   protected int level = 1;
@@ -34,13 +34,17 @@ public abstract class Entity
     
     listener.onPlayedListeners.put(
         UUIDUtils.generateKey(),
-        (game, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto) -> processListeners(player.listener.onPlayedListeners,
-            (action) -> action.process(game, player, this, index, isTavernIndex, index2, isTavernIndex2, auto), player));
+        (game, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto) -> processListeners(
+            player.listener.onPlayedListeners,
+            (action) -> action.process(game, player, this, index, isTavernIndex, index2, isTavernIndex2, auto),
+            player));
     
     listener.onHandledListeners.put(
         UUIDUtils.generateKey(),
-        (game, player, entity) -> processListeners(player.listener.onHandledListeners, (action) -> action.process(game, player, this), player)
-    
+        (game, player, entity) -> processListeners(
+            player.listener.onHandledListeners,
+            (action) -> action.process(game, player, this),
+            player)
     );
   }
   
@@ -57,7 +61,7 @@ public abstract class Entity
   public void onHandled(Game game, Player player)
   {
     listener.processOnHandledListeners(game, player, this);
-  };
+  }
   
   public void onPlayed(Game game, Player player)
   {
@@ -92,7 +96,7 @@ public abstract class Entity
   public void onPlayed(Game game, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2, boolean auto)
   {
     listener.processOnPlayedListeners(game, player, this, index, isTavernIndex, index2, isTavernIndex2, auto);
-  };
+  }
   
   protected <T> void processListeners(Map<String, T> listeners, Consumer<T> actionMove, Player player)
   {

@@ -12,18 +12,20 @@ import ru.vladislavkomkov.util.UUIDUtils;
 
 public abstract class Unit extends Entity
 {
-  protected final List<Buff> buffs = new ArrayList<>();
+  final List<Buff> buffs = new ArrayList<>();
+  protected List<Type> type = new ArrayList<>();
+  
   protected int attack = 0;
   protected int maxHealth = 1;
-  protected List<Type> type = new ArrayList<>();
+  protected int actualHealth = 1;
+  
   protected boolean isBubbled = false;
   protected boolean isTaunt = false;
   protected boolean isRebirth = false;
   protected boolean isMagnet = false;
   protected boolean isDisguise = false;
-  protected boolean answerOnPlayed = false;
-  protected boolean answerOnDead = false;
-  protected int actualHealth = 1;
+  protected boolean isAnswerOnPlayed = false;
+  protected boolean isAnswerOnDead = false;
   
   public Unit()
   {
@@ -33,10 +35,8 @@ public abstract class Unit extends Entity
         UUIDUtils.generateKey(),
         (game, player, entity) -> {
           player.listener.removeListener(this);
-          
           player.addMoney(1);
           player.removeFromTable(this);
-          
           processListeners(player.listener.onSellListeners, (action) -> action.process(game, player, this), player);
         });
     
@@ -102,6 +102,114 @@ public abstract class Unit extends Entity
     attack = i;
   }
   
+  public void incAttack(int i)
+  {
+    attack += i;
+  }
+  
+  public void decAttack(int i)
+  {
+    attack -= i;
+  }
+  
+  public int getHealth()
+  {
+    return actualHealth;
+  }
+  
+  public void setHealth(int i)
+  {
+    maxHealth = i;
+    actualHealth = i;
+  }
+  
+  public int getMaxHealth()
+  {
+    return maxHealth;
+  }
+  
+  public void incHealth(int i)
+  {
+    maxHealth += i;
+    actualHealth += i;
+  }
+  
+  public void decHealth(int i)
+  {
+    maxHealth -= i;
+    actualHealth -= i;
+  }
+  
+  public void applyDamage(int i)
+  {
+    actualHealth -= i;
+  }
+  
+  public boolean isDead()
+  {
+    return actualHealth < 1;
+  }
+  
+  public void kill()
+  {
+    actualHealth = 0;
+  }
+  
+  public boolean getIsTaunt()
+  {
+    return isTaunt;
+  }
+  
+  public void setIsTaunt(boolean isTaunt)
+  {
+    this.isTaunt = isTaunt;
+  }
+  
+  public boolean getIsDisguise()
+  {
+    return isDisguise;
+  }
+  
+  public void setIsDisguise(boolean disguise)
+  {
+    isDisguise = disguise;
+  }
+  
+  public boolean getIsRebirth()
+  {
+    return isRebirth;
+  }
+  
+  public boolean isAnswerOnPlayed()
+  {
+    return isAnswerOnPlayed;
+  }
+  
+  public boolean isAnswerOnDead()
+  {
+    return isAnswerOnDead;
+  }
+  
+  public List<Buff> getBuffs()
+  {
+    return buffs;
+  }
+  
+  public void addBuff(Buff buff)
+  {
+    buff.getUpgrade().accept(this);
+    buffs.add(buff);
+  }
+  
+  public void removeTempBuffs()
+  {
+    buffs.stream()
+        .filter(buff -> buff.getRollback() != null)
+        .forEach(buff -> buff.getRollback().accept(this));
+    
+    buffs.removeIf(buff -> buff.getRollback() != null);
+  }
+  
   public void magnetize(Unit unit)
   {
     if (!unit.isType(Type.MECH) || type.stream().noneMatch(unit::isType))
@@ -114,16 +222,14 @@ public abstract class Unit extends Entity
     this.incAttack(u.getAttack());
     this.incHealth(u.getHealth());
     this.addBuff(new Buff(
-        unit1 -> {
-          listener.push(unit1.listener.newCoreListener(false));
-        },
+        unit1 -> listener.push(unit1.listener.newCoreListener(false)),
         null,
         unit.getDescription()));
   }
   
-  public boolean isDead()
+  public void removeCoreListeners()
   {
-    return actualHealth < 1;
+    listener.removeCoreListener();
   }
   
   public void onSell(Game game, Player player)
@@ -166,12 +272,6 @@ public abstract class Unit extends Entity
     listener.processOnDeadListeners(game, player, player2, this, attacker);
   }
   
-  @Override
-  public void onPlayed(Game game, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2)
-  {
-    super.onPlayed(game, player, index, isTavernIndex, index2, isTavernIndex2);
-  }
-  
   public void onAppear(Game game, Player player)
   {
     listener.processOnAppearListeners(game, player, this);
@@ -199,6 +299,12 @@ public abstract class Unit extends Entity
   }
   
   @Override
+  public void onPlayed(Game game, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2)
+  {
+    super.onPlayed(game, player, index, isTavernIndex, index2, isTavernIndex2);
+  }
+  
+  @Override
   public void onPlayed(Game game, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2, boolean auto)
   {
     super.onPlayed(game, player, index, isTavernIndex, index2, isTavernIndex2, auto);
@@ -206,119 +312,6 @@ public abstract class Unit extends Entity
     {
       player.addToHand(Card.of(new TripleReward(player.getLevel() + 1)));
     }
-  }
-  
-  public int getHealth()
-  {
-    return actualHealth;
-  }
-  
-  public void setHealth(int i)
-  {
-    maxHealth = i;
-    actualHealth = i;
-  }
-  
-  public int getMaxHealth()
-  {
-    return maxHealth;
-  }
-  
-  public void incHealth(int i)
-  {
-    maxHealth += i;
-    actualHealth += i;
-  }
-  
-  public void decHealth(int i)
-  {
-    maxHealth -= i;
-    actualHealth -= i;
-  }
-  
-  public void applyDamage(int i)
-  {
-    actualHealth -= i;
-  }
-  
-  public void incAttack(int i)
-  {
-    attack += i;
-  }
-  
-  public void decAttack(int i)
-  {
-    attack -= i;
-  }
-  
-  public void setIsBubbled(boolean bubbled)
-  {
-    isBubbled = bubbled;
-  }
-  
-  public boolean getIsTaunt()
-  {
-    return isTaunt;
-  }
-  
-  public void setIsTaunt(boolean isTaunt)
-  {
-    this.isTaunt = isTaunt;
-  }
-  
-  public boolean getIsDisguise()
-  {
-    return isDisguise;
-  }
-  
-  public void setIsDisguise(boolean disguise)
-  {
-    isDisguise = disguise;
-  }
-  
-  public void kill()
-  {
-    actualHealth = 0;
-  }
-  
-  public boolean getIsRebirth()
-  {
-    return isRebirth;
-  }
-  
-  public boolean isAnswerOnPlayed()
-  {
-    return answerOnPlayed;
-  }
-  
-  public boolean isAnswerOnDead()
-  {
-    return answerOnDead;
-  }
-  
-  public List<Buff> getBuffs()
-  {
-    return buffs;
-  }
-  
-  public void addBuff(Buff buff)
-  {
-    buff.getUpgrade().accept(this);
-    buffs.add(buff);
-  }
-  
-  public void removeTempBuffs()
-  {
-    buffs.stream()
-        .filter(buff -> buff.getRollback() != null)
-        .forEach(buff -> buff.getRollback().accept(this));
-    
-    buffs.removeIf(buff -> buff.getRollback() != null);
-  }
-  
-  public void removeCoreListeners()
-  {
-    listener.removeCoreListener();
   }
   
   public Unit buildGold()
@@ -355,7 +348,7 @@ public abstract class Unit extends Entity
     
     entity.setIsGold(true);
     return entity;
-  };
+  }
   
   public Unit newThis()
   {

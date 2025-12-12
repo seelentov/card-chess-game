@@ -191,9 +191,9 @@ public class Player
     if (game != null)
     {
       unit.onDisappear(game, this);
+      table.removeIf(unit1 -> unit1 == unit);
+      sendMessage(game.getUUID(), getUUID(), Event.Type.REMOVE_FROM_TABLE, table);
     }
-    table.removeIf(unit1 -> unit1 == unit);
-    sendMessage(game.getUUID(), getUUID(), Event.Type.REMOVE_FROM_TABLE, table);
   }
   
   public void removeFromTable(int index)
@@ -407,75 +407,75 @@ public class Player
   {
     Map<String, List<Pair<Boolean, Integer>>> indexCountMap = new HashMap<>();
     
-      for (int i = 0; i < hand.size(); i++)
+    for (int i = 0; i < hand.size(); i++)
+    {
+      Card card = hand.get(i);
+      if (card.isSpell() || card.isGold())
       {
-        Card card = hand.get(i);
-        if (card.isSpell() || card.isGold())
-        {
-          continue;
-        }
-        
-        String key = card.getName();
-        Pair<Boolean, Integer> pair = new Pair<>(false, i);
-        indexCountMap.computeIfAbsent(key, k -> new ArrayList<>()).add(pair);
+        continue;
       }
       
-      for (int i = 0; i < table.size(); i++)
-      {
-        Unit unit = table.get(i);
-        if (unit.isGold())
-        {
-          continue;
-        }
-        
-        String key = unit.getName();
-        Pair<Boolean, Integer> pair = new Pair<>(true, i);
-        indexCountMap.computeIfAbsent(key, k -> new ArrayList<>()).add(pair);
-      }
-      
-      return indexCountMap;
+      String key = card.getName();
+      Pair<Boolean, Integer> pair = new Pair<>(false, i);
+      indexCountMap.computeIfAbsent(key, k -> new ArrayList<>()).add(pair);
     }
     
-    void processTriplets(List<Pair<Boolean, Integer>> triplets)
+    for (int i = 0; i < table.size(); i++)
     {
-      List<Unit> unitsForGold = new ArrayList<>();
-      List<Pair<Boolean, Integer>> tripletsToRemove = triplets.subList(0, 3);
-      
-      for (Pair<Boolean, Integer> pair : tripletsToRemove)
+      Unit unit = table.get(i);
+      if (unit.isGold())
       {
-        boolean isOnTable = pair.getKey();
-        int index = pair.getValue();
-        
-        if (isOnTable)
-        {
-          unitsForGold.add(table.get(index));
-        }
-        else
-        {
-          unitsForGold.add((Unit) hand.get(index).getEntity());
-        }
+        continue;
       }
       
-      tripletsToRemove.sort((p1, p2) -> Boolean.compare(p2.getKey(), p1.getKey()));
-      tripletsToRemove.sort((p1, p2) -> Integer.compare(p2.getValue(), p1.getValue()));
+      String key = unit.getName();
+      Pair<Boolean, Integer> pair = new Pair<>(true, i);
+      indexCountMap.computeIfAbsent(key, k -> new ArrayList<>()).add(pair);
+    }
+    
+    return indexCountMap;
+  }
+  
+  void processTriplets(List<Pair<Boolean, Integer>> triplets)
+  {
+    List<Unit> unitsForGold = new ArrayList<>();
+    List<Pair<Boolean, Integer>> tripletsToRemove = triplets.subList(0, 3);
+    
+    for (Pair<Boolean, Integer> pair : tripletsToRemove)
+    {
+      boolean isOnTable = pair.getKey();
+      int index = pair.getValue();
       
-      for (Pair<Boolean, Integer> pair : tripletsToRemove)
+      if (isOnTable)
       {
-        boolean isOnTable = pair.getKey();
-        int index = pair.getValue();
-        
-        if (isOnTable)
-        {
-          table.remove(index);
-        }
-        else
-        {
-          hand.remove(index);
-        }
+        unitsForGold.add(table.get(index));
       }
+      else
+      {
+        unitsForGold.add((Unit) hand.get(index).getEntity());
+      }
+    }
+    
+    tripletsToRemove.sort((p1, p2) -> Boolean.compare(p2.getKey(), p1.getKey()));
+    tripletsToRemove.sort((p1, p2) -> Integer.compare(p2.getValue(), p1.getValue()));
+    
+    for (Pair<Boolean, Integer> pair : tripletsToRemove)
+    {
+      boolean isOnTable = pair.getKey();
+      int index = pair.getValue();
       
-      Card goldCard = Card.of(unitsForGold.get(0).buildGold(unitsForGold));
-      addToHand(goldCard);
+      if (isOnTable)
+      {
+        table.remove(index);
+      }
+      else
+      {
+        hand.remove(index);
+      }
+    }
+    
+    Card goldCard = Card.of(unitsForGold.get(0).buildGold(unitsForGold));
+    addToHand(goldCard);
   }
   
   public int getLevel()

@@ -6,10 +6,8 @@ public class Buff
 {
   final String description;
   
-  Consumer<Unit> upgrade = unit -> {
-  };
-  Consumer<Unit> rollback = unit -> {
-  };
+  final Consumer<Unit> upgrade;
+  final Consumer<Unit> rollback;
   
   public Buff(Consumer<Unit> upgrade, Consumer<Unit> rollback)
   {
@@ -23,6 +21,11 @@ public class Buff
     this.description = description;
   }
   
+  public String getDescription()
+  {
+    return description;
+  }
+  
   public Consumer<Unit> getUpgrade()
   {
     return upgrade;
@@ -31,10 +34,5 @@ public class Buff
   public Consumer<Unit> getRollback()
   {
     return rollback;
-  }
-  
-  public String getDescription()
-  {
-    return description;
   }
 }

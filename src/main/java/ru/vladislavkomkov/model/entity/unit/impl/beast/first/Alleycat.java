@@ -23,7 +23,7 @@ public class Alleycat extends Unit
     
     type = List.of(Type.BEAST);
     
-    answerOnPlayed = true;
+    isAnswerOnPlayed = true;
     
     listener.onPlayedListeners.put(
         KEY_CORE,

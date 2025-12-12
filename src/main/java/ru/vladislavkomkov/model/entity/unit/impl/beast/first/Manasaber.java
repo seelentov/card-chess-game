@@ -23,7 +23,7 @@ public class Manasaber extends Unit
     
     type = List.of(Type.BEAST);
     
-    answerOnDead = true;
+    isAnswerOnDead = true;
     
     listener.onDeadListeners.put(
         KEY_CORE,
