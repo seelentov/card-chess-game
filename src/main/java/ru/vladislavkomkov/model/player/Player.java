@@ -410,12 +410,12 @@ public class Player
     for (int i = 0; i < hand.size(); i++)
     {
       Card card = hand.get(i);
-      if (card.isSpell() || card.isGold())
+      if (card.isSpell() || card.getEntity().isGold())
       {
         continue;
       }
       
-      String key = card.getName();
+      String key = card.getEntity().getName();
       Pair<Boolean, Integer> pair = new Pair<>(false, i);
       indexCountMap.computeIfAbsent(key, k -> new ArrayList<>()).add(pair);
     }

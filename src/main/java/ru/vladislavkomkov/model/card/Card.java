@@ -34,16 +34,6 @@ public class Card<T extends Entity>
     return entity;
   }
   
-  public boolean isGold()
-  {
-    return entity.isGold();
-  }
-  
-  public String getName()
-  {
-    return entity.getName();
-  }
-  
   public boolean isSpell()
   {
     return entity instanceof Spell;
