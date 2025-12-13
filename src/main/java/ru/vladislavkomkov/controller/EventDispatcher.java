@@ -119,7 +119,7 @@ public class EventDispatcher
       case FREEZE -> {
         game.freezeTavern(playerUUID);
       }
-      case LVL_UP -> {
+      case LVL -> {
         game.lvlUp(playerUUID);
       }
       case MOVE -> {

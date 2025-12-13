@@ -64,22 +64,51 @@ public class GameProcessor
     });
   }
   
-  public void process() throws Exception
+  boolean process() throws Exception
   {
     Optional<Game> game = games.values().stream().findFirst();
     if (game.isPresent())
     {
-      process(game.get());
+      return process(game.get());
     }
+    return false;
   }
   
-  public void process(String uuid) throws Exception
+  boolean process(String uuid) throws Exception
   {
     Game game = games.get(uuid);
-    process(game);
+    return process(game);
   }
   
   boolean process(Game game) throws Exception
+  {
+    if (processPreFight(game))
+    {
+      return true;
+    }
+
+    processFight(game);
+    
+    return false;
+  }
+  
+  boolean processPreFight() throws Exception
+  {
+    Optional<Game> game = games.values().stream().findFirst();
+    if (game.isPresent())
+    {
+      return processPreFight(game.get());
+    }
+    return false;
+  }
+  
+  boolean processPreFight(String uuid) throws Exception
+  {
+    Game game = games.get(uuid);
+    return processPreFight(game);
+  }
+  
+  boolean processPreFight(Game game) throws Exception
   {
     if (game.calcFights())
     {
@@ -97,10 +126,24 @@ public class GameProcessor
       Thread.sleep(preFightTimer);
     }
     
-    game.doFight();
-    
-    game.incTurn();
-    
     return false;
+  }
+  
+  void processFight()
+  {
+    Optional<Game> game = games.values().stream().findFirst();
+    game.ifPresent(this::processFight);
+  }
+  
+  void processFight(String uuid)
+  {
+    Game game = games.get(uuid);
+    processFight(game);
+  }
+  
+  void processFight(Game game)
+  {
+    game.doFight();
+    game.incTurn();
   }
 }

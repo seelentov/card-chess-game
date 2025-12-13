@@ -71,21 +71,23 @@ public class Game implements AutoCloseable
   {
     Player player = players.get(playerUUID);
     player.setSender(sender);
-    player.sendMessage(uuid, playerUUID, Event.Type.CONNECTED);
+    player.sendMessage(Event.Type.CONNECTED);
   }
   
   public void sendPreFightTimer(int ms)
   {
-    players.forEach((key, player) -> player.sendMessage(uuid, key, Event.Type.PRE_FIGHT_TIMER, ms));
+    players.forEach((key, player) -> player.sendMessage(Event.Type.PRE_FIGHT_TIMER, ms));
   }
   
   public void sendStartGame()
   {
-    players.forEach((key, player) -> player.sendMessage(uuid, key, Event.Type.START));
+    players.forEach((key, player) -> player.sendMessage(Event.Type.START));
   }
   
   public void doPreFight()
   {
+    players.values().forEach(Player::sendArmorHealth);
+
     clearSenderWaiters();
     state = State.PREPARE;
     
@@ -150,7 +152,7 @@ public class Game implements AutoCloseable
       
       if (player != null)
       {
-        player.sendMessage(uuid, player.getUUID(), Event.Type.WIN);
+        player.sendMessage(Event.Type.WIN);
       }
       
       return true;
@@ -198,7 +200,7 @@ public class Game implements AutoCloseable
     if (!availablePlayers.isEmpty())
     {
       Player lonelyPlayer = availablePlayers.get(0);
-      lonelyPlayer.sendMessage(uuid, lonelyPlayer.getUUID(), Event.Type.WIN);
+      lonelyPlayer.sendMessage(Event.Type.WIN);
     }
     
     return false;
@@ -287,7 +289,7 @@ public class Game implements AutoCloseable
   void clearSenderWaiters()
   {
     players.values().forEach(Player::clearSenderWaiters);
-    players.values().forEach(player -> player.sendMessage(getUUID(), player.getUUID(), Event.Type.CLEAR_WAITERS));
+    players.values().forEach(player -> player.sendMessage(Event.Type.CLEAR_WAITERS));
   }
   
   Player findOpponent(

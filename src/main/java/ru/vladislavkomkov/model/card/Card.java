@@ -1,5 +1,6 @@
 package ru.vladislavkomkov.model.card;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.entity.Entity;
 import ru.vladislavkomkov.model.entity.spell.Spell;
@@ -8,6 +9,9 @@ import ru.vladislavkomkov.model.player.Player;
 
 public class Card<T extends Entity>
 {
+  public final static String F_ENTITY = "entity";
+
+
   final T entity;
   
   public Card(T entity)
@@ -28,7 +32,8 @@ public class Card<T extends Entity>
     }
     entity.onPlayed(game, player, index, isTavernIndex, index2, isTavernIndex2, false);
   }
-  
+
+  @JsonProperty(F_ENTITY)
   public T getEntity()
   {
     return entity;

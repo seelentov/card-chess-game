@@ -190,12 +190,12 @@ public class Event
     PLAY,
     SELL,
     FREEZE,
-    LVL_UP,
+    LVL,
     ROLL,
     MOVE,
     RES,
     RESET_TAVERN,
-    APPLY_DAMAGE,
+    HEALTH,
     PRE_FIGHT_TIMER,
     WAIT_REQ,
     CLEAR_WAITERS,
@@ -205,10 +205,8 @@ public class Event
     WIN,
     LOSE,
     START,
-    ADD_TO_TABLE,
-    ADD_TO_FIGHT_TABLE,
-    REMOVE_FROM_TABLE,
-    ADD_TO_HAND,
-    REMOVE_FROM_HAND
+    TABLE,
+    FIGHT_TABLE,
+    HAND
   }
 }

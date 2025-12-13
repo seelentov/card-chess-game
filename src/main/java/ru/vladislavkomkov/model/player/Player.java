@@ -22,10 +22,13 @@ import ru.vladislavkomkov.util.UUIDUtils;
 public class Player
 {
   public static final int MAX_LEVEL = 6;
-  public static final int MAX_MONEY = 6;
+  public static final int MAX_MONEY = 10;
   public static final int TABLE_LIMIT = 7;
   public static final int HAND_LIMIT = 10;
-  
+
+  public static final int START_HEALTH = 10;
+  public static final int START_ARMOR = 10;
+
   final String uuid;
   
   final Tavern tavern = new Tavern();
@@ -36,9 +39,9 @@ public class Player
   final List<Card> hand = new ArrayList<>();
   public List<Unit> inFightTable = null;
   
-  int health = 30;
-  int maxHealth = 30;
-  int armor = 0;
+  int health = START_HEALTH;
+  int maxHealth = START_HEALTH;
+  int armor = START_ARMOR;
   int money = 0;
   int maxMoney = 3;
   int level = 1;
@@ -59,36 +62,51 @@ public class Player
     this.uuid = uuid;
     this.game = game;
   }
-  
-  public void sendMessage(String gameUUID, String playerUUID, Event.Type type)
+
+  public void sendArmorHealth(){
+    sendHealth();
+    sendArmor();
+  }
+
+  public void sendArmor()
+  {
+    sendMessage(Event.Type.ARMOR, armor);
+  }
+
+  public void sendHealth()
+  {
+    sendMessage(Event.Type.HEALTH, health);
+  }
+
+  public void sendMessage(Event.Type type)
   {
     if (sender != null)
     {
-      sender.send(new Event(gameUUID, playerUUID, type).getBytes());
+      sender.send(new Event(game.getUUID(), getUUID(), type).getBytes());
     }
   }
   
-  public void sendMessage(String gameUUID, String playerUUID, Event.Type type, int data)
+  public void sendMessage(Event.Type type, int data)
   {
     if (sender != null)
     {
-      sender.send(new Event(gameUUID, playerUUID, type, data).getBytes());
+      sender.send(new Event(game.getUUID(), getUUID(), type, data).getBytes());
     }
   }
   
-  public void sendMessage(String gameUUID, String playerUUID, Event.Type type, Object data)
+  public void sendMessage(Event.Type type, Object data)
   {
     if (sender != null)
     {
-      sender.send(new Event(gameUUID, playerUUID, type, data).getBytes());
+      sender.send(new Event(game.getUUID(), getUUID(), type, data).getBytes());
     }
   }
   
-  public void sendMessage(String gameUUID, String playerUUID, Event.Type type, byte[] data)
+  public void sendMessage(Event.Type type, byte[] data)
   {
     if (sender != null)
     {
-      sender.send(new Event(gameUUID, playerUUID, type, data).getBytes());
+      sender.send(new Event(game.getUUID(), getUUID(), type, data).getBytes());
     }
   }
   
@@ -97,7 +115,7 @@ public class Player
     String key = UUIDUtils.generateKey();
     senderWaiters.put(key, consumer);
     
-    sendMessage(game.getUUID(), getUUID(), Event.Type.WAIT_REQ,
+    sendMessage(Event.Type.WAIT_REQ,
         new SenderWaiterDataReq(key, data));
   }
   
@@ -152,7 +170,7 @@ public class Player
     Unit unit = table.remove(fromIndex);
     table.add(toIndex, unit);
     
-    sendMessage(game.getUUID(), getUUID(), Event.Type.MOVE, table);
+    sendMessage(Event.Type.MOVE, table);
   }
   
   public boolean addToTable(Unit unit, int index)
@@ -172,7 +190,7 @@ public class Player
     }
     
     unit.onAppear(game, this);
-    sendMessage(game.getUUID(), getUUID(), Event.Type.ADD_TO_TABLE, table);
+    sendMessage(Event.Type.TABLE, table);
     
     return true;
   }
@@ -193,7 +211,7 @@ public class Player
     {
       unit.onDisappear(game, this);
       table.removeIf(unit1 -> unit1 == unit);
-      sendMessage(game.getUUID(), getUUID(), Event.Type.REMOVE_FROM_TABLE, table);
+      sendMessage(Event.Type.TABLE, table);
     }
   }
   
@@ -242,7 +260,7 @@ public class Player
     
     if (game != null)
     {
-      sendMessage(game.getUUID(), getUUID(), Event.Type.ADD_TO_FIGHT_TABLE, table);
+      sendMessage(Event.Type.FIGHT_TABLE, table);
     }
     
     return true;
@@ -287,13 +305,13 @@ public class Player
     }
     
     calcTriplets();
-    sendMessage(game.getUUID(), getUUID(), Event.Type.ADD_TO_HAND, hand);
+    sendMessage(Event.Type.HAND, hand);
   }
   
   public void clearSpellCraft()
   {
     hand.removeIf(card -> card.getEntity() instanceof SpellCraft);
-    sendMessage(game.getUUID(), getUUID(), Event.Type.REMOVE_FROM_HAND, hand);
+    sendMessage(Event.Type.HAND, hand);
   }
   
   public void playCard(int indexCard)
@@ -327,17 +345,17 @@ public class Player
     hand.get(indexCard).play(game, this, index, isTavernIndex, index2, isTavernIndex2);
     hand.remove(indexCard);
     
-    sendMessage(game.getUUID(), getUUID(), Event.Type.PLAY, hand);
+    sendMessage(Event.Type.HAND, hand);
   }
   
   public void buyCard(int index)
   {
     if (money >= buyPrice && hand.size() < HAND_LIMIT)
     {
-      money -= buyPrice;
+      decMoney(buyPrice);
       addToHand(tavern.buy(index));
       
-      sendMessage(game.getUUID(), getUUID(), Event.Type.BUY, hand);
+      sendMessage(Event.Type.BUY, hand);
     }
   }
   
@@ -352,14 +370,14 @@ public class Player
     if (entity instanceof Unit unit)
     {
       unit.onSell(game, this);
-      sendMessage(game.getUUID(), getUUID(), Event.Type.SELL, hand);
+      sendMessage(Event.Type.SELL, hand);
     }
   }
   
   public void freezeTavern()
   {
     tavern.setFreeze(!tavern.isFreeze());
-    sendMessage(game.getUUID(), getUUID(), Event.Type.FREEZE, tavern.isFreeze());
+    sendMessage(Event.Type.FREEZE, tavern.isFreeze());
   }
   
   public void resetTavernManual()
@@ -372,8 +390,8 @@ public class Player
     tavern.setFreeze(false);
     resetTavern();
     
-    sendMessage(game.getUUID(), getUUID(), Event.Type.RESET_TAVERN, tavern.getCards());
-    sendMessage(game.getUUID(), getUUID(), Event.Type.FREEZE, tavern.isFreeze());
+    sendMessage(Event.Type.RESET_TAVERN, tavern.getCards());
+    sendMessage(Event.Type.FREEZE, tavern.isFreeze());
   }
   
   public void resetTavern()
@@ -490,7 +508,8 @@ public class Player
     {
       level++;
       listener.processOnIncTavernLevelListener(game, this);
-      sendMessage(game.getUUID(), getUUID(), Event.Type.LVL_UP, level);
+      decMoney();
+      sendMessage(Event.Type.LVL, level);
     }
   }
   
@@ -512,13 +531,13 @@ public class Player
   public void setArmor(int armor)
   {
     this.armor = Math.max(armor, 0);
-    sendMessage(game.getUUID(), getUUID(), Event.Type.ARMOR, this.armor);
+    sendHealth();
   }
   
   public void addArmor(int amount)
   {
     this.armor += amount;
-    sendMessage(game.getUUID(), getUUID(), Event.Type.ARMOR, this.armor);
+    sendArmor();
   }
   
   public void applyDamage(int damage)
@@ -527,8 +546,8 @@ public class Player
     
     armor = Math.max(armor - damage, 0);
     health -= piercingDamage;
-    
-    sendMessage(game.getUUID(), getUUID(), Event.Type.APPLY_DAMAGE, health);
+
+    sendArmorHealth();
   }
   
   public int getMoney()
@@ -544,7 +563,7 @@ public class Player
   public void resetMoney()
   {
     money = maxMoney;
-    sendMessage(game.getUUID(), getUUID(), Event.Type.MONEY, money);
+    sendMessage(Event.Type.MONEY, money);
   }
   
   public void addMoney()
@@ -555,13 +574,13 @@ public class Player
   public void addMoney(int amount)
   {
     money += amount;
-    sendMessage(game.getUUID(), getUUID(), Event.Type.MONEY, money);
+    sendMessage(Event.Type.MONEY, money);
   }
   
   public void decMoney(int amount)
   {
     money = Math.max(money - amount, 0);
-    sendMessage(game.getUUID(), getUUID(), Event.Type.MONEY, money);
+    sendMessage(Event.Type.MONEY, money);
   }
   
   public void incMaxMoney()
@@ -572,7 +591,7 @@ public class Player
   public void incMaxMoney(int amount)
   {
     maxMoney += amount;
-    sendMessage(game.getUUID(), getUUID(), Event.Type.MAX_MONEY, maxMoney);
+    sendMessage(Event.Type.MAX_MONEY, maxMoney);
   }
   
   public void doForAll(Consumer<Unit> consumer)
@@ -613,12 +632,17 @@ public class Player
   {
     return new ArrayList<>(hand);
   }
-  
+
   public List<Unit> getTable()
   {
     return table;
   }
-  
+
+  public List<Card> getHand()
+  {
+    return hand;
+  }
+
   public int getUnitsCount()
   {
     return table.size();
