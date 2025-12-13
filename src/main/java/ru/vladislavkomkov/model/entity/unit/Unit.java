@@ -3,6 +3,8 @@ package ru.vladislavkomkov.model.entity.unit;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.Entity;
@@ -12,6 +14,20 @@ import ru.vladislavkomkov.util.UUIDUtils;
 
 public abstract class Unit extends Entity
 {
+  public final static String F_ATTACK = "attack";
+  
+  public final static String F_HEALTH = "health";
+  public final static String F_MAX_HEALTH = "max_health";
+  
+  public final static String F_IS_BUBBLED = "is_bubbled";
+  public final static String F_IS_TAUNT = "is_taunt";
+  public final static String F_IS_REBIRTH = "is_rebirth";
+  public final static String F_IS_MAGNET = "is_magnet";
+  public final static String F_IS_DISGUISE = "is_disguise";
+  
+  public final static String F_BUFFS = "buffs";
+  
+  
   final List<Buff> buffs = new ArrayList<>();
   protected List<Type> type = new ArrayList<>();
   
@@ -24,6 +40,7 @@ public abstract class Unit extends Entity
   protected boolean isRebirth = false;
   protected boolean isMagnet = false;
   protected boolean isDisguise = false;
+  
   protected boolean isAnswerOnPlayed = false;
   protected boolean isAnswerOnDead = false;
   
@@ -92,6 +109,7 @@ public abstract class Unit extends Entity
         });
   }
   
+  @JsonProperty(F_ATTACK)
   public int getAttack()
   {
     return attack;
@@ -112,6 +130,7 @@ public abstract class Unit extends Entity
     attack -= i;
   }
   
+  @JsonProperty(F_HEALTH)
   public int getHealth()
   {
     return actualHealth;
@@ -123,6 +142,7 @@ public abstract class Unit extends Entity
     actualHealth = i;
   }
   
+  @JsonProperty(F_MAX_HEALTH)
   public int getMaxHealth()
   {
     return maxHealth;
@@ -155,7 +175,8 @@ public abstract class Unit extends Entity
     actualHealth = 0;
   }
   
-  public boolean getIsTaunt()
+  @JsonProperty(F_IS_TAUNT)
+  public boolean isTaunt()
   {
     return isTaunt;
   }
@@ -165,7 +186,8 @@ public abstract class Unit extends Entity
     this.isTaunt = isTaunt;
   }
   
-  public boolean getIsDisguise()
+  @JsonProperty(F_IS_DISGUISE)
+  public boolean isDisguise()
   {
     return isDisguise;
   }
@@ -175,7 +197,25 @@ public abstract class Unit extends Entity
     isDisguise = disguise;
   }
   
-  public boolean getIsRebirth()
+  @JsonProperty(F_IS_MAGNET)
+  public boolean isMagnet()
+  {
+    return isMagnet;
+  }
+  
+  @JsonProperty(F_IS_BUBBLED)
+  public boolean isBubbled()
+  {
+    return isBubbled;
+  }
+  
+  public void setIsBubbled(boolean isBubbled)
+  {
+    this.isBubbled = isBubbled;
+  }
+  
+  @JsonProperty(F_IS_REBIRTH)
+  public boolean isRebirth()
   {
     return isRebirth;
   }
@@ -190,6 +230,7 @@ public abstract class Unit extends Entity
     return isAnswerOnDead;
   }
   
+  @JsonProperty(F_BUFFS)
   public List<Buff> getBuffs()
   {
     return buffs;

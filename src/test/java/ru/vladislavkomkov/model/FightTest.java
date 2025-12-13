@@ -159,7 +159,7 @@ public class FightTest extends GamePlayerTestCase
     
     Fight fight = new Fight(game, player, player2);
     
-    assertTrue(fight.player1Units.get(0).getIsRebirth());
+    assertTrue(fight.player1Units.get(0).isRebirth());
     
     assertEquals(1, fight.player1Units.size());
     assertEquals(2, fight.player2Units.size());
@@ -169,7 +169,7 @@ public class FightTest extends GamePlayerTestCase
     assertEquals(1, fight.player1Units.size());
     assertEquals(1, fight.player2Units.size());
     
-    assertFalse(fight.player1Units.get(0).getIsRebirth());
+    assertFalse(fight.player1Units.get(0).isRebirth());
     
     assertFalse(fight.doTurn().isPresent());
     

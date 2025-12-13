@@ -336,7 +336,7 @@ public class Player
       money -= buyPrice;
       addToHand(tavern.buy(index));
       
-      sendMessage(game.getUUID(), getUUID(), Event.Type.BYU, hand);
+      sendMessage(game.getUUID(), getUUID(), Event.Type.BUY, hand);
     }
   }
   

@@ -82,7 +82,7 @@ public class EventDispatcher
         playerUUID = game.addPlayer();
         game.setPlayerSender(playerUUID, new WebSocketSender(conn));
       }
-      case BYU -> {
+      case BUY -> {
         game.buyTavernCard(playerUUID, event.getData(Integer.class));
       }
       case PLAY -> {

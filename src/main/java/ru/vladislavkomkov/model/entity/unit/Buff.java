@@ -2,8 +2,13 @@ package ru.vladislavkomkov.model.entity.unit;
 
 import java.util.function.Consumer;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Buff
 {
+  public final static String F_DESCRIPTION = "description";
+  
+  
   final String description;
   
   final Consumer<Unit> upgrade;
@@ -21,6 +26,7 @@ public class Buff
     this.description = description;
   }
   
+  @JsonProperty(F_DESCRIPTION)
   public String getDescription()
   {
     return description;

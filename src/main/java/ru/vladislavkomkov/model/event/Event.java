@@ -28,6 +28,11 @@ public class Event
     this(gameUUID, playerUUID, type, ByteBuffer.allocate(4).putInt(data).array());
   }
   
+  public Event(String gameUUID, String playerUUID, Type type, String data)
+  {
+    this(gameUUID, playerUUID, type, data.getBytes(StandardCharsets.UTF_8));
+  }
+  
   public Event(String gameUUID, String playerUUID, Type type, Object data)
   {
     this(gameUUID, playerUUID, type, ObjectUtils.writeValue(data));
@@ -131,6 +136,11 @@ public class Event
     return ByteBuffer.wrap(data).getInt();
   }
   
+  public String getDataAsString()
+  {
+    return new String(data, StandardCharsets.UTF_8);
+  }
+  
   public boolean hasData()
   {
     return data != null && data.length > 0;
@@ -176,7 +186,7 @@ public class Event
   {
     CONNECTED,
     ERROR,
-    BYU,
+    BUY,
     PLAY,
     SELL,
     FREEZE,

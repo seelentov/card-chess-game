@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import ru.vladislavkomkov.consts.Listeners;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.Listener;
@@ -13,6 +15,11 @@ import ru.vladislavkomkov.util.UUIDUtils;
 
 public abstract class Entity
 {
+  public final static String F_ID = "id";
+  public final static String F_NAME = "name";
+  public final static String F_DESCRIPTION = "description";
+  public final static String F_IS_GOLD = "is_gold";
+  
   
   protected final Listener listener = new Listener();
   
@@ -109,16 +116,19 @@ public abstract class Entity
     });
   }
   
+  @JsonProperty(F_NAME)
   public String getName()
   {
     return name;
   }
   
+  @JsonProperty(F_ID)
   public int getID()
   {
     return ID;
   }
   
+  @JsonProperty(F_DESCRIPTION)
   public String getDescription()
   {
     return getDescription(null);
@@ -150,6 +160,7 @@ public abstract class Entity
     return supplier.get();
   }
   
+  @JsonProperty(F_IS_GOLD)
   public boolean isGold()
   {
     return isGold;

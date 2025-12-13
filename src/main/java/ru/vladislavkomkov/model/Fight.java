@@ -208,7 +208,7 @@ public class Fight
     }
     
     List<Unit> tauntUnits = eligibleUnits.stream()
-        .filter(Unit::getIsTaunt)
+        .filter(Unit::isTaunt)
         .toList();
     
     List<Unit> targetUnits = tauntUnits.isEmpty() ? eligibleUnits : tauntUnits;
@@ -224,7 +224,7 @@ public class Fight
   
   boolean filterAttacked(Unit unit)
   {
-    return !unit.getIsDisguise();
+    return !unit.isDisguise();
   }
   
   boolean checkAttacker(Unit unit)
