@@ -22,6 +22,7 @@ import ru.vladislavkomkov.util.UUIDUtils;
 public class Player
 {
   public static final int MAX_LEVEL = 6;
+  public static final int MAX_MONEY = 6;
   public static final int TABLE_LIMIT = 7;
   public static final int HAND_LIMIT = 10;
   
@@ -535,6 +536,11 @@ public class Player
     return money;
   }
   
+  public int getMaxMoney()
+  {
+    return maxMoney;
+  }
+  
   public void resetMoney()
   {
     money = maxMoney;
@@ -556,6 +562,11 @@ public class Player
   {
     money = Math.max(money - amount, 0);
     sendMessage(game.getUUID(), getUUID(), Event.Type.MONEY, money);
+  }
+  
+  public void incMaxMoney()
+  {
+    incMaxMoney(1);
   }
   
   public void incMaxMoney(int amount)

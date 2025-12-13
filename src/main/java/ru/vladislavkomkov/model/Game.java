@@ -91,6 +91,11 @@ public class Game implements AutoCloseable
     
     for (Player player : players.values())
     {
+      if (turn != 1 && player.getMaxMoney() < Player.MAX_MONEY)
+      {
+        player.incMaxMoney();
+      }
+      
       player.resetMoney();
       player.resetTavern();
       processStartTurn(player);

@@ -4,9 +4,9 @@ import ru.vladislavkomkov.model.event.Event;
 
 public class MockSender implements Sender
 {
-  final MockConsumer<Event> consumer;
+  final MockConsumer consumer;
   
-  public MockSender(MockConsumer<Event> consumer)
+  public MockSender(MockConsumer consumer)
   {
     this.consumer = consumer;
   }
