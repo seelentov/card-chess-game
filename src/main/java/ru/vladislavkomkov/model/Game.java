@@ -84,10 +84,10 @@ public class Game implements AutoCloseable
     players.forEach((key, player) -> player.sendMessage(Event.Type.START));
   }
   
-  public void doPreFight()
+  public void doTurnBegin()
   {
     players.values().forEach(Player::sendArmorHealth);
-
+    
     clearSenderWaiters();
     state = State.PREPARE;
     
@@ -101,6 +101,13 @@ public class Game implements AutoCloseable
       player.resetMoney();
       player.resetTavern();
       processStartTurn(player);
+    }
+  }
+  
+  public void doTurnEnd()
+  {
+    for (Player player : players.values())
+    {
       processEndTurn(player);
     }
   }

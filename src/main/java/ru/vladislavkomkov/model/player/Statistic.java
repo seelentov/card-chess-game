@@ -6,74 +6,75 @@ public class Statistic
 {
   public final Played played = new Played();
   public final Counters counters = new Counters();
-  
+  public final Boosts boosts = new Boosts();
+
   public Statistic()
   {
-  }
-  
-  public void reset()
-  {
-    played.resetOnlyBluesPlayed();
-    counters.resetFreeTavern();
-  }
-  
-  public int getFreeTavernCount()
-  {
-    return counters.getFreeTavernCount();
-  }
-  
-  public int useFreeTavern()
-  {
-    return counters.useFreeTavern();
-  }
-  
-  public int addFreeTavern()
-  {
-    return counters.incrementFreeTavern();
   }
   
   public static class Played
   {
     public int onlyBluesPlayed = 0;
-    
-    public void incrementOnlyBluesPlayed()
-    {
-      onlyBluesPlayed++;
-    }
-    
-    public void resetOnlyBluesPlayed()
-    {
-      onlyBluesPlayed = 0;
-    }
+  }
+  
+  public static class Boosts
+  {
+    public int incMaxMoney = 0;
   }
   
   public static class Counters
   {
-    final AtomicInteger freeTavernCounter = new AtomicInteger(0);
+    final AtomicInteger freeTavernReset = new AtomicInteger(0);
+    final AtomicInteger incLevelDecreaser = new AtomicInteger(0);
     
-    public int useFreeTavern()
+    public int useFreeTavernReset()
     {
-      return freeTavernCounter.getAndUpdate(i -> i > 0 ? i - 1 : i);
+      return freeTavernReset.getAndUpdate(i -> i > 0 ? i - 1 : i);
     }
     
-    public int incrementFreeTavern()
+    public int incrementFreeTavernReset()
     {
-      return freeTavernCounter.incrementAndGet();
+      return freeTavernReset.incrementAndGet();
     }
     
-    public int getFreeTavernCount()
+    public int getFreeTavernResetCount()
     {
-      return freeTavernCounter.get();
+      return freeTavernReset.get();
     }
     
-    public void setFreeTavernCount(int count)
+    public void setFreeTavernResetCount(int count)
     {
-      freeTavernCounter.set(Math.max(0, count));
+      freeTavernReset.set(Math.max(0, count));
     }
     
-    public void resetFreeTavern()
+    public void resetFreeTavernReset()
     {
-      freeTavernCounter.set(0);
+      freeTavernReset.set(0);
+    }
+    
+    public int useIncLevelDecreaser()
+    {
+      return incLevelDecreaser.getAndUpdate(i -> i > 0 ? i - 1 : i);
+    }
+    
+    public int incrementIncLevelDecreaser()
+    {
+      return incLevelDecreaser.incrementAndGet();
+    }
+    
+    public int getIncLevelDecreaser()
+    {
+      return incLevelDecreaser.get();
+    }
+    
+    public void setIncLevelDecreaser(int count)
+    {
+      incLevelDecreaser.set(Math.max(0, count));
+    }
+    
+    public void resetIncLevelDecreaser()
+    {
+      incLevelDecreaser.set(0);
     }
   }
 }

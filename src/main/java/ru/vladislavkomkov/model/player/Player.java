@@ -25,10 +25,10 @@ public class Player
   public static final int MAX_MONEY = 10;
   public static final int TABLE_LIMIT = 7;
   public static final int HAND_LIMIT = 10;
-
+  
   public static final int START_HEALTH = 10;
   public static final int START_ARMOR = 10;
-
+  
   final String uuid;
   
   final Tavern tavern = new Tavern();
@@ -62,22 +62,23 @@ public class Player
     this.uuid = uuid;
     this.game = game;
   }
-
-  public void sendArmorHealth(){
+  
+  public void sendArmorHealth()
+  {
     sendHealth();
     sendArmor();
   }
-
+  
   public void sendArmor()
   {
     sendMessage(Event.Type.ARMOR, armor);
   }
-
+  
   public void sendHealth()
   {
     sendMessage(Event.Type.HEALTH, health);
   }
-
+  
   public void sendMessage(Event.Type type)
   {
     if (sender != null)
@@ -376,13 +377,13 @@ public class Player
   
   public void freezeTavern()
   {
-    tavern.setFreeze(!tavern.isFreeze());
+    tavern.toggleFreeze();
     sendMessage(Event.Type.FREEZE, tavern.isFreeze());
   }
   
   public void resetTavernManual()
   {
-    if (statistic.counters.getFreeTavernCount() <= 0)
+    if (statistic.counters.getFreeTavernResetCount() <= 0)
     {
       money -= resetTavernPrice;
     }
@@ -506,11 +507,32 @@ public class Player
   {
     if (level < MAX_LEVEL)
     {
-      level++;
-      listener.processOnIncTavernLevelListener(game, this);
-      decMoney();
-      sendMessage(Event.Type.LVL, level);
+      int price = getIncLevelPrice();
+      
+      if (price <= money)
+      {
+        level++;
+        listener.processOnIncTavernLevelListener(game, this);
+        decMoney(price);
+        sendMessage(Event.Type.LVL, level);
+        statistic.counters.resetIncLevelDecreaser();
+      }
     }
+  }
+  
+  private int getIncLevelPrice()
+  {
+    int basePrice = switch (level)
+    {
+      case 1 -> 5;
+      case 2 -> 7;
+      case 3 -> 10;
+      default -> 12;
+    };
+    
+    int calcedPrice = basePrice - statistic.counters.getIncLevelDecreaser();
+    
+    return Math.max(calcedPrice, 0);
   }
   
   public int getHealth()
@@ -546,7 +568,7 @@ public class Player
     
     armor = Math.max(armor - damage, 0);
     health -= piercingDamage;
-
+    
     sendArmorHealth();
   }
   
@@ -557,12 +579,12 @@ public class Player
   
   public int getMaxMoney()
   {
-    return maxMoney;
+    return maxMoney + statistic.boosts.incMaxMoney;
   }
   
   public void resetMoney()
   {
-    money = maxMoney;
+    money = getMaxMoney();
     sendMessage(Event.Type.MONEY, money);
   }
   
@@ -591,7 +613,7 @@ public class Player
   public void incMaxMoney(int amount)
   {
     maxMoney += amount;
-    sendMessage(Event.Type.MAX_MONEY, maxMoney);
+    sendMessage(Event.Type.MAX_MONEY, getMaxMoney());
   }
   
   public void doForAll(Consumer<Unit> consumer)
@@ -632,17 +654,17 @@ public class Player
   {
     return new ArrayList<>(hand);
   }
-
+  
   public List<Unit> getTable()
   {
     return table;
   }
-
+  
   public List<Card> getHand()
   {
     return hand;
   }
-
+  
   public int getUnitsCount()
   {
     return table.size();

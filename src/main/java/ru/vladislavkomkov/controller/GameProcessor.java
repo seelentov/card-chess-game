@@ -115,7 +115,7 @@ public class GameProcessor
       return true;
     }
     
-    game.doPreFight();
+    game.doTurnBegin();
     
     int preFightTimer = this.preFightTimer == Integer.MAX_VALUE ? (game.getTurn() * 5000) + 30000 : this.preFightTimer;
     
@@ -125,7 +125,9 @@ public class GameProcessor
     {
       Thread.sleep(preFightTimer);
     }
-    
+
+    game.doTurnEnd();
+
     return false;
   }
   

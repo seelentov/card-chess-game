@@ -10,7 +10,7 @@ public class GameTest extends GamePlayerTestCase
   @Test
   void testSimpleGame()
   {
-    game.doPreFight();
+    game.doTurnBegin();
     players.values().forEach(player1 -> player1.addToTable(new Cat()));
     game.doFight();
   }

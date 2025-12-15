@@ -13,6 +13,7 @@ import ru.vladislavkomkov.util.UnitUtils;
 public class Tavern
 {
   final List<Card> cards = new ArrayList<>();
+  final List<Card> freezed = new ArrayList<>();
   boolean freeze = false;
   
   public static int getCountByLevel(int level)
@@ -57,6 +58,10 @@ public class Tavern
     if (freeze)
     {
       freeze = false;
+
+      cards.addAll(freezed);
+      freezed.clear();
+
       return;
     }
     
@@ -68,7 +73,7 @@ public class Tavern
   void fillWithUnits(int level)
   {
     int count = getCountByLevel(level);
-    
+
     for (int i = 0; i < count; i++)
     {
       Card unitCard = generateUnitCard(level);
