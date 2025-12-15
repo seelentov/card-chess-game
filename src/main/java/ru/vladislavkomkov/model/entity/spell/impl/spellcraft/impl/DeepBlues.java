@@ -47,7 +47,7 @@ public class DeepBlues extends SpellCraft
           }
           else
           {
-            unit = (Unit) player.getTavern().getCards().get(index).getEntity();
+            unit = (Unit) player.getTavern().getCards().get(index).getCard().getEntity();
           }
           
           unit.addBuff(

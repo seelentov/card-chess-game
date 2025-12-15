@@ -377,7 +377,7 @@ public class Player
   
   public void freezeTavern()
   {
-    tavern.toggleFreeze();
+    tavern.setFreeze(!tavern.isFreeze());
     sendMessage(Event.Type.FREEZE, tavern.isFreeze());
   }
   
@@ -397,8 +397,16 @@ public class Player
   
   public void resetTavern()
   {
-    tavern.reset(level);
+    resetTavern(false);
+  }
+  
+  public void resetTavern(boolean saveFreezed)
+  {
+    tavern.reset(level, saveFreezed);
     listener.processOnResetTavernListeners(game, this);
+    
+    sendMessage(Event.Type.RESET_TAVERN, tavern.getCards());
+    sendMessage(Event.Type.FREEZE, tavern.isFreeze());
   }
   
   public void calcTriplets()
@@ -531,6 +539,7 @@ public class Player
     };
     
     int calcedPrice = basePrice - statistic.counters.getIncLevelDecreaser();
+    statistic.counters.resetIncLevelDecreaser();
     
     return Math.max(calcedPrice, 0);
   }
@@ -580,6 +589,10 @@ public class Player
   public int getMaxMoney()
   {
     return maxMoney + statistic.boosts.incMaxMoney;
+  }
+  
+  public int getMaxMoneyBase(){
+    return maxMoney;
   }
   
   public void resetMoney()

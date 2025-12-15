@@ -31,9 +31,9 @@ public class PlayerTest extends GamePlayerTestCase
         Tavern.getCountByLevel(player.getLevel()),
         player.getTavern().cards.stream().filter(card1 -> card1.getEntity() instanceof Unit).count());
     
-    for (Card card : player.getTavern().cards)
+    for (Tavern.Slot slot : player.getTavern().getCards())
     {
-      assertEquals(player.getLevel(), card.getEntity().getLevel());
+      assertEquals(player.getLevel(), slot.getEntity().getLevel());
     }
     
     assertEquals(

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.vladislavkomkov.model.card.Card;
+import ru.vladislavkomkov.model.entity.Entity;
 import ru.vladislavkomkov.model.entity.spell.Spell;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.util.RandUtils;
@@ -12,8 +13,44 @@ import ru.vladislavkomkov.util.UnitUtils;
 
 public class Tavern
 {
-  final List<Card> cards = new ArrayList<>();
-  final List<Card> freezed = new ArrayList<>();
+  public static class Slot<T extends Entity>
+  {
+    private final Card<T> card;
+    private boolean freezed;
+    
+    public Slot(Card<T> card)
+    {
+      this(card, false);
+    }
+    
+    public Slot(Card<T> card, boolean freezed)
+    {
+      this.card = card;
+      this.freezed = freezed;
+    }
+    
+    public Card<T> getCard()
+    {
+      return card;
+    }
+    
+    public T getEntity()
+    {
+      return card.getEntity();
+    }
+    
+    public boolean isFreezed()
+    {
+      return freezed;
+    }
+    
+    public void setFreezed(boolean freezed)
+    {
+      this.freezed = freezed;
+    }
+  }
+  
+  final List<Slot> cards = new ArrayList<>();
   boolean freeze = false;
   
   public static int getCountByLevel(int level)
@@ -28,7 +65,7 @@ public class Tavern
     };
   }
   
-  public List<Card> getCards()
+  public List<Slot> getCards()
   {
     return cards;
   }
@@ -40,12 +77,12 @@ public class Tavern
   
   public Card buy(int index)
   {
-    return cards.remove(index);
+    return cards.remove(index).getCard();
   }
   
   public void add(Card card)
   {
-    cards.add(card);
+    cards.add(new Slot(card));
   }
   
   public void setFreeze(boolean freeze)
@@ -53,50 +90,29 @@ public class Tavern
     this.freeze = freeze;
   }
   
-  public void reset(int level)
+  public void reset(int level, boolean saveFreezed)
   {
-    if (freeze)
-    {
-      freeze = false;
-
-      cards.addAll(freezed);
-      freezed.clear();
-
-      return;
+    if(!saveFreezed){
+    
     }
     
-    cards.clear();
-    fillWithUnits(level);
-    addRandomSpell(level);
+    throw new RuntimeException("Not implemented");
   }
   
-  void fillWithUnits(int level)
-  {
-    int count = getCountByLevel(level);
-
-    for (int i = 0; i < count; i++)
-    {
+  void fillWithUnits(int level, int count) {
+    for (int i = 0; i < count; i++) {
       Card unitCard = generateUnitCard(level);
       add(unitCard);
     }
   }
-  
-  Card generateUnitCard(int level)
+    
+    Card generateUnitCard(int level)
   {
     int targetLevel = RandUtils.getRandLvl(level);
     List<Unit> units = getAvailableUnitsWithFallback(targetLevel, level);
     
     Unit unit = units.get(RandUtils.getRand(units.size() - 1));
     return new Card(unit);
-  }
-  
-  void addRandomSpell(int level)
-  {
-    int targetLevel = RandUtils.getRandLvl(level);
-    List<Spell> spells = getAvailableSpellsWithFallback(targetLevel, level);
-    
-    Spell spell = spells.get(RandUtils.getRand(spells.size() - 1));
-    add(new Card(spell));
   }
   
   List<Unit> getAvailableUnitsWithFallback(int targetLevel, int maxLevel)
