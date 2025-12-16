@@ -26,8 +26,8 @@ public class Player
   public static final int TABLE_LIMIT = 7;
   public static final int HAND_LIMIT = 10;
   
-  public static final int START_HEALTH = 10;
-  public static final int START_ARMOR = 10;
+  public static final int START_HEALTH = 30;
+  public static final int START_ARMOR = 0;
   
   final String uuid;
   
@@ -511,11 +511,15 @@ public class Player
     return level;
   }
   
-  public void incLevel()
+  public void incLevel(){
+    incLevel(false);
+  }
+  
+  public void incLevel(boolean free)
   {
     if (level < MAX_LEVEL)
     {
-      int price = getIncLevelPrice();
+      int price = free ? 0 : getIncLevelPrice();
       
       if (price <= money)
       {

@@ -282,7 +282,7 @@ public class PlayerTest extends GamePlayerTestCase
     for (int i = 1; i < 10; i++)
     {
       assertEquals(Math.min(i, Player.MAX_LEVEL), player.getLevel());
-      player.incLevel();
+      player.incLevel(true);
     }
   }
   

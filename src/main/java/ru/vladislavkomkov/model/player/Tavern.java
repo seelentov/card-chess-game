@@ -3,6 +3,8 @@ package ru.vladislavkomkov.model.player;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.Entity;
 import ru.vladislavkomkov.model.entity.spell.Spell;
@@ -15,8 +17,12 @@ public class Tavern
 {
   public static class Slot<T extends Entity>
   {
+    public final static String F_CARD = "card";
+    public final static String F_ENTITY = "entity";
+    public final static String F_IS_FREEZED = "card";
+    
     private final Card<T> card;
-    private boolean freezed;
+    private boolean isFreezed;
     
     public Slot(Card<T> card)
     {
@@ -26,27 +32,30 @@ public class Tavern
     public Slot(Card<T> card, boolean freezed)
     {
       this.card = card;
-      this.freezed = freezed;
+      this.isFreezed = freezed;
     }
     
+    @JsonProperty(F_CARD)
     public Card<T> getCard()
     {
       return card;
     }
     
+    @JsonProperty(F_ENTITY)
     public T getEntity()
     {
       return card.getEntity();
     }
     
+    @JsonProperty(F_IS_FREEZED)
     public boolean isFreezed()
     {
-      return freezed;
+      return isFreezed;
     }
     
     public void setFreezed(boolean freezed)
     {
-      this.freezed = freezed;
+      this.isFreezed = freezed;
     }
   }
   
@@ -92,27 +101,66 @@ public class Tavern
   
   public void reset(int level, boolean saveFreezed)
   {
-    if(!saveFreezed){
-    
+    boolean isLastCardSpellAndFreezed = false;
+    if (!cards.isEmpty() && saveFreezed)
+    {
+      Slot last = cards.get(cards.size() - 1);
+      if (last.getEntity() instanceof Spell && last.isFreezed())
+      {
+        isLastCardSpellAndFreezed = true;
+      }
     }
     
-    throw new RuntimeException("Not implemented");
+    if (saveFreezed)
+    {
+      cards.removeIf(card -> !card.isFreezed());
+    }
+    else
+    {
+      cards.clear();
+    }
+    
+    int count = getCountByLevel(level) - cards.size();
+    fillWithUnits(level, count);
+    
+    if (saveFreezed)
+    {
+      if (!isLastCardSpellAndFreezed)
+      {
+        addRandomSpell(level);
+      }
+    }
+    else
+    {
+      addRandomSpell(level);
+    }
   }
   
-  void fillWithUnits(int level, int count) {
-    for (int i = 0; i < count; i++) {
+  void fillWithUnits(int level, int count)
+  {
+    for (int i = 0; i < count; i++)
+    {
       Card unitCard = generateUnitCard(level);
       add(unitCard);
     }
   }
-    
-    Card generateUnitCard(int level)
+  
+  Card generateUnitCard(int level)
   {
     int targetLevel = RandUtils.getRandLvl(level);
     List<Unit> units = getAvailableUnitsWithFallback(targetLevel, level);
     
     Unit unit = units.get(RandUtils.getRand(units.size() - 1));
     return new Card(unit);
+  }
+  
+  void addRandomSpell(int level)
+  {
+    int targetLevel = RandUtils.getRandLvl(level);
+    List<Spell> spells = getAvailableSpellsWithFallback(targetLevel, level);
+    
+    Spell spell = spells.get(RandUtils.getRand(spells.size() - 1));
+    add(new Card(spell));
   }
   
   List<Unit> getAvailableUnitsWithFallback(int targetLevel, int maxLevel)

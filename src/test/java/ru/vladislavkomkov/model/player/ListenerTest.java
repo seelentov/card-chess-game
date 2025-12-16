@@ -383,7 +383,7 @@ public class ListenerTest extends GamePlayerTestCase
   {
     testListener(
         player.listener.onIncLevelListeners,
-        () -> player.incLevel(),
+        () -> player.incLevel(true),
         (game1, player1) -> testAction(),
         once);
   }
