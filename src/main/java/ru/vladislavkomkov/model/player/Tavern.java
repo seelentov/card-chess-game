@@ -19,7 +19,7 @@ public class Tavern
   {
     public final static String F_CARD = "card";
     public final static String F_ENTITY = "entity";
-    public final static String F_IS_FREEZED = "card";
+    public final static String F_IS_FREEZED = "is_freezed";
     
     private final Card<T> card;
     private boolean isFreezed;
@@ -59,6 +59,20 @@ public class Tavern
     }
   }
   
+  public Tavern()
+  {
+    this(SpellUtils.getTavern(), UnitUtils.getTavern());
+  }
+  
+  public Tavern(List<Spell> spellsPool, List<Unit> unitsPool)
+  {
+    this.spellsPool.addAll(spellsPool);
+    this.unitsPool.addAll(unitsPool);
+  }
+  
+  final List<Spell> spellsPool = new ArrayList<>();
+  final List<Unit> unitsPool = new ArrayList<>();
+  
   final List<Slot> cards = new ArrayList<>();
   boolean freeze = false;
   
@@ -96,7 +110,13 @@ public class Tavern
   
   public void setFreeze(boolean freeze)
   {
+    cards.forEach(slot -> slot.setFreezed(freeze));
     this.freeze = freeze;
+  }
+  
+  public void reset(int level)
+  {
+    reset(level, true);
   }
   
   public void reset(int level, boolean saveFreezed)
@@ -120,7 +140,9 @@ public class Tavern
       cards.clear();
     }
     
-    int count = getCountByLevel(level) - cards.size();
+    int unitsCount = (int) cards.stream().filter(card -> card.getEntity() instanceof Unit).count();
+    
+    int count = getCountByLevel(level) - unitsCount;
     fillWithUnits(level, count);
     
     if (saveFreezed)
@@ -134,6 +156,9 @@ public class Tavern
     {
       addRandomSpell(level);
     }
+    
+    freeze = false;
+    cards.forEach(slot -> slot.setFreezed(false));
   }
   
   void fillWithUnits(int level, int count)
@@ -165,12 +190,12 @@ public class Tavern
   
   List<Unit> getAvailableUnitsWithFallback(int targetLevel, int maxLevel)
   {
-    List<Unit> units = UnitUtils.getUnitsByTavern(targetLevel);
+    List<Unit> units = UnitUtils.getByTavern(targetLevel, unitsPool);
     
     while (units.isEmpty())
     {
       targetLevel = getNextFallbackLevel(targetLevel, maxLevel);
-      units = UnitUtils.getUnitsByTavern(targetLevel);
+      units = UnitUtils.getByTavern(targetLevel, unitsPool);
     }
     
     return units;
@@ -178,12 +203,12 @@ public class Tavern
   
   List<Spell> getAvailableSpellsWithFallback(int targetLevel, int maxLevel)
   {
-    List<Spell> spells = SpellUtils.getByTavern(targetLevel);
+    List<Spell> spells = SpellUtils.getByTavern(targetLevel, spellsPool);
     
     while (spells.isEmpty())
     {
       targetLevel = getNextFallbackLevel(targetLevel, maxLevel);
-      spells = SpellUtils.getByTavern(targetLevel);
+      spells = SpellUtils.getByTavern(targetLevel, spellsPool);
     }
     
     return spells;
@@ -199,5 +224,15 @@ public class Tavern
     {
       return maxLevel;
     }
+  }
+  
+  public List<Unit> getUnitsPool()
+  {
+    return unitsPool;
+  }
+  
+  public List<Spell> getSpellsPool()
+  {
+    return spellsPool;
   }
 }

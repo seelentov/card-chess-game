@@ -53,7 +53,7 @@ public class PlayerTest extends GamePlayerTestCase
       @Override
       public void build()
       {
-        
+      
       }
       
       @Override
@@ -329,5 +329,58 @@ public class PlayerTest extends GamePlayerTestCase
     assertEquals(new Cat().getName(), goldUnit.getName());
     assertEquals(new Cat().getAttack() * 2, goldUnit.getAttack());
     assertEquals(new Cat().getHealth() * 2, goldUnit.getHealth());
+  }
+  
+  @Test
+  void testDynamicIncTavernPrice()
+  {
+    game.incTurn();
+    
+    for (int j = 1; j < 100; j++)
+    {
+      assertEquals(Math.min(j, Player.MAX_LEVEL), player.getLevel());
+      for (int i = player.getIncLevelPrice(); i >= 0; i--)
+      {
+        assertEquals(i, player.getIncLevelPrice());
+        game.doTurnBegin();
+        game.incTurn();
+      }
+      player.incLevel();
+    }
+  }
+  
+  @Test
+  void testDynamicIncTavernPriceIncByMiddle()
+  {
+    game.incTurn();
+    
+    for (int j = 1; j < 100; j++)
+    {
+      assertEquals(Math.min(j, Player.MAX_LEVEL), player.getLevel());
+      int price = player.getIncLevelPrice();
+      for (int i = price; i >= 0; i--)
+      {
+        assertEquals(i, player.getIncLevelPrice());
+        game.doTurnBegin();
+        game.incTurn();
+        
+        if(i == (price / 2)){
+          break;
+        }
+      }
+      player.incLevel();
+    }
+  }
+  
+  @Test
+  void testMaxMoneyIncreasement()
+  {
+    game.incTurn();
+    
+    for (int j = 3; j < 100; j++)
+    {
+      assertEquals(Math.min(j, Player.MAX_MONEY), player.maxMoney);
+      game.doTurnBegin();
+    }
   }
 }

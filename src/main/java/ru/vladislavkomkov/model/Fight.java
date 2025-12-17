@@ -132,10 +132,20 @@ public class Fight
   {
     List<Unit> units = isPlayer1Turn ? player1Units : player2Units;
     int currentTurn = isPlayer1Turn ? player1Turn : player2Turn;
+    
+    if (currentTurn >= units.size())
+    {
+      currentTurn = 0;
+    }
+    
     int startTurn = currentTurn;
     
     while (true)
     {
+      if (currentTurn >= units.size())
+      {
+        currentTurn = 0;
+      }
       Unit attacker = units.get(currentTurn);
       
       if (checkAttacker(attacker))
@@ -147,11 +157,15 @@ public class Fight
       turn += 2;
       
       int newTurn = isPlayer1Turn ? player1Turn : player2Turn;
-      if (newTurn == startTurn)
+      int normalizedNewTurn = newTurn % units.size();
+      int normalizedStartTurn = startTurn % units.size();
+      
+      currentTurn = isPlayer1Turn ? player1Turn : player2Turn;
+      
+      if (normalizedNewTurn == normalizedStartTurn)
       {
         break;
       }
-      currentTurn = newTurn;
     }
     
     return Optional.empty();
@@ -234,13 +248,17 @@ public class Fight
   
   void incTurn(boolean isPlayer1Turn)
   {
-    if (isPlayer1Turn)
+    List<Unit> unitsForTurn = isPlayer1Turn ? player1Units : player2Units;
+    if (!unitsForTurn.isEmpty())
     {
-      player1Turn = (player1Turn + 1) % player1Units.size();
-    }
-    else
-    {
-      player2Turn = (player2Turn + 1) % player2Units.size();
+      if (isPlayer1Turn)
+      {
+        player1Turn = (player1Turn + 1) % unitsForTurn.size();
+      }
+      else
+      {
+        player2Turn = (player2Turn + 1) % unitsForTurn.size();
+      }
     }
   }
   

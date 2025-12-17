@@ -34,7 +34,7 @@ public class TripleReward extends Spell
     listener.onPlayedListeners.put(
         KEY_CORE,
         (game, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto) -> {
-          List<Unit> allUnits = UnitUtils.getUnitsByTavern(player.getLevel());
+          List<Unit> allUnits = UnitUtils.getByTavern(player.getLevel(), player.getTavern().getUnitsPool());
           Set<Integer> setInts = new HashSet<>();
           while (setInts.size() < 3)
           {

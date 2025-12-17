@@ -16,7 +16,7 @@ public class UnitUtilsTest
   @Test
   void testGetUnits()
   {
-    var units = UnitUtils.getUnits();
+    var units = UnitUtils.getAll();
     
     assertNotNull(units);
     assertFalse(units.isEmpty());
@@ -25,7 +25,7 @@ public class UnitUtilsTest
   @Test
   void testGetTavernUnits()
   {
-    var units = UnitUtils.getTavernUnits();
+    var units = UnitUtils.getTavern();
     
     assertNotNull(units);
     units.forEach(unit -> assertTrue(unit.isTavern()));
@@ -38,7 +38,7 @@ public class UnitUtilsTest
     {
       int fLevel = level;
       
-      var units = UnitUtils.getUnitsByTavern(fLevel);
+      var units = UnitUtils.getByTavern(fLevel);
       
       assertNotNull(units);
       units.forEach(unit -> assertEquals(fLevel, unit.getLevel()));

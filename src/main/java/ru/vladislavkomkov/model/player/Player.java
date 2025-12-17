@@ -12,12 +12,15 @@ import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.Listener;
 import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.Entity;
+import ru.vladislavkomkov.model.entity.spell.Spell;
 import ru.vladislavkomkov.model.entity.spell.impl.spellcraft.SpellCraft;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.event.Event;
 import ru.vladislavkomkov.model.event.data.SenderWaiterDataReq;
 import ru.vladislavkomkov.util.RandUtils;
+import ru.vladislavkomkov.util.SpellUtils;
 import ru.vladislavkomkov.util.UUIDUtils;
+import ru.vladislavkomkov.util.UnitUtils;
 
 public class Player
 {
@@ -29,9 +32,15 @@ public class Player
   public static final int START_HEALTH = 30;
   public static final int START_ARMOR = 0;
   
+  public static final Map<Integer, Integer> INC_LEVEL_PRICE_MAP = Map.of(
+      1, 5,
+      2, 7);
+  
+  public static final int INC_LEVEL_PRICE_MAX = 10;
+  
   final String uuid;
   
-  final Tavern tavern = new Tavern();
+  final Tavern tavern;
   public Listener listener = new Listener();
   public Statistic statistic = new Statistic();
   
@@ -59,8 +68,19 @@ public class Player
   
   public Player(String uuid, Game game)
   {
+    this(uuid, game, UnitUtils.getTavern(), SpellUtils.getTavern());
+  }
+  
+  public Player(Game game, List<Unit> unitsPool, List<Spell> spellsPool)
+  {
+    this(UUIDUtils.generateKey(), game, unitsPool, spellsPool);
+  }
+  
+  public Player(String uuid, Game game, List<Unit> unitsPool, List<Spell> spellsPool)
+  {
     this.uuid = uuid;
     this.game = game;
+    this.tavern = new Tavern(spellsPool, unitsPool);
   }
   
   public void sendArmorHealth()
@@ -88,6 +108,14 @@ public class Player
   }
   
   public void sendMessage(Event.Type type, int data)
+  {
+    if (sender != null)
+    {
+      sender.send(new Event(game.getUUID(), getUUID(), type, data).getBytes());
+    }
+  }
+  
+  public void sendMessage(Event.Type type, boolean data)
   {
     if (sender != null)
     {
@@ -356,28 +384,27 @@ public class Player
       decMoney(buyPrice);
       addToHand(tavern.buy(index));
       
-      sendMessage(Event.Type.BUY, hand);
+      sendMessage(Event.Type.TAVERN, tavern.getCards());
     }
   }
   
   public void sellCard(int index)
   {
-    if (index < 0 || index >= hand.size())
+    if (index < 0 || index >= table.size())
     {
       return;
     }
     
-    Entity entity = hand.get(index).getEntity();
-    if (entity instanceof Unit unit)
-    {
-      unit.onSell(game, this);
-      sendMessage(Event.Type.SELL, hand);
-    }
+    Unit unit = table.get(index);
+    unit.onSell(game, this);
+    sendMessage(Event.Type.TABLE, table);
+    sendMessage(Event.Type.MONEY, money);
   }
   
   public void freezeTavern()
   {
     tavern.setFreeze(!tavern.isFreeze());
+    sendMessage(Event.Type.TAVERN, tavern.getCards());
     sendMessage(Event.Type.FREEZE, tavern.isFreeze());
   }
   
@@ -391,7 +418,7 @@ public class Player
     tavern.setFreeze(false);
     resetTavern();
     
-    sendMessage(Event.Type.RESET_TAVERN, tavern.getCards());
+    sendMessage(Event.Type.TAVERN, tavern.getCards());
     sendMessage(Event.Type.FREEZE, tavern.isFreeze());
   }
   
@@ -405,8 +432,8 @@ public class Player
     tavern.reset(level, saveFreezed);
     listener.processOnResetTavernListeners(game, this);
     
-    sendMessage(Event.Type.RESET_TAVERN, tavern.getCards());
     sendMessage(Event.Type.FREEZE, tavern.isFreeze());
+    sendMessage(Event.Type.TAVERN, tavern.getCards());
   }
   
   public void calcTriplets()
@@ -511,7 +538,8 @@ public class Player
     return level;
   }
   
-  public void incLevel(){
+  public void incLevel()
+  {
     incLevel(false);
   }
   
@@ -532,18 +560,11 @@ public class Player
     }
   }
   
-  private int getIncLevelPrice()
+  public int getIncLevelPrice()
   {
-    int basePrice = switch (level)
-    {
-      case 1 -> 5;
-      case 2 -> 7;
-      case 3 -> 10;
-      default -> 12;
-    };
+    int basePrice = INC_LEVEL_PRICE_MAP.getOrDefault(level, INC_LEVEL_PRICE_MAX);
     
     int calcedPrice = basePrice - statistic.counters.getIncLevelDecreaser();
-    statistic.counters.resetIncLevelDecreaser();
     
     return Math.max(calcedPrice, 0);
   }
@@ -590,13 +611,35 @@ public class Player
     return money;
   }
   
+  public void setMoney(int money)
+  {
+    this.money = money;
+  }
+  
   public int getMaxMoney()
   {
     return maxMoney + statistic.boosts.incMaxMoney;
   }
   
-  public int getMaxMoneyBase(){
+  public int getMaxMoneyBase()
+  {
     return maxMoney;
+  }
+  
+  public void setMaxMoney(int maxMoney)
+  {
+    this.maxMoney = maxMoney;
+  }
+  
+  public void incMaxMoney()
+  {
+    incMaxMoney(1);
+  }
+  
+  public void incMaxMoney(int amount)
+  {
+    maxMoney += amount;
+    sendMessage(Event.Type.MAX_MONEY, getMaxMoney());
   }
   
   public void resetMoney()
@@ -620,17 +663,6 @@ public class Player
   {
     money = Math.max(money - amount, 0);
     sendMessage(Event.Type.MONEY, money);
-  }
-  
-  public void incMaxMoney()
-  {
-    incMaxMoney(1);
-  }
-  
-  public void incMaxMoney(int amount)
-  {
-    maxMoney += amount;
-    sendMessage(Event.Type.MAX_MONEY, getMaxMoney());
   }
   
   public void doForAll(Consumer<Unit> consumer)
@@ -695,5 +727,10 @@ public class Player
   public Tavern getTavern()
   {
     return tavern;
+  }
+  
+  public int getBuyPrice()
+  {
+    return buyPrice;
   }
 }

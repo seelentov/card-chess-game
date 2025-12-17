@@ -18,11 +18,14 @@ public class MockConsumer
   public int maxGold = 0;
   
   public boolean freeze = false;
+  public List<Map> tavern = new ArrayList<>();
   
   public List<Map> hand = new ArrayList<>();
   public List<Map> table = new ArrayList<>();
   
   public int tavernLevel = 1;
+  
+  public int timer = 0;
   
   public MockConsumer()
   {
@@ -38,6 +41,9 @@ public class MockConsumer
       case MONEY -> {
         this.gold = event.getDataAsInt();
       }
+      case MAX_MONEY -> {
+        this.maxGold = event.getDataAsInt();
+      }
       case HAND -> {
         this.hand = event.getData(List.class);
       }
@@ -52,6 +58,15 @@ public class MockConsumer
       }
       case LVL -> {
         this.tavernLevel = event.getDataAsInt();
+      }
+      case TAVERN -> {
+        this.tavern = event.getData(List.class);
+      }
+      case FREEZE -> {
+        this.freeze = event.getDataAsBool();
+      }
+      case PRE_FIGHT_TIMER -> {
+        this.timer = event.getDataAsInt();
       }
     }
   }

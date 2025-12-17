@@ -1,10 +1,13 @@
 package ru.vladislavkomkov.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +16,14 @@ import org.junit.jupiter.api.Test;
 import ru.vladislavkomkov.controller.sender.MockConsumer;
 import ru.vladislavkomkov.controller.sender.MockSender;
 import ru.vladislavkomkov.model.Game;
+import ru.vladislavkomkov.model.card.Card;
+import ru.vladislavkomkov.model.entity.spell.impl.second.StrikeOil;
+import ru.vladislavkomkov.model.entity.unit.impl.beast.first.Alleycat;
+import ru.vladislavkomkov.model.entity.unit.impl.mech.fourth.AccordoTron;
+import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
+import ru.vladislavkomkov.model.event.Event;
 import ru.vladislavkomkov.model.player.Player;
+import ru.vladislavkomkov.model.player.Tavern;
 
 public class GameProcessorTest
 {
@@ -49,6 +59,7 @@ public class GameProcessorTest
   private final Map<String, MockConsumer> playerConsumers = new HashMap<>();
   
   private GameProcessor gameProcessor;
+  private EventDispatcher eventDispatcher;
   
   @BeforeEach
   protected void setUp()
@@ -112,6 +123,7 @@ public class GameProcessorTest
     playerConsumers.put("8" + UUIDPart, player8Consumer);
     
     gameProcessor = new GameProcessor(Map.of(gameUUID, game), 0);
+    eventDispatcher = new EventDispatcher(game, true);
   }
   
   @AfterEach
@@ -146,22 +158,39 @@ public class GameProcessorTest
   }
   
   @Test
-  void testPreFight() throws Exception
+  void testBuyPlaySell() throws Exception
   {
     gameProcessor.processPreFight();
     
-    players.values().forEach(player -> player.buyCard(0));
+    players.values().forEach(player -> player.setMoney(player.getBuyPrice()));
+    
+    for (Player player : players.values()) {
+      eventDispatcher.process(new Event(gameUUID, player.getUUID(), Event.Type.BUY, 0));
+    }
+
     players.values().forEach(player -> assertEquals(0, player.getMoney()));
     playerConsumers.values().forEach(consumer -> assertEquals(0, consumer.gold));
 
     players.values().forEach(player -> assertEquals(1, player.getHand().size()));
     playerConsumers.values().forEach(consumer -> assertEquals(1, consumer.hand.size()));
     
-    players.values().forEach(player -> player.playCard(0));
+    for (Player player : players.values()) {
+      eventDispatcher.process(new Event(gameUUID, player.getUUID(), Event.Type.PLAY, List.of(0,0,0,0,0)));
+    }
+    
     players.values().forEach(player -> assertEquals(0, player.getHand().size()));
     playerConsumers.values().forEach(consumer -> assertEquals(0, consumer.hand.size()));
     players.values().forEach(player -> assertEquals(1, player.getTable().size()));
     playerConsumers.values().forEach(consumer -> assertEquals(1, consumer.table.size()));
+    
+    for (Player player : players.values()) {
+      eventDispatcher.process(new Event(gameUUID, player.getUUID(), Event.Type.SELL, 0));
+    }
+    
+    players.values().forEach(player -> assertEquals(0, player.getTable().size()));
+    playerConsumers.values().forEach(consumer -> assertEquals(0, consumer.table.size()));
+    players.values().forEach(player -> assertEquals(1, player.getMoney()));
+    playerConsumers.values().forEach(consumer -> assertEquals(1, consumer.gold));
   }
 
   @Test
@@ -171,36 +200,119 @@ public class GameProcessorTest
     players.values().forEach(player -> assertEquals(Player.START_HEALTH, player.getHealth()));
     players.values().forEach(player -> assertEquals(Player.START_ARMOR, player.getArmor()));
   }
-
+  
   @Test
-  void testTavern() throws Exception
+  void testIncTavern() throws Exception
   {
     gameProcessor.process();
-
-    players.values().forEach(Player::incLevel);
-
+    
+    players.values().forEach(player -> player.setMoney(5));
+    
+    for (Player player : players.values()) {
+      eventDispatcher.process(new Event(gameUUID, player.getUUID(), Event.Type.LVL));
+    }
+    
     players.values().forEach(player -> assertEquals(0, player.getMoney()));
     playerConsumers.values().forEach(consumer -> assertEquals(0, consumer.gold));
-
+    
     players.values().forEach(player -> assertEquals(2, player.getLevel()));
     playerConsumers.values().forEach(consumer -> assertEquals(2, consumer.tavernLevel));
   }
   
-  private void waitStatus(Game.State state) throws Exception
+  @Test
+  void testTavernReset() throws Exception
   {
-    waitStatus(state, 5000);
+    players.values().forEach(player -> assertTrue(player.getTavern().getCards().isEmpty()));
+    playerConsumers.values().forEach(consumer -> assertTrue(consumer.tavern.isEmpty()));
+    
+    gameProcessor.process();
+    
+    for (Player player : players.values()) {
+      eventDispatcher.process(new Event(gameUUID, player.getUUID(), Event.Type.RESET_TAVERN));
+    }
+    
+    players.values().forEach(player -> assertFalse(player.getTavern().getCards().isEmpty()));
+    playerConsumers.values().forEach(consumer -> assertFalse(consumer.tavern.isEmpty()));
   }
   
-  private void waitStatus(Game.State state, int timeout) throws Exception
+  @Test
+  void testTavernFreeze() throws Exception
   {
-    while (game.getState() != state)
-    {
-      if (timeout <= 0)
-      {
-        break;
-      }
-      Thread.sleep(100);
-      timeout -= 100;
+    gameProcessor.process();
+    
+    players.values().forEach(player -> player.getTavern().getCards().forEach(slot -> assertFalse(slot.isFreezed())));
+    playerConsumers.values().forEach(consumer -> consumer.tavern.forEach(slot -> {
+      boolean isFreezed = (Boolean) slot.get(Tavern.Slot.F_IS_FREEZED);
+      assertFalse(isFreezed);
+    }));
+    
+    for (Player player : players.values()) {
+      eventDispatcher.process(new Event(gameUUID, player.getUUID(), Event.Type.FREEZE));
     }
+    
+    players.values().forEach(player -> player.getTavern().getCards().forEach(slot -> assertTrue(slot.isFreezed())));
+    playerConsumers.values().forEach(consumer -> consumer.tavern.forEach(slot -> {
+      boolean isFreezed = (Boolean) slot.get(Tavern.Slot.F_IS_FREEZED);
+      assertTrue(isFreezed);
+    }));
+  }
+  
+  @Test
+  void testTavernBuy() throws Exception
+  {
+    gameProcessor.process();
+    
+    player1.setMoney(player1.getBuyPrice());
+    
+    int serverTavernSize = player1.getTavern().getCards().size();
+    int clientTavernSize = player1Consumer.tavern.size();
+    
+    assertEquals(serverTavernSize, clientTavernSize);
+    
+    eventDispatcher.process(new Event(gameUUID, player1.getUUID(), Event.Type.BUY, 0));
+    
+    int serverTavernSizeAfter = player1.getTavern().getCards().size();
+    int clientTavernSizeAfter = player1Consumer.tavern.size();
+    
+    assertEquals((serverTavernSizeAfter + (1)), serverTavernSize);
+    assertEquals((clientTavernSizeAfter + (1)), clientTavernSize);
+  }
+  
+  @Test
+  void testMoveTavern() throws Exception
+  {
+    gameProcessor.process();
+    
+    player1.addToTable(new Cat());
+    player1.addToTable(new Alleycat());
+    player1.addToTable(new AccordoTron());
+    
+    eventDispatcher.process(new Event(gameUUID, player1.getUUID(), Event.Type.MOVE, List.of(0,1)));
+    
+    assertEquals(new Alleycat().getName(), player1.getTable().get(0).getName());
+    assertEquals(new Cat().getName(), player1.getTable().get(1).getName());
+    assertEquals(new AccordoTron().getName(), player1.getTable().get(2).getName());
+  }
+  
+  @Test
+  void testPreFightTimer()
+  {
+    int ms = 10;
+    game.sendPreFightTimer(ms);
+    assertEquals(ms, player1Consumer.timer);
+  }
+  
+  @Test
+  void testIncMaxMoney() throws Exception
+  {
+    gameProcessor.process();
+    
+    int maxMoneyInit = player1.getMaxMoney();
+    
+    player1.addToHand(Card.of(new StrikeOil()));
+    eventDispatcher.process(new Event(gameUUID, player1.getUUID(), Event.Type.PLAY, List.of(0,0,0,0,0)));
+    
+    assertEquals(maxMoneyInit+1, player1.getMaxMoney());
+    assertEquals(maxMoneyInit+1, player1Consumer.maxGold);
   }
 }

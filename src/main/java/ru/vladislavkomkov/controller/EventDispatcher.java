@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
+import ru.vladislavkomkov.controller.sender.Sender;
 import ru.vladislavkomkov.controller.sender.WebSocketSender;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.event.Event;
@@ -28,33 +29,34 @@ public class EventDispatcher
   
   public EventDispatcher(Game game)
   {
+    this(game, false);
+  }
+  
+  public EventDispatcher(Game game, boolean withoutExecutor)
+  {
     this.game = game;
     
-    executor.submit(() -> {
-      
-      while (true)
-      {
-        Event ev = null;
+    if (!withoutExecutor)
+      executor.submit(() -> {
         
-        try
+        while (true)
         {
-          if (!game.getState().equals(Game.State.PREPARE))
-          {
-            Thread.sleep(1000);
-            continue;
-          }
-          ev = queue.take();
+          Event ev = null;
           
-          log.info("PROCESS {}", ev);
-          process(game, ev);
-          log.info("COMPLETE {}", ev);
+          try
+          {
+            ev = queue.take();
+            
+            log.info("PROCESS {}", ev);
+            process(ev);
+            log.info("COMPLETE {}", ev);
+          }
+          catch (Exception ex)
+          {
+            log.error("ERROR {}", ev, ex);
+          }
         }
-        catch (Exception ex)
-        {
-          log.error("ERROR {}", ev, ex);
-        }
-      }
-    });
+      });
   }
   
   public void put(Event event) throws InterruptedException
@@ -62,28 +64,18 @@ public class EventDispatcher
     queue.put(event);
   }
   
-  void process(Game game, Event event)
-  {
-    process(game, event, null);
-  }
-  
-  void process(Game game, Event event, WebSocket conn)
+  void process(Event event)
   {
     String playerUUID = event.getPlayerUUID();
     
     switch (event.getType())
     {
       case CONNECTED -> {
-        if (conn == null)
-        {
-          throw new RuntimeException("WenSocketClient is null");
-        }
-        
         playerUUID = game.addPlayer();
-        game.setPlayerSender(playerUUID, new WebSocketSender(conn));
+        // game.setPlayerSender(playerUUID, new WebSocketSender(conn));
       }
       case BUY -> {
-        game.buyTavernCard(playerUUID, event.getData(Integer.class));
+        game.buyTavernCard(playerUUID, event.getDataAsInt());
       }
       case PLAY -> {
         List<Integer> data = event.getData(new TypeReference<List<Integer>>()
@@ -114,7 +106,7 @@ public class EventDispatcher
             data.get(4) == 1);
       }
       case SELL -> {
-        game.sellCard(playerUUID, event.getData(Integer.class));
+        game.sellCard(playerUUID, event.getDataAsInt());
       }
       case FREEZE -> {
         game.freezeTavern(playerUUID);
@@ -129,14 +121,14 @@ public class EventDispatcher
         
         game.moveTable(playerUUID, data.get(0), data.get(1));
       }
-      case ROLL -> {
+      case RESET_TAVERN -> {
         game.resetTavern(playerUUID);
       }
       case RES -> {
         SenderWaiterDataRes data = event.getData(SenderWaiterDataRes.class);
         game.doSenderWaiter(playerUUID, data.getKey(), data.getParam());
       }
-      default -> throw new RuntimeException("Unexpected event type: " + event.getType());
+        default -> throw new RuntimeException("Unexpected event type: " + event.getType());
     }
   }
 }

@@ -23,6 +23,11 @@ public class Event
     this(gameUUID, playerUUID, type, new byte[0]);
   }
   
+  public Event(String gameUUID, String playerUUID, Type type, boolean data)
+  {
+    this(gameUUID, playerUUID, type, new byte[] { (byte) (data ? 1 : 0) });
+  }
+  
   public Event(String gameUUID, String playerUUID, Type type, int data)
   {
     this(gameUUID, playerUUID, type, ByteBuffer.allocate(4).putInt(data).array());
@@ -141,6 +146,15 @@ public class Event
     return new String(data, StandardCharsets.UTF_8);
   }
   
+  public boolean getDataAsBool()
+  {
+    if (data.length != 1)
+    {
+      throw new IllegalStateException("Data is not a boolean");
+    }
+    return data[0] != 0;
+  }
+  
   public boolean hasData()
   {
     return data != null && data.length > 0;
@@ -191,7 +205,6 @@ public class Event
     SELL,
     FREEZE,
     LVL,
-    ROLL,
     MOVE,
     RES,
     RESET_TAVERN,
@@ -207,6 +220,7 @@ public class Event
     START,
     TABLE,
     FIGHT_TABLE,
-    HAND
+    HAND,
+    TAVERN
   }
 }
