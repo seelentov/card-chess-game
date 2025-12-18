@@ -8,20 +8,20 @@ import java.util.function.Supplier;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import ru.vladislavkomkov.consts.Listeners;
+import ru.vladislavkomkov.model.Fight;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.Listener;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.UUIDUtils;
 
-public abstract class Entity
+public abstract class Entity implements Cloneable
 {
   public final static String F_ID = "id";
   public final static String F_NAME = "name";
   public final static String F_DESCRIPTION = "description";
   public final static String F_IS_GOLD = "is_gold";
   
-  
-  protected final Listener listener = new Listener();
+  protected Listener listener = new Listener();
   
   protected int ID = System.identityHashCode(this);
   protected String name = this.getClass().getSimpleName();
@@ -41,18 +41,17 @@ public abstract class Entity
     
     listener.onPlayedListeners.put(
         UUIDUtils.generateKey(),
-        (game, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto) -> processListeners(
+        (game, fight, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto) -> processListeners(
             player.listener.onPlayedListeners,
-            (action) -> action.process(game, player, this, index, isTavernIndex, index2, isTavernIndex2, auto),
+            (action) -> action.process(game, null, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto),
             player));
     
     listener.onHandledListeners.put(
         UUIDUtils.generateKey(),
-        (game, player, entity) -> processListeners(
+        (game, fight, player, entity) -> processListeners(
             player.listener.onHandledListeners,
-            (action) -> action.process(game, player, this),
-            player)
-    );
+            (action) -> action.process(game, null, player, entity),
+            player));
   }
   
   public int getLevel()
@@ -65,44 +64,44 @@ public abstract class Entity
     return isTavern;
   }
   
-  public void onHandled(Game game, Player player)
+  public void onHandled(Game game, Fight fight, Player player)
   {
-    listener.processOnHandledListeners(game, player, this);
+    listener.processOnHandledListeners(game, fight, player, this);
   }
   
-  public void onPlayed(Game game, Player player)
+  public void onPlayed(Game game, Fight fight, Player player)
   {
-    onPlayed(game, player, 0);
+    onPlayed(game, fight, player, 0, false);
   }
   
-  public void onPlayed(Game game, Player player, int index)
+  public void onPlayed(Game game, Fight fight, Player player, int index)
   {
-    onPlayed(game, player, index, false, 0);
+    onPlayed(game, fight, player, index, false, 0);
   }
   
-  public void onPlayed(Game game, Player player, int index, int index2)
+  public void onPlayed(Game game, Fight fight, Player player, int index, int index2)
   {
-    onPlayed(game, player, index, false, index2);
+    onPlayed(game, fight, player, index, false, index2);
   }
   
-  public void onPlayed(Game game, Player player, int index, boolean isTavernIndex)
+  public void onPlayed(Game game, Fight fight, Player player, int index, boolean isTavernIndex)
   {
-    onPlayed(game, player, index, isTavernIndex, 0);
+    onPlayed(game, fight, player, index, isTavernIndex, 0);
   }
   
-  public void onPlayed(Game game, Player player, int index, boolean isTavernIndex, int index2)
+  public void onPlayed(Game game, Fight fight, Player player, int index, boolean isTavernIndex, int index2)
   {
-    onPlayed(game, player, index, isTavernIndex, index2, false);
+    onPlayed(game, fight, player, index, isTavernIndex, index2, false);
   }
   
-  public void onPlayed(Game game, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2)
+  public void onPlayed(Game game, Fight fight, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2)
   {
-    onPlayed(game, player, index, isTavernIndex, index2, isTavernIndex2, false);
+    onPlayed(game, fight, player, index, isTavernIndex, index2, isTavernIndex2, false);
   }
   
-  public void onPlayed(Game game, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2, boolean auto)
+  public void onPlayed(Game game, Fight fight, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2, boolean auto)
   {
-    listener.processOnPlayedListeners(game, player, this, index, isTavernIndex, index2, isTavernIndex2, auto);
+    listener.processOnPlayedListeners(game, fight, player, this, index, isTavernIndex, index2, isTavernIndex2, auto);
   }
   
   protected <T> void processListeners(Map<String, T> listeners, Consumer<T> actionMove, Player player)
@@ -174,5 +173,16 @@ public abstract class Entity
   public Listener getListener()
   {
     return listener;
+  }
+  
+  @Override
+  public Entity clone() {
+    try {
+      Entity clonedEntity = (Entity) super.clone();
+      clonedEntity.listener = this.listener.clone();
+      return clonedEntity;
+    } catch (CloneNotSupportedException e) {
+      throw new AssertionError("Clone not supported", e);
+    }
   }
 }

@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 import ru.vladislavkomkov.GamePlayerTestCase;
+import ru.vladislavkomkov.model.Fight;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.player.Player;
 
@@ -20,9 +21,10 @@ public class UnitTest extends GamePlayerTestCase
     
     Unit unit = new Unit()
     {
-      public void onStartTurn(Game game, Player player)
+      @Override
+      public void onStartTurn(Game game, Fight fight, Player player)
       {
-        super.onStartTurn(game, player);
+        super.onStartTurn(game,null,  player);
         player.addMoney(moneyStep);
       }
     };
@@ -41,9 +43,10 @@ public class UnitTest extends GamePlayerTestCase
     
     Unit unit = new Unit()
     {
-      public void onEndTurn(Game game, Player player)
+      @Override
+      public void onEndTurn(Game game, Fight fight, Player player)
       {
-        super.onEndTurn(game, player);
+        super.onEndTurn(game, null, player);
         player.addMoney(moneyStep);
       }
     };
@@ -62,15 +65,16 @@ public class UnitTest extends GamePlayerTestCase
     
     Unit unit = new Unit()
     {
-      public void onStartFight(Game game, Player player, Player player2)
+      @Override
+      public void onStartFight(Game game, Fight fight, Player player, Player player2)
       {
-        super.onStartFight(game, player, player2);
+        super.onStartFight(game, null, player, player2);
         player.addMoney(moneyStep);
       }
     };
     
     player.addToTable(unit, 0);
-    game.processStartFight(player, player2);
+    game.processStartFight(null, player, player2);
     
     assertEquals(moneyStart + (moneyStep), player.getMoney());
   }
@@ -83,15 +87,16 @@ public class UnitTest extends GamePlayerTestCase
     
     Unit unit = new Unit()
     {
-      public void onEndFight(Game game, Player player, Player player2)
+      @Override
+      public void onEndFight(Game game, Fight fight, Player player, Player player2)
       {
-        super.onEndFight(game, player, player2);
+        super.onEndFight(game, null, player, player2);
         player.addMoney(moneyStep);
       }
     };
     
     player.addToTable(unit, 0);
-    game.processEndFight(player, player2);
+    game.processEndFight(null, player, player2);
     
     assertEquals(moneyStart + (moneyStep), player.getMoney());
   }
@@ -104,9 +109,10 @@ public class UnitTest extends GamePlayerTestCase
     
     Unit unit = new Unit()
     {
-      public void onAttacked(Game game, Player player, Player player2, Unit attacker)
+      @Override
+      public void onAttacked(Game game, Fight fight, Player player, Player player2, Unit attacker)
       {
-        super.onAttacked(game, player, player2, attacker);
+        super.onAttacked(game, null, player, player2, attacker);
         player.addMoney(moneyStep);
       }
     };
@@ -116,7 +122,7 @@ public class UnitTest extends GamePlayerTestCase
     };
     
     player.addToTable(unit, 0);
-    unit.onAttacked(game, player, player2, unit2);
+    unit.onAttacked(game, null, player, player2, unit2);
     
     assertEquals(moneyStart + (moneyStep), player.getMoney());
   }
@@ -129,9 +135,10 @@ public class UnitTest extends GamePlayerTestCase
     
     Unit unit = new Unit()
     {
-      public void onAttack(Game game, Player player, Player player2, Unit attacked)
+      @Override
+      public void onAttack(Game game, Fight fight, Player player, Player player2, Unit attacked)
       {
-        super.onAttack(game, player, player2, attacked);
+        super.onAttack(game,null, player, player2, attacked);
         player.addMoney(moneyStep);
       }
     };
@@ -141,7 +148,7 @@ public class UnitTest extends GamePlayerTestCase
     };
     
     player.addToTable(unit, 0);
-    unit.onAttack(game, player, player2, unit2);
+    unit.onAttack(game, null, player, player2, unit2);
     
     assertEquals(moneyStart + (moneyStep), player.getMoney());
   }
@@ -154,9 +161,10 @@ public class UnitTest extends GamePlayerTestCase
     
     Unit unit = new Unit()
     {
-      public void onDead(Game game, Player player, Player player2, Unit attacker)
+      @Override
+      public void onDead(Game game, Fight fight, Player player, Player player2, Unit attacker)
       {
-        super.onDead(game, player, player2, attacker);
+        super.onDead(game, null, player, player2, attacker);
         player.addMoney(moneyStep);
       }
     };
@@ -166,7 +174,7 @@ public class UnitTest extends GamePlayerTestCase
     };
     
     player.addToTable(unit, 0);
-    unit.onDead(game, player, player2, unit2);
+    unit.onDead(game, null, player, player2, unit2);
     
     assertEquals(moneyStart + (moneyStep), player.getMoney());
   }
@@ -191,7 +199,7 @@ public class UnitTest extends GamePlayerTestCase
     };
     
     assertFalse(unit.isDead());
-    unit.onAttacked(game, player, player2, unit2);
+    unit.onAttacked(game, null, player, player2, unit2);
     assertTrue(unit.isDead());
   }
 }

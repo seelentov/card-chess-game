@@ -73,7 +73,7 @@ public class Tavern
   final List<Spell> spellsPool = new ArrayList<>();
   final List<Unit> unitsPool = new ArrayList<>();
   
-  final List<Slot> cards = new ArrayList<>();
+  List<Slot> cards = new ArrayList<>();
   boolean freeze = false;
   
   public static int getCountByLevel(int level)

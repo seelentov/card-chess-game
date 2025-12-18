@@ -18,7 +18,7 @@ public class TavernCoinTest extends SpellTestCase
   protected void testOnPlayed()
   {
     int money = player.getMoney();
-    new TavernCoin().onPlayed(game, player, 0);
+    new TavernCoin().onPlayed(game, null, player, 0);
     assertEquals(money + 1, player.getMoney());
   }
 }

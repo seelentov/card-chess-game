@@ -3,9 +3,11 @@ package ru.vladislavkomkov.controller.sender;
 import java.util.*;
 import java.util.function.Consumer;
 
+import kotlin.collections.ArrayDeque;
 import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.event.Event;
+import ru.vladislavkomkov.model.event.data.SenderWaiterDataReq;
 
 public class MockConsumer
 {
@@ -27,8 +29,15 @@ public class MockConsumer
   
   public int timer = 0;
   
+  public Map<String, Object> waiters = new HashMap<>();
+  
   public MockConsumer()
   {
+  }
+  
+  public Object getWaiter(String key)
+  {
+    return waiters.get(key);
   }
   
   public void consume(Event event)
@@ -67,6 +76,10 @@ public class MockConsumer
       }
       case PRE_FIGHT_TIMER -> {
         this.timer = event.getDataAsInt();
+      }
+      case WAIT_REQ -> {
+        SenderWaiterDataReq waiter = event.getData(SenderWaiterDataReq.class);
+        waiters.put(waiter.getKey(), waiter.getData());
       }
     }
   }

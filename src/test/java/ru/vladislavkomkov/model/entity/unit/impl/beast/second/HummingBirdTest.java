@@ -27,15 +27,15 @@ public class HummingBirdTest extends UnitTestCase
       player.addToTable(new Cat());
     }
     Fight fight = new Fight(game, player, player2);
-    game.processStartFight(player, player2);
+    game.processStartFight(fight,player, player2);
     
-    Unit bird = (Unit) player.getTable().get(0);
+    Unit bird = player.getTable().get(0);
     assertEquals(new HummingBird().getName(), bird.getName());
     assertEquals(new HummingBird().getAttack(), bird.getAttack());
     
     for (int i = 1; i < 4; i++)
     {
-      Unit unit = (Unit) player.getTable().get(i);
+      Unit unit = fight.getFightTable(player).get(i);
       assertEquals(new Cat().getName(), unit.getName());
       assertEquals(new Cat().getAttack() + HummingBird.ATTACK_BOOST, unit.getAttack());
     }
@@ -50,8 +50,8 @@ public class HummingBirdTest extends UnitTestCase
     {
       player.addToTable(new Cat());
     }
-    new Fight(game, player, player2);
-    game.processStartFight(player, player2);
+    Fight fight = new Fight(game, player, player2);
+    game.processStartFight(fight,player, player2);
     
     Unit bird = player.getTable().get(0);
     assertEquals(new HummingBird().getName(), bird.getName());
@@ -59,7 +59,7 @@ public class HummingBirdTest extends UnitTestCase
     
     for (int i = 1; i < 4; i++)
     {
-      Unit unit = player.getTable().get(i);
+      Unit unit = fight.getFightTable(player).get(i);
       assertEquals(new Cat().getName(), unit.getName());
       assertEquals(new Cat().getAttack() + (HummingBird.ATTACK_BOOST * 2), unit.getAttack());
     }

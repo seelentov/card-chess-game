@@ -22,7 +22,7 @@ public class IckyImpTest extends UnitTestCase
   {
     Unit unit = new IckyImp();
     player.addToTable(unit, -1);
-    unit.onDead(game, player, player2, new Cat());
+    unit.onDead(game, null,player, player2, new Cat());
     
     assertEquals(3, player.getUnitsCount());
     assertEquals(new Imp().getName(), player.cloneTable().get(1).getName());
@@ -34,9 +34,10 @@ public class IckyImpTest extends UnitTestCase
   {
     Unit unit = new IckyImp().buildGold();
     player.addToTable(unit, -1);
-    unit.onDead(game, player, player2, new Cat());
+    unit.onDead(game, null,player, player2, new Cat());
     
     assertEquals(3, player.getUnitsCount());
+    assertEquals(new IckyImp().getName(), player.cloneTable().get(0).getName());
     assertEquals(new Imp().getName(), player.cloneTable().get(1).getName());
     assertEquals(new Imp().getName(), player.cloneTable().get(2).getName());
     
@@ -60,10 +61,11 @@ public class IckyImpTest extends UnitTestCase
       player.addToTable(new Cat());
     }
     
-    unit.onDead(game, player, player2, new Cat());
+    unit.onDead(game, null,player, player2, new Cat());
+    player.getTable().removeIf(unit1 -> unit1 == unit);
     
     assertEquals(new Cat().getName(), player.cloneTable().get(0).getName());
-    assertEquals(new IckyImp().getName(), player.cloneTable().get(1).getName());
+    assertEquals(new Imp().getName(), player.cloneTable().get(1).getName());
     assertEquals(new Imp().getName(), player.cloneTable().get(2).getName());
     
     for (int i = 3; i < 7; i++)
@@ -85,10 +87,11 @@ public class IckyImpTest extends UnitTestCase
       player.addToTable(new Cat());
     }
     
-    unit.onDead(game, player, player2, new Cat());
+    unit.onDead(game, null,player, player2, new Cat());
+    player.getTable().removeIf(unit1 -> unit1 == unit);
     
     assertEquals(new Cat().getName(), player.cloneTable().get(0).getName());
-    assertEquals(new IckyImp().getName(), player.cloneTable().get(1).getName());
+    assertEquals(new Imp().getName(), player.cloneTable().get(1).getName());
     
     for (int i = 2; i < 7; i++)
     {

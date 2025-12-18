@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import javafx.util.Pair;
 import ru.vladislavkomkov.controller.sender.Sender;
@@ -46,7 +48,6 @@ public class Player
   
   final List<Unit> table = new ArrayList<>(TABLE_LIMIT);
   final List<Card> hand = new ArrayList<>();
-  public List<Unit> inFightTable = null;
   
   int health = START_HEALTH;
   int maxHealth = START_HEALTH;
@@ -204,12 +205,19 @@ public class Player
   
   public boolean addToTable(Unit unit, int index)
   {
-    if (table.size() >= TABLE_LIMIT)
+    return addToTable(unit,index, false);
+  }
+  
+  public boolean addToTable(Unit unit, int index, boolean withoutOne)
+  {
+    int tableSize = table.size() - (withoutOne ? 1 : 0);
+    
+    if (tableSize >= TABLE_LIMIT)
     {
       return false;
     }
     
-    if (index < 0 || index >= table.size())
+    if (index < 0 || index >= tableSize)
     {
       table.add(unit);
     }
@@ -218,7 +226,7 @@ public class Player
       table.add(index, unit);
     }
     
-    unit.onAppear(game, this);
+    unit.onAppear(game, null, this);
     sendMessage(Event.Type.TABLE, table);
     
     return true;
@@ -238,7 +246,7 @@ public class Player
   {
     if (game != null)
     {
-      unit.onDisappear(game, this);
+      unit.onDisappear(game, null,this);
       table.removeIf(unit1 -> unit1 == unit);
       sendMessage(Event.Type.TABLE, table);
     }
@@ -248,7 +256,7 @@ public class Player
   {
     if (index >= 0 && index < table.size())
     {
-      table.get(index).onDisappear(game, this);
+      table.get(index).onDisappear(game, null,this);
       table.remove(index);
     }
   }
@@ -256,68 +264,6 @@ public class Player
   public int getIndex(Unit unit)
   {
     return table.indexOf(unit);
-  }
-  
-  public int getFightIndex(Unit unit)
-  {
-    return inFightTable != null ? inFightTable.indexOf(unit) : -1;
-  }
-  
-  public boolean addToFightTable(Unit unit, int index, boolean withoutOne)
-  {
-    if (inFightTable == null)
-    {
-      return false;
-    }
-    
-    int size = withoutOne ? inFightTable.size() - 1 : inFightTable.size();
-    if (size >= TABLE_LIMIT)
-    {
-      return false;
-    }
-    
-    if (index < 0 || index >= inFightTable.size())
-    {
-      inFightTable.add(unit);
-    }
-    else
-    {
-      inFightTable.add(index, unit);
-    }
-    
-    unit.onAppear(game, this);
-    
-    if (game != null)
-    {
-      sendMessage(Event.Type.FIGHT_TABLE, table);
-    }
-    
-    return true;
-  }
-  
-  public boolean addToFightTable(Unit unit, int index)
-  {
-    return addToFightTable(unit, index, false);
-  }
-  
-  public boolean addToFightTable(Unit unit)
-  {
-    return addToFightTable(unit, -1, false);
-  }
-  
-  public void addToFightTable(List<Unit> units, int index, boolean withoutOne)
-  {
-    units.forEach(unit -> addToFightTable(unit, index, withoutOne));
-  }
-  
-  public void addToFightTable(List<Unit> units, int index)
-  {
-    units.forEach(unit -> addToFightTable(unit, index, false));
-  }
-  
-  public boolean inFight()
-  {
-    return inFightTable != null;
   }
   
   public void addToHand(Card card)
@@ -329,7 +275,7 @@ public class Player
   {
     if (force || hand.size() < HAND_LIMIT)
     {
-      card.getEntity().onHandled(game, this);
+      card.getEntity().onHandled(game, null,this);
       hand.add(card);
     }
     
@@ -396,7 +342,7 @@ public class Player
     }
     
     Unit unit = table.get(index);
-    unit.onSell(game, this);
+    unit.onSell(game,null, this);
     sendMessage(Event.Type.TABLE, table);
     sendMessage(Event.Type.MONEY, money);
   }
@@ -430,7 +376,7 @@ public class Player
   public void resetTavern(boolean saveFreezed)
   {
     tavern.reset(level, saveFreezed);
-    listener.processOnResetTavernListeners(game, this);
+    listener.processOnResetTavernListeners(game, null,this);
     
     sendMessage(Event.Type.FREEZE, tavern.isFreeze());
     sendMessage(Event.Type.TAVERN, tavern.getCards());
@@ -552,7 +498,7 @@ public class Player
       if (price <= money)
       {
         level++;
-        listener.processOnIncTavernLevelListener(game, this);
+        listener.processOnIncTavernLevelListener(game, null,this);
         decMoney(price);
         sendMessage(Event.Type.LVL, level);
         statistic.counters.resetIncLevelDecreaser();
@@ -694,11 +640,15 @@ public class Player
     return health > 0;
   }
   
-  public List<Unit> cloneTable()
-  {
-    return new ArrayList<>(table);
+  //TODO: DEEP COPY
+  public List<Unit> cloneTable() {
+    return table.stream()
+            .filter(Objects::nonNull)
+            .map(Unit::clone)
+            .collect(Collectors.toCollection(ArrayList::new));
   }
   
+  //TODO: DEEP COPY
   public List<Card> cloneHand()
   {
     return new ArrayList<>(hand);
@@ -717,11 +667,6 @@ public class Player
   public int getUnitsCount()
   {
     return table.size();
-  }
-  
-  public int getFightUnitsCount()
-  {
-    return inFightTable != null ? inFightTable.size() : 0;
   }
   
   public Tavern getTavern()

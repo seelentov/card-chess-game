@@ -20,7 +20,7 @@ public class StrikeOilTest extends SpellTestCase
   protected void testOnPlayed()
   {
     int money = player.getMaxMoney();
-    new StrikeOil().onPlayed(game, player, 0);
+    new StrikeOil().onPlayed(game, null, player, 0);
     assertEquals(money + 1, player.getMaxMoney());
   }
   
@@ -28,7 +28,7 @@ public class StrikeOilTest extends SpellTestCase
   protected void testOnPlayedIfMax()
   {
     player.setMaxMoney(Player.MAX_MONEY);
-    new StrikeOil().onPlayed(game, player, 0);
+    new StrikeOil().onPlayed(game,null,  player, 0);
     assertEquals(Player.MAX_MONEY + 1, player.getMaxMoney());
   }
 }

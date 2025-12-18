@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import ru.vladislavkomkov.model.Fight;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.Entity;
@@ -27,8 +28,7 @@ public abstract class Unit extends Entity
   
   public final static String F_BUFFS = "buffs";
   
-  
-  final List<Buff> buffs = new ArrayList<>();
+  List<Buff> buffs = new ArrayList<>();
   protected List<Type> type = new ArrayList<>();
   
   protected int attack = 0;
@@ -50,62 +50,66 @@ public abstract class Unit extends Entity
     
     listener.onSellListeners.put(
         UUIDUtils.generateKey(),
-        (game, player, entity) -> {
-          player.listener.removeListener(this);
+        (game, fight, player, entity) -> {
+          player.listener.removeListener((Unit) entity);
           player.addMoney(1);
-          player.removeFromTable(this);
-          processListeners(player.listener.onSellListeners, (action) -> action.process(game, player, this), player);
+          player.removeFromTable((Unit) entity);
+          processListeners(player.listener.onSellListeners, (action) -> action.process(game, null, player, entity), player);
         });
     
     listener.onAppearListeners.put(
         UUIDUtils.generateKey(),
-        (game, player, entity) -> {
-          processListeners(player.listener.onAppearListeners, (action) -> action.process(game, player, this), player);
+        (game, fight, player, entity) -> {
+          processListeners(player.listener.onAppearListeners, (action) -> action.process(game, null, player, entity), player);
         });
     
     listener.onDisappearListeners.put(
         UUIDUtils.generateKey(),
-        (game, player, entity) -> {
-          processListeners(player.listener.onDisappearListeners, (action) -> action.process(game, player, this), player);
+        (game, fight, player, entity) -> {
+          processListeners(player.listener.onDisappearListeners, (action) -> action.process(game, null, player, entity), player);
         });
     
     listener.onAttackedListeners.put(
         UUIDUtils.generateKey(),
-        (game, player, player2, unit, attacker) -> {
-          processListeners(player.listener.onAttackedListeners, (action) -> action.process(game, player, player2, this, attacker), player);
-          if (isBubbled)
+        (game, fight, player, player2, unit, attacker) -> {
+          processListeners(player.listener.onAttackedListeners, (action) -> action.process(game, null, player, player2, unit, attacker), player);
+          if (unit.isBubbled)
           {
-            isBubbled = false;
+            unit.isBubbled = false;
           }
           else
           {
-            this.actualHealth -= attacker.getAttack();
+            unit.actualHealth -= attacker.getAttack();
           }
         });
     
     listener.onAttackListeners.put(
         UUIDUtils.generateKey(),
-        (game, player, player2, unit, attacked) -> {
-          processListeners(player.listener.onAttackListeners, (action) -> action.process(game, player, player2, this, attacked), player);
-          if (isBubbled)
+        (game, fight, player, player2, unit, attacked) -> {
+          processListeners(player.listener.onAttackListeners, (action) -> action.process(game, null, player, player2, unit, attacked), player);
+          if (unit.isBubbled)
           {
-            isBubbled = false;
+            unit.isBubbled = false;
           }
           else
           {
-            this.actualHealth -= attacked.getAttack();
+            unit.actualHealth -= attacked.getAttack();
           }
         });
     
     listener.onDeadListeners.put(
         UUIDUtils.generateKey(),
-        (game, player, player2, unit, attacker) -> {
-          if (isRebirth)
+        (game, fight, player, player2, unit, attacker) -> {
+          processListeners(player.listener.onDeadListeners, (action) -> action.process(game, null, player, player2, unit, attacker), player);
+          List table = fight != null ? fight.getFightTable(player) : player.getTable();
+          if (unit.isRebirth)
           {
-            isRebirth = false;
-            actualHealth = 1;
+            unit.isRebirth = false;
+            if (table.size() < Player.TABLE_LIMIT)
+            {
+              unit.actualHealth = 1;
+            }
           }
-          processListeners(player.listener.onDeadListeners, (action) -> action.process(game, player, player2, this, attacker), player);
         });
   }
   
@@ -273,82 +277,70 @@ public abstract class Unit extends Entity
     listener.removeCoreListener();
   }
   
-  public void onSell(Game game, Player player)
+  public void onSell(Game game, Fight fight, Player player)
   {
-    listener.processOnSellListeners(game, player, this);
+    listener.processOnSellListeners(game, fight, player, this);
   }
   
-  public void onStartTurn(Game game, Player player)
+  public void onStartTurn(Game game, Fight fight, Player player)
   {
-    listener.processOnStartTurnListeners(game, player);
+    listener.processOnStartTurnListeners(game, fight, player);
   }
   
-  public void onEndTurn(Game game, Player player)
+  public void onEndTurn(Game game, Fight fight, Player player)
   {
-    listener.processOnEndTurnListeners(game, player);
+    listener.processOnEndTurnListeners(game, fight, player);
   }
   
-  public void onStartFight(Game game, Player player, Player player2)
+  public void onStartFight(Game game, Fight fight, Player player, Player player2)
   {
-    listener.processOnStartFightListeners(game, player);
+    listener.processOnStartFightListeners(game, fight, player, player2);
   }
   
-  public void onEndFight(Game game, Player player, Player player2)
+  public void onEndFight(Game game, Fight fight, Player player, Player player2)
   {
-    listener.processOnEndFightListeners(game, player);
+    listener.processOnEndFightListeners(game, fight, player, player2);
   }
   
-  public void onAttacked(Game game, Player player, Player player2, Unit attacker)
+  public void onAttacked(Game game, Fight fight, Player player, Player player2, Unit attacker)
   {
-    listener.processOnAttackedListeners(game, player, player2, this, attacker);
+    listener.processOnAttackedListeners(game, fight, player, player2, this, attacker);
   }
   
-  public void onAttack(Game game, Player player, Player player2, Unit attacked)
+  public void onAttack(Game game, Fight fight, Player player, Player player2, Unit attacked)
   {
-    listener.processOnAttackListeners(game, player, player2, this, attacked);
+    listener.processOnAttackListeners(game, fight, player, player2, this, attacked);
   }
   
-  public void onDead(Game game, Player player, Player player2, Unit attacker)
+  public void onDead(Game game, Fight fight, Player player, Player player2, Unit attacker)
   {
-    listener.processOnDeadListeners(game, player, player2, this, attacker);
+    listener.processOnDeadListeners(game, fight, player, player2, this, attacker);
   }
   
-  public void onAppear(Game game, Player player)
+  public void onAppear(Game game, Fight fight, Player player)
   {
-    listener.processOnAppearListeners(game, player, this);
+    listener.processOnAppearListeners(game, fight, player, this);
   }
   
-  public void onDisappear(Game game, Player player)
+  public void onDisappear(Game game, Fight fight, Player player)
   {
-    listener.processOnDisappearListeners(game, player, this);
+    listener.processOnDisappearListeners(game, fight, player, this);
   }
   
-  public void onAppearEnemy(Game game, Player player, Player player2)
+  public void onAppearEnemy(Game game, Fight fight, Player player, Player player2)
   {
-    listener.processOnAppearListeners(game, player, this);
+    listener.processOnAppearListeners(game, fight, player, this);
   }
   
-  public void onDisappearEnemy(Game game, Player player, Player player2)
+  public void onDisappearEnemy(Game game, Fight fight, Player player, Player player2)
   {
-    listener.processOnDisappearListeners(game, player, this);
-  }
-  
-  @Override
-  public void onHandled(Game game, Player player)
-  {
-    super.onHandled(game, player);
+    listener.processOnDisappearListeners(game, fight, player, this);
   }
   
   @Override
-  public void onPlayed(Game game, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2)
+  public void onPlayed(Game game, Fight fight, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2, boolean auto)
   {
-    super.onPlayed(game, player, index, isTavernIndex, index2, isTavernIndex2);
-  }
-  
-  @Override
-  public void onPlayed(Game game, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2, boolean auto)
-  {
-    super.onPlayed(game, player, index, isTavernIndex, index2, isTavernIndex2, auto);
+    super.onPlayed(game, fight, player, index, isTavernIndex, index2, isTavernIndex2, auto);
     if (this.isGold())
     {
       player.addToHand(Card.of(new TripleReward(player.getLevel() + 1)));
@@ -410,5 +402,21 @@ public abstract class Unit extends Entity
   public boolean isType(Type type)
   {
     return this.type.contains(type);
+  }
+  
+  @Override
+  public Unit clone()
+  {
+    Unit clonedUnit = (Unit) super.clone();
+    
+    clonedUnit.buffs = new ArrayList<>();
+    for (Buff buff : this.buffs)
+    {
+      clonedUnit.buffs.add(buff.clone());
+    }
+    
+    clonedUnit.type = new ArrayList<>(this.type);
+    
+    return clonedUnit;
   }
 }

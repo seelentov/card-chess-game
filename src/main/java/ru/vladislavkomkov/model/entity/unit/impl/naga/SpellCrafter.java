@@ -24,11 +24,11 @@ public abstract class SpellCrafter extends Unit
     
     listener.onStartTurnListeners.put(
         KEY_CORE,
-        (game, player) -> addSpellCraft(player));
+        (game, fight, player) -> addSpellCraft(player));
     
     listener.onPlayedListeners.put(
         KEY_CORE,
-        (game, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto) -> addSpellCraft(player));
+        (game, fight, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto) -> addSpellCraft(player));
   }
   
   public SpellCraft getSpellcraft()

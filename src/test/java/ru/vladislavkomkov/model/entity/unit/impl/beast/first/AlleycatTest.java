@@ -21,16 +21,22 @@ public class AlleycatTest extends UnitTestCase
   @Test
   protected void testOnPlayed()
   {
-    new Alleycat().onPlayed(game, player, 0);
-    assertEquals(new Cat().getName(), player.cloneTable().get(0).getName());
+    new Alleycat();
+    Unit cat = new Alleycat();
+    player.addToTable(cat);
+    cat.onPlayed(game, null, player);
+    
+    assertEquals(new Cat().getName(), player.cloneTable().get(1).getName());
   }
   
   @Test
   protected void testOnPlayedGold()
   {
-    new Alleycat().buildGold().onPlayed(game, player, 0);
+    Unit cat = new Alleycat().buildGold();
+    player.addToTable(cat);
+    cat.onPlayed(game, null, player);
     
-    assertEquals(new Cat().getName(), player.cloneTable().get(0).getName());
+    assertEquals(new Cat().getName(), player.getTable().get(1).getName());
     
     assertEquals(new Cat().getAttack() * 2, player.cloneTable().get(0).getAttack());
     assertEquals(new Cat().getHealth() * 2, player.cloneTable().get(0).getHealth());
@@ -51,7 +57,7 @@ public class AlleycatTest extends UnitTestCase
       player.addToTable(new Imp());
     }
     
-    unit.onPlayed(game, player);
+    unit.onPlayed(game, null, player);
     
     assertEquals(new Imp().getName(), player.cloneTable().get(0).getName());
     assertEquals(new Alleycat().getName(), player.cloneTable().get(1).getName());
@@ -76,7 +82,7 @@ public class AlleycatTest extends UnitTestCase
       player.addToTable(new Imp());
     }
     
-    unit.onPlayed(game, player);
+    unit.onPlayed(game, null,player);
     
     assertEquals(new Imp().getName(), player.cloneTable().get(0).getName());
     assertEquals(new Alleycat().getName(), player.cloneTable().get(1).getName());

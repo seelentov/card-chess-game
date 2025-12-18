@@ -27,14 +27,14 @@ public class HummingBird extends Unit
     
     listener.onStartFightListeners.put(
         KEY_CORE,
-        (game, player) -> {
-          if (player.inFightTable == null)
+        (game, fight, player, player2) -> {
+          if (fight == null)
           {
             return;
           }
-          for (Unit unit : player.inFightTable)
+          for (Unit unit : fight.getFightTable(player))
           {
-            if (unit.isType(Type.BEAST) && unit != this)
+            if (unit.isType(Type.BEAST))
             {
               unit.incAttack(ATTACK_BOOST);
             }
@@ -50,14 +50,14 @@ public class HummingBird extends Unit
     gold.setDescription("Start of Combat: For the rest of this combat, your Beasts have +2 Attack");
     gold.getListener().onStartFightListeners.put(
         KEY_CORE,
-        (game, player) -> {
-          if (player.inFightTable == null)
+        (game, fight, player, player2) -> {
+          if (fight == null)
           {
             return;
           }
-          for (Unit unit : player.inFightTable)
+          for (Unit unit : fight.getFightTable(player))
           {
-            if (unit.isType(Type.BEAST) && unit != gold)
+            if (unit.isType(Type.BEAST))
             {
               unit.incAttack(ATTACK_BOOST * 2);
             }

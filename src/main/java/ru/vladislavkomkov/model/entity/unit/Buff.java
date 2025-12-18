@@ -4,10 +4,9 @@ import java.util.function.Consumer;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Buff
+public class Buff implements Cloneable
 {
   public final static String F_DESCRIPTION = "description";
-  
   
   final String description;
   
@@ -40,5 +39,18 @@ public class Buff
   public Consumer<Unit> getRollback()
   {
     return rollback;
+  }
+  
+  @Override
+  public Buff clone()
+  {
+    try
+    {
+      return new Buff(this.upgrade, this.rollback, this.description);
+    }
+    catch (Exception e)
+    {
+      throw new AssertionError("Unexpected error during cloning Buff", e);
+    }
   }
 }

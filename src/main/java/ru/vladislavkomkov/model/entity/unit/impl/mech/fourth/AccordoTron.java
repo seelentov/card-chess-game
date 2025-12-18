@@ -29,7 +29,7 @@ public class AccordoTron extends Unit
     
     listener.onStartTurnListeners.put(
         KEY_CORE,
-        (game, player) -> player.addMoney(GOLD));
+        (game, fight, player) -> player.addMoney(GOLD));
   }
   
   @Override
@@ -39,7 +39,7 @@ public class AccordoTron extends Unit
     gold.setDescription("At the start of your turn, gain 2 Gold");
     gold.getListener().onStartTurnListeners.put(
         KEY_CORE,
-        (game, player) -> player.addMoney(GOLD * 2));
+        (game, fight, player) -> player.addMoney(GOLD * 2));
     
     return gold;
   }

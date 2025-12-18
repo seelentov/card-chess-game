@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import ru.vladislavkomkov.GamePlayerTestCase;
 import ru.vladislavkomkov.consts.Listeners;
+import ru.vladislavkomkov.model.Fight;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.Listener;
 import ru.vladislavkomkov.model.entity.Entity;
@@ -19,15 +20,15 @@ public class ListenerTest extends GamePlayerTestCase
   void testPush()
   {
     Listener listener = new Listener();
-    listener.onAttackedListeners.put(Listeners.KEY_CORE, (game1, player1, player3, unit, attacker) -> {
+    listener.onAttackedListeners.put(Listeners.KEY_CORE, (game1, fight, player1, player3, unit, attacker) -> {
     });
-    listener.onAttackedListeners.put(UUIDUtils.generateKey(), (game1, player1, player3, unit, attacker) -> {
+    listener.onAttackedListeners.put(UUIDUtils.generateKey(), (game1, fight, player1, player3, unit, attacker) -> {
     });
-    listener.onAttackListeners.put(Listeners.KEY_CORE, (game1, player1, player3, unit, attacker) -> {
+    listener.onAttackListeners.put(Listeners.KEY_CORE, (game1, fight, player1, player3, unit, attacker) -> {
     });
-    listener.onAttackListeners.put(UUIDUtils.generateKey(), (game1, player1, player3, unit, attacker) -> {
+    listener.onAttackListeners.put(UUIDUtils.generateKey(), (game1, fight, player1, player3, unit, attacker) -> {
     });
-    listener.onAttackListeners.put(UUIDUtils.generateKey(), (game1, player1, player3, unit, attacker) -> {
+    listener.onAttackListeners.put(UUIDUtils.generateKey(), (game1, fight, player1, player3, unit, attacker) -> {
     });
     
     assertEquals(2, listener.onAttackedListeners.size());
@@ -35,15 +36,15 @@ public class ListenerTest extends GamePlayerTestCase
     
     Listener listener2 = new Listener();
     
-    listener.onAttackedListeners.put(Listeners.KEY_CORE, (game1, player1, player3, unit, attacker) -> {
+    listener.onAttackedListeners.put(Listeners.KEY_CORE, (game1, fight, player1, player3, unit, attacker) -> {
     });
-    listener.onAttackedListeners.put(UUIDUtils.generateKey(), (game1, player1, player3, unit, attacker) -> {
+    listener.onAttackedListeners.put(UUIDUtils.generateKey(), (game1, fight, player1, player3, unit, attacker) -> {
     });
-    listener.onAttackListeners.put(Listeners.KEY_CORE, (game1, player1, player3, unit, attacker) -> {
+    listener.onAttackListeners.put(Listeners.KEY_CORE, (game1, fight, player1, player3, unit, attacker) -> {
     });
-    listener.onAttackListeners.put(UUIDUtils.generateKey(), (game1, player1, player3, unit, attacker) -> {
+    listener.onAttackListeners.put(UUIDUtils.generateKey(), (game1, fight, player1, player3, unit, attacker) -> {
     });
-    listener.onAttackListeners.put(UUIDUtils.generateKey(), (game1, player1, player3, unit, attacker) -> {
+    listener.onAttackListeners.put(UUIDUtils.generateKey(), (game1, fight, player1, player3, unit, attacker) -> {
     });
     
     listener2.push(listener);
@@ -57,9 +58,9 @@ public class ListenerTest extends GamePlayerTestCase
   {
     Listener listener = new Listener();
     
-    listener.onAttackedListeners.put(Listeners.KEY_CORE, (game1, player1, player3, unit, attacker) -> {
+    listener.onAttackedListeners.put(Listeners.KEY_CORE, (game1, fight, player1, player3, unit, attacker) -> {
     });
-    listener.onAttackListeners.put(Listeners.KEY_CORE, (game1, player1, player3, unit, attacker) -> {
+    listener.onAttackListeners.put(Listeners.KEY_CORE, (game1, fight, player1, player3, unit, attacker) -> {
     });
     
     assertEquals(1, listener.onAttackedListeners.size());
@@ -77,15 +78,15 @@ public class ListenerTest extends GamePlayerTestCase
   void testGetCore()
   {
     Listener listener = new Listener();
-    listener.onAttackedListeners.put(Listeners.KEY_CORE, (game1, player1, player3, unit, attacker) -> {
+    listener.onAttackedListeners.put(Listeners.KEY_CORE, (game1, fight, player1, player3, unit, attacker) -> {
     });
-    listener.onAttackedListeners.put(UUIDUtils.generateKey(), (game1, player1, player3, unit, attacker) -> {
+    listener.onAttackedListeners.put(UUIDUtils.generateKey(), (game1, fight, player1, player3, unit, attacker) -> {
     });
-    listener.onAttackListeners.put(Listeners.KEY_CORE, (game1, player1, player3, unit, attacker) -> {
+    listener.onAttackListeners.put(Listeners.KEY_CORE, (game1, fight, player1, player3, unit, attacker) -> {
     });
-    listener.onAttackListeners.put(UUIDUtils.generateKey(), (game1, player1, player3, unit, attacker) -> {
+    listener.onAttackListeners.put(UUIDUtils.generateKey(), (game1, fight, player1, player3, unit, attacker) -> {
     });
-    listener.onAttackListeners.put(UUIDUtils.generateKey(), (game1, player1, player3, unit, attacker) -> {
+    listener.onAttackListeners.put(UUIDUtils.generateKey(), (game1, fight, player1, player3, unit, attacker) -> {
     });
     
     assertEquals(2, listener.onAttackedListeners.size());
@@ -120,8 +121,8 @@ public class ListenerTest extends GamePlayerTestCase
     
     testListener(
         player.listener.onPlayedListeners,
-        () -> unit.onPlayed(game, player, 0),
-        (Game game, Player player, Entity entity, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2, boolean auto) -> testAction(),
+        () -> unit.onPlayed(game, null, player, 0),
+        (Game game, Fight fight, Player player, Entity entity, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2, boolean auto) -> testAction(),
         once);
   }
   
@@ -145,8 +146,8 @@ public class ListenerTest extends GamePlayerTestCase
     
     testListener(
         player.listener.onHandledListeners,
-        () -> unit.onHandled(game, player),
-        (game1, player1, entity) -> testAction(),
+        () -> unit.onHandled(game, null, player),
+        (game1, fight, player1, entity) -> testAction(),
         once);
   }
   
@@ -173,8 +174,8 @@ public class ListenerTest extends GamePlayerTestCase
     
     testListener(
         player.listener.onAttackListeners,
-        () -> unit.onAttack(game, player, player2, unit2),
-        (game1, player1, player3, unit1, attacked) -> testAction(),
+        () -> unit.onAttack(game, null, player, player2, unit2),
+        (game1, fight, player1, player3, unit1, attacked) -> testAction(),
         once);
   }
   
@@ -201,8 +202,8 @@ public class ListenerTest extends GamePlayerTestCase
     
     testListener(
         player.listener.onAttackedListeners,
-        () -> unit.onAttacked(game, player, player2, unit2),
-        (game1, player1, player3, unit1, attacked) -> testAction(),
+        () -> unit.onAttacked(game, null, player, player2, unit2),
+        (game1, fight, player1, player3, unit1, attacked) -> testAction(),
         once);
   }
   
@@ -229,8 +230,8 @@ public class ListenerTest extends GamePlayerTestCase
     
     testListener(
         player.listener.onDeadListeners,
-        () -> unit.onDead(game, player, player2, unit2),
-        (game1, player1, player3, unit1, attacked) -> testAction(),
+        () -> unit.onDead(game, null, player, player2, unit2),
+        (game1, fight, player1, player3, unit1, attacked) -> testAction(),
         once);
   }
   
@@ -255,10 +256,10 @@ public class ListenerTest extends GamePlayerTestCase
     testListener(
         player.listener.onSellListeners,
         () -> {
-          unit.onSell(game, player);
+          unit.onSell(game, null, player);
           player.decMoney(1);
         },
-        (game1, player1, entity) -> testAction(),
+        (game1, fight, player1, entity) -> testAction(),
         once);
   }
   
@@ -279,7 +280,7 @@ public class ListenerTest extends GamePlayerTestCase
     testListener(
         player.listener.onStartTurnListeners,
         () -> game.processStartTurn(player),
-        (game1, player1) -> testAction(),
+        (game1, fight, player1) -> testAction(),
         once);
   }
   
@@ -300,7 +301,7 @@ public class ListenerTest extends GamePlayerTestCase
     testListener(
         player.listener.onEndTurnListeners,
         () -> game.processEndTurn(player),
-        (game1, player1) -> testAction(),
+        (game1, fight, player1) -> testAction(),
         once);
   }
   
@@ -320,8 +321,8 @@ public class ListenerTest extends GamePlayerTestCase
   {
     testListener(
         player.listener.onStartFightListeners,
-        () -> game.processStartFight(player, player2),
-        (game1, player1) -> testAction(),
+        () -> game.processStartFight(null, player, player2),
+        (game1, fight, player1, player2) -> testAction(),
         once);
   }
   
@@ -341,8 +342,8 @@ public class ListenerTest extends GamePlayerTestCase
   {
     testListener(
         player.listener.onEndFightListeners,
-        () -> game.processEndFight(player, player2),
-        (game1, player1) -> testAction(),
+        () -> game.processEndFight(null, player, player2),
+        (game1, fight, player1, player2) -> testAction(),
         once);
   }
   
@@ -363,7 +364,7 @@ public class ListenerTest extends GamePlayerTestCase
     testListener(
         player.listener.onResetTavernListeners,
         () -> player.resetTavern(),
-        (game1, player1) -> testAction(),
+        (game1, fight, player1) -> testAction(),
         once);
   }
   
@@ -384,7 +385,7 @@ public class ListenerTest extends GamePlayerTestCase
     testListener(
         player.listener.onIncLevelListeners,
         () -> player.incLevel(true),
-        (game1, player1) -> testAction(),
+        (game1, fight, player1) -> testAction(),
         once);
   }
   

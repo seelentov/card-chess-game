@@ -38,6 +38,9 @@ public class FightTest extends GamePlayerTestCase
     
     Fight fight = new Fight(game, player, player2);
     
+    unit = fight.getFightTable(player).get(0);
+    unit2 = fight.getFightTable(player2).get(0);
+    
     for (int i = 1; i <= 3; i++)
     {
       assertFalse(fight.doTurn().isPresent());
@@ -64,6 +67,9 @@ public class FightTest extends GamePlayerTestCase
     player2.addToTable(unit2, 0);
     
     Fight fight = new Fight(game, player, player2);
+    
+    unit = fight.getFightTable(player).get(0);
+    unit2 = fight.getFightTable(player2).get(0);
     
     for (int i = 1; i <= 2; i++)
     {
@@ -315,15 +321,15 @@ public class FightTest extends GamePlayerTestCase
       assertFalse(fight.doTurn().isPresent());
     }
     
-    assertEquals(7, player.inFightTable.size());
+    assertEquals(7, fight.getFightTable(player).size());
     
     for (int i = 0; i < 6; i++)
     {
-      assertEquals(new Cat().getName(), player.inFightTable.get(i).getName());
-      assertEquals(new Cat().getHealth(), player.inFightTable.get(i).getHealth());
+      assertEquals(new Cat().getName(), fight.getFightTable(player).get(i).getName());
+      assertEquals(new Cat().getHealth(), fight.getFightTable(player).get(i).getHealth());
     }
     
-    assertEquals(tauntHealth / 2, player.inFightTable.get(6).getHealth());
+    assertEquals(tauntHealth / 2, fight.getFightTable(player).get(6).getHealth());
   }
   
   @Test
@@ -342,17 +348,17 @@ public class FightTest extends GamePlayerTestCase
     
     assertFalse(fight.doTurn().isPresent());
     
-    assertEquals(7, player.getFightUnitsCount());
+    assertEquals(7, fight.getFightTable(player).size());
     
-    assertEquals(player.inFightTable.get(0).getName(), new Greenskeeper().getName());
-    assertEquals(player.inFightTable.get(1).getName(), new Imp().getName());
-    assertEquals(player.inFightTable.get(2).getName(), new Alleycat().getName());
-    assertEquals(player.inFightTable.get(3).getName(), new Cat().getName());
-    assertEquals(player.inFightTable.get(4).getName(), new Imp().getName());
-    assertEquals(player.inFightTable.get(5).getName(), new Imp().getName());
-    assertEquals(player.inFightTable.get(6).getName(), new Imp().getName());
+    assertEquals(fight.getFightTable(player).get(0).getName(), new Greenskeeper().getName());
+    assertEquals(fight.getFightTable(player).get(1).getName(), new Imp().getName());
+    assertEquals(fight.getFightTable(player).get(2).getName(), new Alleycat().getName());
+    assertEquals(fight.getFightTable(player).get(3).getName(), new Cat().getName());
+    assertEquals(fight.getFightTable(player).get(4).getName(), new Imp().getName());
+    assertEquals(fight.getFightTable(player).get(5).getName(), new Imp().getName());
+    assertEquals(fight.getFightTable(player).get(6).getName(), new Imp().getName());
     
-    assertTrue(player2.inFightTable.isEmpty());
+    assertTrue(fight.getFightTable(player2).isEmpty());
   }
   
   @Test
@@ -372,17 +378,17 @@ public class FightTest extends GamePlayerTestCase
     
     assertFalse(fight.doTurn().isPresent());
     
-    assertEquals(7, player.getFightUnitsCount());
+    assertEquals(7, fight.getFightTable(player).size());
     
-    assertEquals(player.inFightTable.get(0).getName(), new Greenskeeper().getName());
-    assertEquals(player.inFightTable.get(1).getName(), new Imp().getName());
-    assertEquals(player.inFightTable.get(2).getName(), new Alleycat().getName());
-    assertEquals(player.inFightTable.get(3).getName(), new Imp().getName());
-    assertEquals(player.inFightTable.get(4).getName(), new Imp().getName());
-    assertEquals(player.inFightTable.get(5).getName(), new Imp().getName());
-    assertEquals(player.inFightTable.get(6).getName(), new Imp().getName());
+    assertEquals(fight.getFightTable(player).get(0).getName(), new Greenskeeper().getName());
+    assertEquals(fight.getFightTable(player).get(1).getName(), new Imp().getName());
+    assertEquals(fight.getFightTable(player).get(2).getName(), new Alleycat().getName());
+    assertEquals(fight.getFightTable(player).get(3).getName(), new Imp().getName());
+    assertEquals(fight.getFightTable(player).get(4).getName(), new Imp().getName());
+    assertEquals(fight.getFightTable(player).get(5).getName(), new Imp().getName());
+    assertEquals(fight.getFightTable(player).get(6).getName(), new Imp().getName());
     
-    assertTrue(player2.inFightTable.isEmpty());
+    assertTrue(fight.getFightTable(player2).isEmpty());
   }
   
   @Test

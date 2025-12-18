@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import ru.vladislavkomkov.model.entity.unit.Unit;
+import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.RandUtils;
 
@@ -30,6 +31,46 @@ public class Fight
     this.player2 = player2;
     
     setup();
+  }
+  
+  public void addToFightTable(Player player, Unit unit, Unit parent){
+    addToFightTable(player, unit, parent, false);
+  }
+  
+  public void addToFightTable(Player player, Unit unit, Unit parent, boolean withoutOne)
+  {
+    List<Unit> table = getFightTable(player);
+    
+    if ((table.size() - (withoutOne ? 1 : 0)) == Player.TABLE_LIMIT)
+    {
+      return;
+    }
+    
+    int indexParent = table.indexOf(parent);
+    if ((indexParent + 1) > table.size())
+    {
+      table.add(unit);
+    }
+    else
+    {
+      table.add(indexParent + 1, unit);
+    }
+  }
+  
+  public List<Unit> getFightTable(Player player)
+  {
+    if (player == player1)
+    {
+      return player1Units;
+    }
+    else if (player == player2)
+    {
+      return player2Units;
+    }
+    else
+    {
+      throw new RuntimeException("Player not found in this fight");
+    }
   }
   
   public Optional<Info> doTurn()
@@ -85,9 +126,6 @@ public class Fight
     {
       turn = RandUtils.getRand(1);
     }
-    
-    player1.inFightTable = player1Units;
-    player2.inFightTable = player2Units;
   }
   
   Optional<Info> handleFightEnd()
@@ -176,8 +214,8 @@ public class Fight
     Player turnPlayer1 = isPlayer1Turn ? player1 : player2;
     Player turnPlayer2 = isPlayer1Turn ? player2 : player1;
     
-    attacker.onAttack(game, turnPlayer1, turnPlayer2, attacked);
-    attacked.onAttacked(game, turnPlayer2, turnPlayer1, attacker);
+    attacker.onAttack(game, this, turnPlayer1, turnPlayer2, attacked);
+    attacked.onAttacked(game, this, turnPlayer2, turnPlayer1, attacker);
     
     handleUnitDeath(isPlayer1Turn, attacker, turnPlayer1, turnPlayer2, attacked);
     handleUnitDeath(!isPlayer1Turn, attacked, turnPlayer2, turnPlayer1, attacker);
@@ -187,7 +225,7 @@ public class Fight
   {
     if (unit.isDead())
     {
-      unit.onDead(game, unitOwner, opponent, otherUnit);
+      unit.onDead(game, this, unitOwner, opponent, otherUnit);
       
       if (unit.isDead())
       {
@@ -273,8 +311,6 @@ public class Fight
   
   void afterFight()
   {
-    player1.inFightTable = null;
-    player2.inFightTable = null;
   }
   
   public Player getPlayer1()

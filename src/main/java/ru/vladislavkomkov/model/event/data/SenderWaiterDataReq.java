@@ -1,9 +1,19 @@
 package ru.vladislavkomkov.model.event.data;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class SenderWaiterDataReq
 {
+  public final static String F_KEY = "key";
+  public final static String F_DATA = "data";
+  
+  
   String key;
   Object data;
+  
+  public SenderWaiterDataReq()
+  {
+  }
   
   public SenderWaiterDataReq(String key, Object data)
   {
@@ -11,6 +21,7 @@ public class SenderWaiterDataReq
     this.data = data;
   }
   
+  @JsonProperty(F_KEY)
   public String getKey()
   {
     return key;
@@ -21,6 +32,7 @@ public class SenderWaiterDataReq
     this.key = key;
   }
   
+  @JsonProperty(F_DATA)
   public Object getData()
   {
     return data;

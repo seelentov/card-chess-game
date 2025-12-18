@@ -24,7 +24,7 @@ public abstract class UnitTestCase extends GamePlayerTestCase
     int money = player.getMoney();
     player.addToTable(unit, 0);
     assertNotNull(player.cloneTable().get(0));
-    unit.onSell(game, player);
+    unit.onSell(game, null, player);
     assertEquals(money + 1, player.getMoney());
     assertEquals(0, player.getUnitsCount());
     
@@ -41,7 +41,7 @@ public abstract class UnitTestCase extends GamePlayerTestCase
     
     if (unit.isRebirth)
     {
-      unit.onDead(game, player, player2, unit2);
+      unit.onDead(game, null, player, player2, unit2);
       assertFalse(unit.isRebirth);
     }
     
@@ -89,20 +89,20 @@ public abstract class UnitTestCase extends GamePlayerTestCase
     boolean unitBeginBubbled = unit.isBubbled;
     boolean unit2BeginBubbled = unit2.isBubbled;
     
-    unit.onAttack(game, player, player2, unit2);
+    unit.onAttack(game, null, player, player2, unit2);
     
     if (unitBeginBubbled)
     {
       assertFalse(unit.isBubbled);
-      unit.onAttack(game, player, player2, unit2);
+      unit.onAttack(game, null, player, player2, unit2);
     }
     
-    unit2.onAttacked(game, player, player2, unit);
+    unit2.onAttacked(game, null, player, player2, unit);
     
     if (unit2BeginBubbled)
     {
       assertFalse(unit2.isBubbled);
-      unit2.onAttacked(game, player, player2, unit);
+      unit2.onAttacked(game, null, player, player2, unit);
     }
     
     assertEquals(unitBeginHP - unit2.getAttack(), unit.getHealth());

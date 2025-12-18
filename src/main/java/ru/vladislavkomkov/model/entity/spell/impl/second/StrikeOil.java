@@ -23,7 +23,7 @@ public class StrikeOil extends Spell
   {
     listener.onPlayedListeners.put(
         KEY_CORE,
-        (game, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto) -> {
+        (game, fight, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto) -> {
           player.incMaxMoney();
         });
   }

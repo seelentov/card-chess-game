@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
+import ru.vladislavkomkov.model.Fight;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.UnitTestCase;
@@ -40,15 +41,28 @@ public class GreenskeeperTest extends UnitTestCase
         }
         
         @Override
-        public void onPlayed(Game game, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2, boolean auto)
+        public void onPlayed(Game game, Fight fight, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2, boolean auto)
         {
           player.addMoney(finalI * moneyStep);
         }
       });
     }
     
-    gk.onAttack(game, player, player2, new Cat());
+    gk.onAttack(game, null, player, player2, new Cat());
     
     assertEquals((moneyStep * (Player.TABLE_LIMIT - 1)) + moneyInit, player.getMoney());
+  }
+  
+  @Test
+  protected void testOnPlayedCat()
+  {
+    Unit gk = new Greenskeeper();
+    
+    player.addToTable(gk);
+    player.addToTable(new Alleycat());
+    
+    gk.onAttack(game, null, player, player2, new Cat());
+    
+    assertEquals(new Cat().getName(), player.getTable().get(2).getName());
   }
 }

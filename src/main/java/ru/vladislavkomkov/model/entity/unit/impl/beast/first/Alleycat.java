@@ -4,6 +4,7 @@ import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
 
 import java.util.List;
 
+import ru.vladislavkomkov.consts.Units;
 import ru.vladislavkomkov.model.entity.unit.Type;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
@@ -27,15 +28,14 @@ public class Alleycat extends Unit
     
     listener.onPlayedListeners.put(
         KEY_CORE,
-        (game, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto) -> {
-          if (player.inFight())
+        (game, fight, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto) -> {
+          if (fight != null)
           {
-            int indexParent = player.getFightIndex(this);
-            player.addToFightTable(new Cat(), indexParent + 1);
+            fight.addToFightTable(player, new Cat(), (Unit) entity);
           }
           else
           {
-            int indexParent = player.getIndex(this);
+            int indexParent = player.getIndex((Unit) entity);
             player.addToTable(new Cat(), indexParent + 1);
           }
         });
@@ -49,15 +49,14 @@ public class Alleycat extends Unit
     gold.setDescription("Summon a 2/2 Cat");
     gold.getListener().onPlayedListeners.put(
         KEY_CORE,
-        (game, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto) -> {
-          if (player.inFight())
+        (game, fight, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto) -> {
+          if (fight != null)
           {
-            int indexParent = player.getFightIndex(gold);
-            player.addToFightTable(new Cat().newGold(), indexParent + 1);
+            fight.addToFightTable(player, new Cat().newGold(), (Unit) entity);
           }
           else
           {
-            int indexParent = player.getIndex(gold);
+            int indexParent = player.getIndex((Unit) entity);
             player.addToTable(new Cat().newGold(), indexParent + 1);
           }
         });

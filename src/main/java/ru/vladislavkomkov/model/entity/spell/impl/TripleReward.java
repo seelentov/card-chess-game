@@ -2,6 +2,7 @@ package ru.vladislavkomkov.model.entity.spell.impl;
 
 import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,8 +34,20 @@ public class TripleReward extends Spell
   {
     listener.onPlayedListeners.put(
         KEY_CORE,
-        (game, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto) -> {
+        (game, fight, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto) -> {
           List<Unit> allUnits = UnitUtils.getByTavern(player.getLevel(), player.getTavern().getUnitsPool());
+          
+          if (allUnits.isEmpty())
+          {
+            throw new RuntimeException("Units list for reward is empty");
+          }
+          
+          while (allUnits.size() < 3)
+          {
+            allUnits = new ArrayList<>(allUnits);
+            allUnits.add(allUnits.get(0).newThis());
+          }
+          
           Set<Integer> setInts = new HashSet<>();
           while (setInts.size() < 3)
           {

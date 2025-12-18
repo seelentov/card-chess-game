@@ -6,6 +6,7 @@ import java.util.List;
 
 import ru.vladislavkomkov.model.entity.unit.Type;
 import ru.vladislavkomkov.model.entity.unit.Unit;
+import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cubling;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.demon.first.Imp;
 
 public class IckyImp extends Unit
@@ -25,21 +26,20 @@ public class IckyImp extends Unit
     
     listener.onDeadListeners.put(
         KEY_CORE,
-        (game, player, player2, unit, attacker) -> {
-          if (player.inFight())
+        (game, fight, player, player2, unit, attacker) -> {
+          if (fight != null)
           {
-            int index = player.getFightIndex(this);
             for (int i = 0; i < 2; i++)
             {
-              player.addToFightTable(new Imp(), index + 1, true);
+              fight.addToFightTable(player, new Imp(), unit, true);
             }
           }
           else
           {
-            int index = player.getIndex(this);
+            int index = player.getIndex(unit);
             for (int i = 0; i < 2; i++)
             {
-              player.addToTable(new Imp(), index + 1);
+              player.addToTable(new Imp(), index + 1, true);
             }
           }
         });
@@ -52,18 +52,17 @@ public class IckyImp extends Unit
     gold.setDescription("Deathrattle: Summon two 2/2 Imps");
     gold.getListener().onDeadListeners.put(
         KEY_CORE,
-        (game, player, player2, uni1, attacker) -> {
-          if (player.inFight())
+        (game, fight, player, player2, unit1, attacker) -> {
+          if (fight != null)
           {
-            int index = player.getFightIndex(gold);
             for (int i = 0; i < 2; i++)
             {
-              player.addToFightTable(new Imp().newGold(), index + 1, true);
+              fight.addToFightTable(player, new Imp().newGold(), unit1);
             }
           }
           else
           {
-            int index = player.getIndex(gold);
+            int index = player.getIndex(unit1);
             for (int i = 0; i < 2; i++)
             {
               player.addToTable(new Imp().newGold(), index + 1);

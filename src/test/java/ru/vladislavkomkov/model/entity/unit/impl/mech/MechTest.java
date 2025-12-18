@@ -79,16 +79,16 @@ public class MechTest extends GamePlayerTestCase
     Unit unit = new AccordoTron();
     unit.getListener().onAttackListeners.put(
         Listeners.KEY_CORE,
-        (game1, player1, player3, unit1, attacked) -> player1.addMoney(moneyStep));
+        (game1, fight, player1, player3, unit1, attacked) -> player1.addMoney(moneyStep));
     
     Unit unit2 = new AccordoTron();
     unit2.getListener().onAttackListeners.put(
         Listeners.KEY_CORE,
-        (game1, player1, player3, unit1, attacked) -> player.addMoney(moneyStep));
+        (game1, fight, player1, player3, unit1, attacked) -> player.addMoney(moneyStep));
     
     unit.magnetize(unit2);
     
-    unit.onAttack(game, player, player2, new Cat());
+    unit.onAttack(game, null,player, player2, new Cat());
     assertEquals(moneyStep * 2 + initMoney, player.getMoney());
   }
   
@@ -101,14 +101,14 @@ public class MechTest extends GamePlayerTestCase
     Unit unit = new AccordoTron();
     unit.getListener().onStartTurnListeners.put(
         Listeners.KEY_CORE,
-        (game1, player1) -> player1.addMoney(moneyStep));
+        (game1, fight, player1) -> player1.addMoney(moneyStep));
     
     player.addToTable(unit);
     
     Unit unit2 = new AccordoTron();
     unit2.getListener().onStartTurnListeners.put(
         Listeners.KEY_CORE,
-        (game1, player1) -> player1.addMoney(moneyStep));
+        (game1, fight, player1) -> player1.addMoney(moneyStep));
     
     unit.magnetize(unit2);
     

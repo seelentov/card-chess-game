@@ -11,6 +11,7 @@ import java.util.Objects;
 import org.junit.jupiter.api.Test;
 
 import ru.vladislavkomkov.GamePlayerTestCase;
+import ru.vladislavkomkov.model.Fight;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.spell.Spell;
@@ -57,7 +58,7 @@ public class PlayerTest extends GamePlayerTestCase
       }
       
       @Override
-      public void onPlayed(Game game, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2, boolean auto)
+      public void onPlayed(Game game, Fight fight, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2, boolean auto)
       {
         player.addMoney(moneyTest);
       }
@@ -310,7 +311,7 @@ public class PlayerTest extends GamePlayerTestCase
     Unit unit = new Cat();
     player.addToTable(unit);
     
-    new DeepBlues().onPlayed(game, player, 0);
+    new DeepBlues().onPlayed(game, null, player, 0);
     
     player.addToHand(Card.of(new Cat()));
     assertEquals(1, player.hand.size());

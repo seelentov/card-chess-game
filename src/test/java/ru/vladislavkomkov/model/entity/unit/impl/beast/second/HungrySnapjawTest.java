@@ -23,9 +23,9 @@ public class HungrySnapjawTest extends UnitTestCase
     player.addToTable(cat);
     Unit hs = new HungrySnapjaw();
     player.addToTable(hs);
-    hs.onPlayed(game, player);
+    hs.onPlayed(game, null,player);
     
-    cat.onDead(game, player, player2, new Cat());
+    cat.onDead(game, null,player, player2, new Cat());
     
     assertEquals(new HungrySnapjaw().getHealth() + HungrySnapjaw.ATTACK_BOOST, hs.getHealth());
   }
@@ -37,9 +37,9 @@ public class HungrySnapjawTest extends UnitTestCase
     player.addToTable(cat);
     Unit hs = new HungrySnapjaw().buildGold();
     player.addToTable(hs);
-    hs.onPlayed(game, player);
+    hs.onPlayed(game, null,player);
     
-    cat.onDead(game, player, player2, new Cat());
+    cat.onDead(game, null,player, player2, new Cat());
     
     assertEquals(new HungrySnapjaw().getHealth() + (HungrySnapjaw.ATTACK_BOOST * 2), hs.getHealth());
   }

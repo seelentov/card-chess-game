@@ -28,7 +28,7 @@ import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.ListenerUtils;
 import ru.vladislavkomkov.util.UUIDUtils;
 
-public class Listener
+public class Listener implements Cloneable
 {
   public Map<String, OnPlayedAction> onPlayedListeners = new HashMap<>();
   public Map<String, OnHandledAction> onHandledListeners = new HashMap<>();
@@ -118,6 +118,7 @@ public class Listener
   
   public void processOnPlayedListeners(
       Game game,
+      Fight fight,
       Player player,
       Entity entity,
       int index,
@@ -129,19 +130,20 @@ public class Listener
     ListenerUtils.processActionListeners(
         onPlayedListeners,
         player,
-        (action) -> action.process(game, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto));
+        (action) -> action.process(game, fight, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto));
   }
   
-  public void processOnHandledListeners(Game game, Player player, Entity entity)
+  public void processOnHandledListeners(Game game, Fight fight, Player player, Entity entity)
   {
     ListenerUtils.processActionListeners(
         onHandledListeners,
         player,
-        (action) -> action.process(game, player, entity));
+        (action) -> action.process(game, fight, player, entity));
   }
   
   public void processOnAttackListeners(
       Game game,
+      Fight fight,
       Player player1,
       Player player2,
       Unit unit,
@@ -150,11 +152,12 @@ public class Listener
     ListenerUtils.processActionListeners(
         onAttackListeners,
         player1,
-        (action) -> action.process(game, player1, player2, unit, attacked));
+        (action) -> action.process(game, fight, player1, player2, unit, attacked));
   }
   
   public void processOnAttackedListeners(
       Game game,
+      Fight fight,
       Player player1,
       Player player2,
       Unit unit,
@@ -163,11 +166,12 @@ public class Listener
     ListenerUtils.processActionListeners(
         onAttackedListeners,
         player1,
-        (action) -> action.process(game, player1, player2, unit, attacker));
+        (action) -> action.process(game, fight, player1, player2, unit, attacker));
   }
   
   public void processOnDeadListeners(
       Game game,
+      Fight fight,
       Player player1,
       Player player2,
       Unit unit,
@@ -176,77 +180,131 @@ public class Listener
     ListenerUtils.processActionListeners(
         onDeadListeners,
         player1,
-        (action) -> action.process(game, player1, player2, unit, attacker));
+        (action) -> action.process(game, fight, player1, player2, unit, attacker));
   }
   
-  public void processOnSellListeners(Game game, Player player, Entity entity)
+  public void processOnSellListeners(Game game, Fight fight, Player player, Entity entity)
   {
     ListenerUtils.processActionListeners(
         onSellListeners,
         player,
-        (action) -> action.process(game, player, entity));
+        (action) -> action.process(game, fight, player, entity));
   }
   
-  public void processOnStartTurnListeners(Game game, Player player)
+  public void processOnStartTurnListeners(Game game, Fight fight, Player player)
   {
-    processGlobalListeners(onStartTurnListeners, game, player);
+    processGlobalListeners(onStartTurnListeners, game, fight, player);
   }
   
-  public void processOnEndTurnListeners(Game game, Player player)
+  public void processOnEndTurnListeners(Game game, Fight fight, Player player)
   {
-    processGlobalListeners(onEndTurnListeners, game, player);
+    processGlobalListeners(onEndTurnListeners, game, fight, player);
   }
   
-  public void processOnStartFightListeners(Game game, Player player)
+  public void processOnStartFightListeners(Game game, Fight fight, Player player, Player player2)
   {
-    processGlobalListeners(onStartFightListeners, game, player);
+    ListenerUtils.processActionListeners(
+        onStartFightListeners,
+        player,
+        (action) -> action.process(game, fight, player, player2));
   }
   
-  public void processOnEndFightListeners(Game game, Player player)
+  public void processOnEndFightListeners(Game game, Fight fight, Player player, Player player2)
   {
-    processGlobalListeners(onEndFightListeners, game, player);
+    ListenerUtils.processActionListeners(
+        onEndFightListeners,
+        player,
+        (action) -> action.process(game, fight, player, player2));
   }
   
-  public void processOnResetTavernListeners(Game game, Player player)
+  public void processOnResetTavernListeners(Game game, Fight fight, Player player)
   {
-    processGlobalListeners(onResetTavernListeners, game, player);
+    processGlobalListeners(onResetTavernListeners, game, fight, player);
   }
   
-  public void processOnIncTavernLevelListener(Game game, Player player)
+  public void processOnIncTavernLevelListener(Game game, Fight fight, Player player)
   {
-    processGlobalListeners(onIncLevelListeners, game, player);
+    processGlobalListeners(onIncLevelListeners, game, fight, player);
   }
   
-  public void processOnAppearListeners(Game game, Player player, Entity entity)
+  public void processOnAppearListeners(Game game, Fight fight, Player player, Entity entity)
   {
-    processPrepareListeners(onAppearListeners, game, player, entity);
+    processPrepareListeners(onAppearListeners, game, fight, player, entity);
   }
   
-  public void processOnDisappearListeners(Game game, Player player, Entity entity)
+  public void processOnDisappearListeners(Game game, Fight fight, Player player, Entity entity)
   {
-    processPrepareListeners(onDisappearListeners, game, player, entity);
+    processPrepareListeners(onDisappearListeners, game, fight, player, entity);
   }
   
   <T extends GlobalAction> void processGlobalListeners(
       Map<String, T> listeners,
       Game game,
+      Fight fight,
       Player player)
   {
     ListenerUtils.processActionListeners(
         listeners,
         player,
-        (action) -> action.process(game, player));
+        (action) -> action.process(game, fight, player));
   }
   
   <T extends PrepareAction> void processPrepareListeners(
       Map<String, T> listeners,
       Game game,
+      Fight fight,
       Player player,
       Entity entity)
   {
     ListenerUtils.processActionListeners(
         listeners,
         player,
-        (action) -> action.process(game, player, entity));
+        (action) -> action.process(game, fight, player, entity));
+  }
+  
+  @Override
+  public Listener clone()
+  {
+    try
+    {
+      Listener clonedInstance = (Listener) super.clone();
+      
+      clonedInstance.onPlayedListeners = new HashMap<>(this.onPlayedListeners);
+      clonedInstance.onHandledListeners = new HashMap<>(this.onHandledListeners);
+      clonedInstance.onAttackListeners = new HashMap<>(this.onAttackListeners);
+      clonedInstance.onAttackedListeners = new HashMap<>(this.onAttackedListeners);
+      clonedInstance.onDeadListeners = new HashMap<>(this.onDeadListeners);
+      clonedInstance.onSellListeners = new HashMap<>(this.onSellListeners);
+      clonedInstance.onStartTurnListeners = new HashMap<>(this.onStartTurnListeners);
+      clonedInstance.onEndTurnListeners = new HashMap<>(this.onEndTurnListeners);
+      clonedInstance.onStartFightListeners = new HashMap<>(this.onStartFightListeners);
+      clonedInstance.onEndFightListeners = new HashMap<>(this.onEndFightListeners);
+      clonedInstance.onResetTavernListeners = new HashMap<>(this.onResetTavernListeners);
+      clonedInstance.onIncLevelListeners = new HashMap<>(this.onIncLevelListeners);
+      clonedInstance.onAppearListeners = new HashMap<>(this.onAppearListeners);
+      clonedInstance.onDisappearListeners = new HashMap<>(this.onDisappearListeners);
+      
+      clonedInstance.listeners = List.of(
+          clonedInstance.onPlayedListeners,
+          clonedInstance.onHandledListeners,
+          clonedInstance.onAttackListeners,
+          clonedInstance.onAttackedListeners,
+          clonedInstance.onDeadListeners,
+          clonedInstance.onSellListeners,
+          clonedInstance.onStartTurnListeners,
+          clonedInstance.onEndTurnListeners,
+          clonedInstance.onStartFightListeners,
+          clonedInstance.onEndFightListeners,
+          clonedInstance.onResetTavernListeners,
+          clonedInstance.onIncLevelListeners,
+          clonedInstance.onAppearListeners,
+          clonedInstance.onDisappearListeners);
+      
+      return clonedInstance;
+    }
+    catch (CloneNotSupportedException e)
+    {
+      throw new AssertionError("Clone not supported", e);
+    }
   }
 }

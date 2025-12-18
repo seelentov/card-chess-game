@@ -34,7 +34,7 @@ public class DeepBlues extends SpellCraft
     
     listener.onPlayedListeners.put(
         KEY_CORE,
-        (game, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto) -> {
+        (game, fight, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto) -> {
           
           int multi = calcMulti(player);
           int attackBonus = getAttackBoost(multi);
@@ -70,12 +70,6 @@ public class DeepBlues extends SpellCraft
   {
     int casted = player.statistic.played.onlyBluesPlayed;
     return casted + 1;
-  }
-  
-  @Override
-  public void onPlayed(Game game, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2, boolean auto)
-  {
-    super.onPlayed(game, player, index, isTavernIndex, index2, isTavernIndex2, auto);
   }
   
   @Override

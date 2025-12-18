@@ -25,14 +25,14 @@ public class Greenskeeper extends Unit
     
     listener.onAttackListeners.put(
         KEY_CORE,
-        (game, player, player2, unit1, attacked) -> {
-          List<Unit> units = player.inFightTable != null ? player.inFightTable : player.cloneTable();
+        (game, fight, player, player2, unit1, attacked) -> {
+          List<Unit> units = fight != null ? fight.getFightTable(player) : player.getTable();
           for (int i = units.size() - 1; i >= 0; i--)
           {
             Unit unit = units.get(i);
             if (unit.isAnswerOnPlayed())
             {
-              unit.onPlayed(game, player, RandUtils.getRand(units.size()), RandUtils.getRand(units.size()));
+              unit.onPlayed(game, fight, player, RandUtils.getRand(units.size()), RandUtils.getRand(units.size()));
               break;
             }
           }
@@ -46,15 +46,15 @@ public class Greenskeeper extends Unit
     gold.setDescription("Rally: Trigger your right-most Battlecry twice");
     gold.getListener().onAttackListeners.put(
         KEY_CORE,
-        (game, player, player2, unit1, attacked) -> {
-          List<Unit> units = player.inFightTable != null ? player.inFightTable : player.cloneTable();
+        (game, fight, player, player2, unit1, attacked) -> {
+            List<Unit> units = fight != null ? fight.getFightTable(player) : player.cloneTable();
           for (int i = units.size() - 1; i >= 0; i--)
           {
             Unit u = units.get(i);
             if (u.isAnswerOnPlayed())
             {
-              u.onPlayed(game, player, RandUtils.getRand(units.size()), RandUtils.getRand(units.size()));
-              u.onPlayed(game, player, RandUtils.getRand(units.size()), RandUtils.getRand(units.size()));
+              u.onPlayed(game, fight, player, RandUtils.getRand(units.size()), RandUtils.getRand(units.size()));
+              u.onPlayed(game, fight, player, RandUtils.getRand(units.size()), RandUtils.getRand(units.size()));
               break;
             }
           }

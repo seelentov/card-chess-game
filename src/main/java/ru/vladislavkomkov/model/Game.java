@@ -9,11 +9,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import ru.vladislavkomkov.controller.sender.Sender;
+import ru.vladislavkomkov.model.entity.Entity;
 import ru.vladislavkomkov.model.event.Event;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.ListenerUtils;
@@ -28,7 +30,7 @@ public class Game implements AutoCloseable
   final String uuid;
   final ExecutorService executor = Executors.newFixedThreadPool(FIGHTS_COUNT);
   final List<Fight> fights = new ArrayList<>();
-  final List<Fight.Info> fightHistory = new ArrayList<>();
+  final List<Fight.Info> fightHistory = new CopyOnWriteArrayList<>();
   final Map<String, Player> players;
   
   State state = State.LOBBY;
@@ -95,7 +97,8 @@ public class Game implements AutoCloseable
     {
       if (turn != 1)
       {
-        if(player.getMaxMoneyBase() < Player.MAX_MONEY){
+        if (player.getMaxMoneyBase() < Player.MAX_MONEY)
+        {
           player.incMaxMoney();
         }
         player.statistic.counters.incrementIncLevelDecreaser();
@@ -129,7 +132,7 @@ public class Game implements AutoCloseable
         Player player = isPlayerFirst ? fight.getPlayer1() : fight.getPlayer2();
         Player player2 = isPlayerFirst ? fight.getPlayer2() : fight.getPlayer1();
         
-        processStartFight(player, player2);
+        processStartFight(fight, player, player2);
         
         Optional<Fight.Info> result;
         do
@@ -138,9 +141,9 @@ public class Game implements AutoCloseable
         }
         while (result.isEmpty());
         
-        fightHistory.add(result.get());
-        processEndFight(player, player2);
+        processEndFight(fight, player, player2);
         
+        fightHistory.add(result.get());
         return null;
       }, executor));
     }
@@ -266,29 +269,29 @@ public class Game implements AutoCloseable
   
   public void processStartTurn(Player player)
   {
-    ListenerUtils.processGlobalActionListeners(player.listener.onStartTurnListeners, this, player);
-    player.doForAll(unit -> unit.onStartTurn(this, player));
+    ListenerUtils.processGlobalActionListeners(player.listener.onStartTurnListeners, this, null, player);
+    player.doForAll(unit -> unit.onStartTurn(this, null, player));
     player.removeTempBuffs();
     player.calcTriplets();
   }
   
   public void processEndTurn(Player player)
   {
-    ListenerUtils.processGlobalActionListeners(player.listener.onEndTurnListeners, this, player);
+    ListenerUtils.processGlobalActionListeners(player.listener.onEndTurnListeners, this, null, player);
     player.clearSpellCraft();
-    player.doForAll(unit -> unit.onEndTurn(this, player));
+    player.doForAll(unit -> unit.onEndTurn(this, null, player));
   }
   
-  public void processStartFight(Player player, Player player2)
+  public void processStartFight(Fight fight, Player player, Player player2)
   {
-    ListenerUtils.processGlobalActionListeners(player.listener.onStartFightListeners, this, player);
-    player.doForAll(unit -> unit.onStartFight(this, player, player2));
+    ListenerUtils.processFightActionListeners(player.listener.onStartFightListeners, this, fight, player, player2);
+    player.doForAll(unit -> unit.onStartFight(this, fight, player, player2));
   }
   
-  public void processEndFight(Player player, Player player2)
+  public void processEndFight(Fight fight, Player player, Player player2)
   {
-    ListenerUtils.processGlobalActionListeners(player.listener.onEndFightListeners, this, player);
-    player.doForAll(unit -> unit.onEndFight(this, player, player2));
+    ListenerUtils.processFightActionListeners(player.listener.onEndFightListeners, this, fight, player, player2);
+    player.doForAll(unit -> unit.onEndFight(this, fight, player, player2));
   }
   
   Player getPlayer(String uuid)

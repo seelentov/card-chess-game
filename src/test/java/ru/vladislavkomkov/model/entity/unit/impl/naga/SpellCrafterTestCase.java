@@ -28,7 +28,7 @@ public class SpellCrafterTestCase extends UnitTestCase
   {
     setUp();
     
-    spellCrafter.onPlayed(game, player, 0);
+    spellCrafter.onPlayed(game, null, player, 0);
     assertEquals(player.cloneHand().get(0).getEntity().getName(), spellCrafter.getSpellcraft().getName());
     
     tearDown();

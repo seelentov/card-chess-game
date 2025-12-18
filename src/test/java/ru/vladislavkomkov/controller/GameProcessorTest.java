@@ -2,11 +2,13 @@ package ru.vladislavkomkov.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.junit.jupiter.api.AfterEach;
@@ -17,11 +19,15 @@ import ru.vladislavkomkov.controller.sender.MockConsumer;
 import ru.vladislavkomkov.controller.sender.MockSender;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.card.Card;
+import ru.vladislavkomkov.model.entity.Entity;
+import ru.vladislavkomkov.model.entity.spell.Spell;
+import ru.vladislavkomkov.model.entity.spell.impl.TripleReward;
 import ru.vladislavkomkov.model.entity.spell.impl.second.StrikeOil;
 import ru.vladislavkomkov.model.entity.unit.impl.beast.first.Alleycat;
 import ru.vladislavkomkov.model.entity.unit.impl.mech.fourth.AccordoTron;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
 import ru.vladislavkomkov.model.event.Event;
+import ru.vladislavkomkov.model.event.data.SenderWaiterDataRes;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.model.player.Tavern;
 
@@ -158,21 +164,12 @@ public class GameProcessorTest
   }
   
   @Test
-  void testBuyPlaySell() throws Exception
+  void testPlaySell() throws Exception
   {
     gameProcessor.processPreFight();
     
-    players.values().forEach(player -> player.setMoney(player.getBuyPrice()));
-    
-    for (Player player : players.values()) {
-      eventDispatcher.process(new Event(gameUUID, player.getUUID(), Event.Type.BUY, 0));
-    }
-
-    players.values().forEach(player -> assertEquals(0, player.getMoney()));
-    playerConsumers.values().forEach(consumer -> assertEquals(0, consumer.gold));
-
-    players.values().forEach(player -> assertEquals(1, player.getHand().size()));
-    playerConsumers.values().forEach(consumer -> assertEquals(1, consumer.hand.size()));
+    players.values().forEach(player -> player.getHand().add(Card.of(new Cat())));
+    players.values().forEach(player -> player.setMoney(0));
     
     for (Player player : players.values()) {
       eventDispatcher.process(new Event(gameUUID, player.getUUID(), Event.Type.PLAY, List.of(0,0,0,0,0)));
@@ -191,6 +188,23 @@ public class GameProcessorTest
     playerConsumers.values().forEach(consumer -> assertEquals(0, consumer.table.size()));
     players.values().forEach(player -> assertEquals(1, player.getMoney()));
     playerConsumers.values().forEach(consumer -> assertEquals(1, consumer.gold));
+  }
+  
+  @Test
+  void testBuy() throws Exception {
+    gameProcessor.processPreFight();
+    
+    players.values().forEach(player -> player.setMoney(player.getBuyPrice()));
+    
+    for (Player player : players.values()) {
+      eventDispatcher.process(new Event(gameUUID, player.getUUID(), Event.Type.BUY, 0));
+    }
+    
+    players.values().forEach(player -> assertEquals(0, player.getMoney()));
+    playerConsumers.values().forEach(consumer -> assertEquals(0, consumer.gold));
+    
+    players.values().forEach(player -> assertEquals(1, player.getHand().size()));
+    playerConsumers.values().forEach(consumer -> assertEquals(1, consumer.hand.size()));
   }
 
   @Test
@@ -314,5 +328,27 @@ public class GameProcessorTest
     
     assertEquals(maxMoneyInit+1, player1.getMaxMoney());
     assertEquals(maxMoneyInit+1, player1Consumer.maxGold);
+  }
+  
+  @Test
+  void testReqRes() throws Exception
+  {
+    gameProcessor.process();
+    
+    Spell tripleReward = new TripleReward();
+    tripleReward.build();
+    player1.addToHand(Card.of(tripleReward));
+    
+    assertEquals(new TripleReward().getName(), ((Map)(player1Consumer.hand.get(0).get(Card.F_ENTITY))).get(Entity.F_NAME));
+
+    eventDispatcher.process(new Event(gameUUID, player1.getUUID(), Event.Type.PLAY, List.of(0,0,0,0,0)));
+
+    Optional<String> key = player1Consumer.waiters.keySet().stream().findFirst();
+    assertTrue(key.isPresent());
+
+    assertTrue(player1Consumer.hand.isEmpty());
+    
+    eventDispatcher.process(new Event(gameUUID, player1.getUUID(), Event.Type.RES, new SenderWaiterDataRes(key.get(), 0)));
+    assertNotEquals(new TripleReward().getName(), ((Map)(player1Consumer.hand.get(0).get(Card.F_ENTITY))).get(Entity.F_NAME));
   }
 }
