@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import ru.vladislavkomkov.consts.Listeners;
-import ru.vladislavkomkov.model.Fight;
+import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.Listener;
 import ru.vladislavkomkov.model.player.Player;

@@ -15,8 +15,9 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import ru.vladislavkomkov.controller.sender.Sender;
-import ru.vladislavkomkov.model.entity.Entity;
 import ru.vladislavkomkov.model.event.Event;
+import ru.vladislavkomkov.model.fight.Fight;
+import ru.vladislavkomkov.model.fight.FightInfo;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.ListenerUtils;
 import ru.vladislavkomkov.util.RandUtils;
@@ -30,7 +31,7 @@ public class Game implements AutoCloseable
   final String uuid;
   final ExecutorService executor = Executors.newFixedThreadPool(FIGHTS_COUNT);
   final List<Fight> fights = new ArrayList<>();
-  final List<Fight.Info> fightHistory = new CopyOnWriteArrayList<>();
+  final List<FightInfo> fightHistory = new CopyOnWriteArrayList<>();
   final Map<String, Player> players;
   
   State state = State.LOBBY;
@@ -134,7 +135,7 @@ public class Game implements AutoCloseable
         
         processStartFight(fight, player, player2);
         
-        Optional<Fight.Info> result;
+        Optional<FightInfo> result;
         do
         {
           result = fight.doTurn();
@@ -181,7 +182,7 @@ public class Game implements AutoCloseable
       fightCounts.put(player.getUUID(), new HashMap<>());
     }
     
-    for (Fight.Info fightInfo : fightHistory)
+    for (FightInfo fightInfo : fightHistory)
     {
       String p1 = fightInfo.player1.getUUID();
       String p2 = fightInfo.player2.getUUID();

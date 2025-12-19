@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import ru.vladislavkomkov.consts.Listeners;
-import ru.vladislavkomkov.model.Fight;
+import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.action.FightAction;
 import ru.vladislavkomkov.model.action.GlobalAction;

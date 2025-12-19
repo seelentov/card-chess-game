@@ -24,6 +24,7 @@ import ru.vladislavkomkov.model.action.OnStartTurnAction;
 import ru.vladislavkomkov.model.action.PrepareAction;
 import ru.vladislavkomkov.model.entity.Entity;
 import ru.vladislavkomkov.model.entity.unit.Unit;
+import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.ListenerUtils;
 import ru.vladislavkomkov.util.UUIDUtils;

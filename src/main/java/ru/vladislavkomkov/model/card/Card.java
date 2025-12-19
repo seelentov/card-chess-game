@@ -2,7 +2,6 @@ package ru.vladislavkomkov.model.card;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import ru.vladislavkomkov.model.Fight;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.entity.Entity;
 import ru.vladislavkomkov.model.entity.spell.Spell;

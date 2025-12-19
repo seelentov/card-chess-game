@@ -1,17 +1,17 @@
-package ru.vladislavkomkov.model;
+package ru.vladislavkomkov.model.fight;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.entity.unit.Unit;
-import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.RandUtils;
 
 public class Fight
 {
-  static final int TURN_LIMIT = 10000;
+  public static final int TURN_LIMIT = 10000;
   
   final Game game;
   final Player player1;
@@ -33,7 +33,8 @@ public class Fight
     setup();
   }
   
-  public void addToFightTable(Player player, Unit unit, Unit parent){
+  public void addToFightTable(Player player, Unit unit, Unit parent)
+  {
     addToFightTable(player, unit, parent, false);
   }
   
@@ -73,12 +74,12 @@ public class Fight
     }
   }
   
-  public Optional<Info> doTurn()
+  public Optional<FightInfo> doTurn()
   {
     if (turn >= TURN_LIMIT)
     {
       afterFight();
-      return Optional.of(new Info(player1, player2, Info.Result.DRAW, 0));
+      return Optional.of(new FightInfo(player1, player2, FightInfo.Result.DRAW, 0));
     }
     
     if (player1Units.isEmpty() || player2Units.isEmpty())
@@ -128,12 +129,12 @@ public class Fight
     }
   }
   
-  Optional<Info> handleFightEnd()
+  Optional<FightInfo> handleFightEnd()
   {
     if (player1Units.isEmpty() && player2Units.isEmpty())
     {
       afterFight();
-      return Optional.of(new Info(player1, player2, Info.Result.DRAW, 0));
+      return Optional.of(new FightInfo(player1, player2, FightInfo.Result.DRAW, 0));
     }
     
     boolean isPlayer1Win = player2Units.isEmpty();
@@ -146,11 +147,11 @@ public class Fight
     
     afterFight();
     
-    Info.Result result = isPlayer1Win ? Info.Result.PLAYER1_WIN : Info.Result.PLAYER2_WIN;
-    return Optional.of(new Info(player1, player2, result, damage));
+    FightInfo.Result result = isPlayer1Win ? FightInfo.Result.PLAYER1_WIN : FightInfo.Result.PLAYER2_WIN;
+    return Optional.of(new FightInfo(player1, player2, result, damage));
   }
   
-  Optional<Info> processTurn(boolean isPlayer1Turn)
+  Optional<FightInfo> processTurn(boolean isPlayer1Turn)
   {
     Optional<Unit> attackerOpt = findAttacker(isPlayer1Turn);
     Optional<Unit> attackedOpt = getRandAttackedUnit(isPlayer1Turn ? player2Units : player1Units);
@@ -313,6 +314,11 @@ public class Fight
   {
   }
   
+  public int getTurn()
+  {
+    return turn;
+  }
+  
   public Player getPlayer1()
   {
     return player1;
@@ -323,26 +329,13 @@ public class Fight
     return player2;
   }
   
-  public static class Info
+  public List<Unit> getPlayer1Units()
   {
-    public final Player player1;
-    public final Player player2;
-    public final Result result;
-    public final int damage;
-    
-    public Info(Player player1, Player player2, Result result, int damage)
-    {
-      this.player1 = player1;
-      this.player2 = player2;
-      this.result = result;
-      this.damage = damage;
-    }
-    
-    public enum Result
-    {
-      PLAYER1_WIN,
-      PLAYER2_WIN,
-      DRAW
-    }
+    return player1Units;
+  }
+  
+  public List<Unit> getPlayer2Units()
+  {
+    return player2Units;
   }
 }
