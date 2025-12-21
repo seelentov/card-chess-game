@@ -10,6 +10,7 @@ import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.Entity;
 import ru.vladislavkomkov.model.entity.spell.impl.TripleReward;
+import ru.vladislavkomkov.model.fight.FightEvent;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.UUIDUtils;
 
@@ -152,6 +153,11 @@ public abstract class Unit extends Entity
     return maxHealth;
   }
   
+  public void setMaxHealth(int maxHealth)
+  {
+    this.maxHealth = maxHealth;
+  }
+  
   public void incHealth(int i)
   {
     maxHealth += i;
@@ -280,61 +286,91 @@ public abstract class Unit extends Entity
   public void onSell(Game game, Fight fight, Player player)
   {
     listener.processOnSellListeners(game, fight, player, this);
+    if (fight != null)
+    {
+      fight.addToHistory(FightEvent.Type.ON_SELL, player, List.of(this));
+    }
   }
   
   public void onStartTurn(Game game, Fight fight, Player player)
   {
     listener.processOnStartTurnListeners(game, fight, player);
+    if (fight != null)
+    {
+      fight.addToHistory(FightEvent.Type.ON_START_TURN, player, List.of(this));
+    }
   }
   
   public void onEndTurn(Game game, Fight fight, Player player)
   {
     listener.processOnEndTurnListeners(game, fight, player);
+    if (fight != null)
+    {
+      fight.addToHistory(FightEvent.Type.ON_END_TURN, player, List.of(this));
+    }
   }
   
   public void onStartFight(Game game, Fight fight, Player player, Player player2)
   {
     listener.processOnStartFightListeners(game, fight, player, player2);
+    if (fight != null)
+    {
+      fight.addToHistory(FightEvent.Type.ON_START_FIGHT, player, List.of(this));
+    }
   }
   
   public void onEndFight(Game game, Fight fight, Player player, Player player2)
   {
     listener.processOnEndFightListeners(game, fight, player, player2);
+    if (fight != null)
+    {
+      fight.addToHistory(FightEvent.Type.ON_END_FIGHT, player, List.of(this));
+    }
   }
   
   public void onAttacked(Game game, Fight fight, Player player, Player player2, Unit attacker)
   {
     listener.processOnAttackedListeners(game, fight, player, player2, this, attacker);
+    if (fight != null)
+    {
+      fight.addToHistory(FightEvent.Type.ON_ATTACKED, player, List.of(this, attacker));
+    }
   }
   
   public void onAttack(Game game, Fight fight, Player player, Player player2, Unit attacked)
   {
     listener.processOnAttackListeners(game, fight, player, player2, this, attacked);
+    if (fight != null)
+    {
+      fight.addToHistory(FightEvent.Type.ON_ATTACK, player, List.of(this, attacked));
+    }
   }
   
   public void onDead(Game game, Fight fight, Player player, Player player2, Unit attacker)
   {
     listener.processOnDeadListeners(game, fight, player, player2, this, attacker);
+    if (fight != null)
+    {
+      fight.addToHistory(FightEvent.Type.ON_DEAD, player, List.of(this, attacker));
+    }
   }
   
   public void onAppear(Game game, Fight fight, Player player)
   {
     listener.processOnAppearListeners(game, fight, player, this);
+    if (fight != null)
+    {
+      fight.addToHistory(FightEvent.Type.ON_APPEAR, player, List.of(this));
+    }
   }
   
   public void onDisappear(Game game, Fight fight, Player player)
   {
     listener.processOnDisappearListeners(game, fight, player, this);
-  }
-  
-  public void onAppearEnemy(Game game, Fight fight, Player player, Player player2)
-  {
-    listener.processOnAppearListeners(game, fight, player, this);
-  }
-  
-  public void onDisappearEnemy(Game game, Fight fight, Player player, Player player2)
-  {
-    listener.processOnDisappearListeners(game, fight, player, this);
+    if (fight != null)
+    {
+      fight.addToHistory(FightEvent.Type.ON_DISAPPEAR, player, List.of(this));
+    }
   }
   
   @Override

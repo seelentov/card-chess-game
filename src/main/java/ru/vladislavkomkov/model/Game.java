@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import ru.vladislavkomkov.controller.sender.Sender;
 import ru.vladislavkomkov.model.event.Event;
 import ru.vladislavkomkov.model.fight.Fight;
+import ru.vladislavkomkov.model.fight.FightEvent;
 import ru.vladislavkomkov.model.fight.FightInfo;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.ListenerUtils;
@@ -30,7 +31,7 @@ public class Game implements AutoCloseable
   
   final String uuid;
   final ExecutorService executor = Executors.newFixedThreadPool(FIGHTS_COUNT);
-  final List<Fight> fights = new ArrayList<>();
+  List<Fight> fights = new ArrayList<>();
   final List<FightInfo> fightHistory = new CopyOnWriteArrayList<>();
   final Map<String, Player> players;
   
@@ -61,8 +62,13 @@ public class Game implements AutoCloseable
   public String addPlayer()
   {
     String key = UUIDUtils.generateKey();
-    players.put(key, new Player(key, this));
+    addPlayer(key, new Player(key, this));
     return key;
+  }
+  
+  public void addPlayer(String UUID, Player player)
+  {
+    players.put(UUID, player);
   }
   
   public void removePlayer(String key)
@@ -134,6 +140,7 @@ public class Game implements AutoCloseable
         Player player2 = isPlayerFirst ? fight.getPlayer2() : fight.getPlayer1();
         
         processStartFight(fight, player, player2);
+        processStartFight(fight, player2, player);
         
         Optional<FightInfo> result;
         do
@@ -142,9 +149,28 @@ public class Game implements AutoCloseable
         }
         while (result.isEmpty());
         
+        if (!player.isAlive())
+        {
+          player.sendMessage(Event.Type.LOSE);
+        }
+        else if (!player2.isAlive())
+        {
+          player2.sendMessage(Event.Type.LOSE);
+        }
+        
         processEndFight(fight, player, player2);
+        processEndFight(fight, player2, player);
+        
+        fight.addToHistory(FightEvent.Type.END, player, null);
         
         fightHistory.add(result.get());
+        
+        FightInfo info = result.get();
+        
+        player.sendMessage(Event.Type.FIGHT, info);
+        
+        player2.sendMessage(Event.Type.FIGHT, info);
+        
         return null;
       }, executor));
     }
@@ -153,6 +179,11 @@ public class Game implements AutoCloseable
         fightFutures.toArray(new CompletableFuture[0]));
     
     allOf.join();
+  }
+  
+  public void setFights(List<Fight> fights)
+  {
+    this.fights = fights;
   }
   
   public boolean calcFights()
@@ -286,13 +317,14 @@ public class Game implements AutoCloseable
   public void processStartFight(Fight fight, Player player, Player player2)
   {
     ListenerUtils.processFightActionListeners(player.listener.onStartFightListeners, this, fight, player, player2);
-    player.doForAll(unit -> unit.onStartFight(this, fight, player, player2));
+    fight.getFightTable(player).forEach(unit -> unit.onStartFight(this, fight, player, player2));
   }
   
   public void processEndFight(Fight fight, Player player, Player player2)
   {
     ListenerUtils.processFightActionListeners(player.listener.onEndFightListeners, this, fight, player, player2);
-    player.doForAll(unit -> unit.onEndFight(this, fight, player, player2));
+    fight.getFightTable(player).forEach(unit -> unit.onEndFight(this, fight, player, player2));
+    
   }
   
   Player getPlayer(String uuid)

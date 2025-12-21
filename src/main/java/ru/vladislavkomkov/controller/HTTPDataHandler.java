@@ -1,5 +1,6 @@
 package ru.vladislavkomkov.controller;
 
+import java.security.Key;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,11 +33,10 @@ public class HTTPDataHandler
     
     app = Javalin.create();
     
-    app.get("/", this::index);
     app.get("/games", this::getAllGames);
     app.get("/games/{key}", this::getGameByKey);
-    app.post("/games/{key}/start", this::getGameByKey);
-    app.post("/games", this::startGame);
+    app.post("/games/{key}/start", this::startGame);
+    app.post("/games", this::createGame);
   }
   
   public void start()
@@ -48,18 +48,6 @@ public class HTTPDataHandler
   public void stop()
   {
     app.stop();
-  }
-  
-  void index(Context context)
-  {
-    Map<String, Object> response = new HashMap<>();
-    response.put("message", "Game Server API");
-    response.put("endpoints", new String[] {
-        "GET /games - получить все игры",
-        "GET /games/{key} - получить игру по ключу",
-        "POST /games - создать новую игру"
-    });
-    context.json(response);
   }
   
   void getAllGames(Context context)
@@ -84,21 +72,20 @@ public class HTTPDataHandler
   
   void createGame(Context context)
   {
-    String key = UUIDUtils.generateKey();
+    String uuid = UUIDUtils.generateKey();
     
     JWTUtils.generateToken(
-        Map.of(UUID_KEY, key));
+        Map.of(UUID_KEY, uuid));
     
-    Game game = new Game(key);
+    Game game = new Game(uuid);
     
-    games.put(key, game);
+    games.put(uuid, game);
     
-    log.info("Created new game with key: {}", key);
+    log.info("Created new game with uuid: {}", uuid);
     
     Map<String, Object> response = new HashMap<>();
     response.put("message", "Game created successfully");
-    response.put("key", key);
-    response.put("game", game);
+    response.put("uuid", uuid);
     
     context.status(201);
     context.json(response);
@@ -107,9 +94,9 @@ public class HTTPDataHandler
   void startGame(Context context)
   {
     String key = context.pathParam("key");
-    KeyRequest req = context.bodyAsClass(KeyRequest.class);
+    Map req = context.bodyAsClass(Map.class);
     
-    String reqKey = req.getKey();
+    String reqKey = req.get("key").toString();
     String uuid = JWTUtils.extractClaim(reqKey, UUID_KEY);
     
     if (uuid.equals(key))
@@ -128,6 +115,16 @@ public class HTTPDataHandler
   public class KeyRequest
   {
     String key;
+    
+    public KeyRequest()
+    {
+      
+    }
+    
+    public KeyRequest(String key)
+    {
+      this.key = key;
+    }
     
     public String getKey()
     {

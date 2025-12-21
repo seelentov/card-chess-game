@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -481,7 +482,7 @@ public class FightTest extends GamePlayerTestCase
         
         for (Fight fight : game.fights)
         {
-          game.fightHistory.add(new FightInfo(fight.getPlayer1(), fight.getPlayer2(), FightInfo.Result.DRAW, 0));
+          game.fightHistory.add(new FightInfo(fight.getPlayer1(), fight.getPlayer2(), FightInfo.Result.DRAW, 0, new ArrayList<>()));
         }
       }
       

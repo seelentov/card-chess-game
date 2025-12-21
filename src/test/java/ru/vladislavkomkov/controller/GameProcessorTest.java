@@ -3,18 +3,25 @@ package ru.vladislavkomkov.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.function.Consumer;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javassist.bytecode.analysis.Type;
 import ru.vladislavkomkov.controller.sender.MockConsumer;
 import ru.vladislavkomkov.controller.sender.MockSender;
 import ru.vladislavkomkov.model.Game;
@@ -23,13 +30,17 @@ import ru.vladislavkomkov.model.entity.Entity;
 import ru.vladislavkomkov.model.entity.spell.Spell;
 import ru.vladislavkomkov.model.entity.spell.impl.TripleReward;
 import ru.vladislavkomkov.model.entity.spell.impl.second.StrikeOil;
+import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.impl.beast.first.Alleycat;
 import ru.vladislavkomkov.model.entity.unit.impl.mech.fourth.AccordoTron;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
 import ru.vladislavkomkov.model.event.Event;
 import ru.vladislavkomkov.model.event.data.SenderWaiterDataRes;
+import ru.vladislavkomkov.model.fight.Fight;
+import ru.vladislavkomkov.model.fight.FightEvent;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.model.player.Tavern;
+import ru.vladislavkomkov.util.ObjectUtils;
 
 public class GameProcessorTest
 {
@@ -73,35 +84,35 @@ public class GameProcessorTest
     game = new Game(players, gameUUID);
     
     player1 = new Player("1" + UUIDPart, game);
-    player1Consumer = new MockConsumer();
+    player1Consumer = new MockConsumer("1" + UUIDPart);
     player1.setSender(new MockSender(player1Consumer));
     
     player2 = new Player("2" + UUIDPart, game);
-    player2Consumer = new MockConsumer();
+    player2Consumer = new MockConsumer("2" + UUIDPart);
     player2.setSender(new MockSender(player2Consumer));
     
     player3 = new Player("3" + UUIDPart, game);
-    player3Consumer = new MockConsumer();
+    player3Consumer = new MockConsumer("3" + UUIDPart);
     player3.setSender(new MockSender(player3Consumer));
     
     player4 = new Player("4" + UUIDPart, game);
-    player4Consumer = new MockConsumer();
+    player4Consumer = new MockConsumer("4" + UUIDPart);
     player4.setSender(new MockSender(player4Consumer));
     
     player5 = new Player("5" + UUIDPart, game);
-    player5Consumer = new MockConsumer();
+    player5Consumer = new MockConsumer("5" + UUIDPart);
     player5.setSender(new MockSender(player5Consumer));
     
     player6 = new Player("6" + UUIDPart, game);
-    player6Consumer = new MockConsumer();
+    player6Consumer = new MockConsumer("6" + UUIDPart);
     player6.setSender(new MockSender(player6Consumer));
     
     player7 = new Player("7" + UUIDPart, game);
-    player7Consumer = new MockConsumer();
+    player7Consumer = new MockConsumer("7" + UUIDPart);
     player7.setSender(new MockSender(player7Consumer));
     
     player8 = new Player("8" + UUIDPart, game);
-    player8Consumer = new MockConsumer();
+    player8Consumer = new MockConsumer("8" + UUIDPart);
     player8.setSender(new MockSender(player8Consumer));
     
     players.put("1" + UUIDPart, player1);
@@ -171,8 +182,9 @@ public class GameProcessorTest
     players.values().forEach(player -> player.getHand().add(Card.of(new Cat())));
     players.values().forEach(player -> player.setMoney(0));
     
-    for (Player player : players.values()) {
-      eventDispatcher.process(new Event(gameUUID, player.getUUID(), Event.Type.PLAY, List.of(0,0,0,0,0)));
+    for (Player player : players.values())
+    {
+      eventDispatcher.process(new Event(gameUUID, player.getUUID(), Event.Type.PLAY, List.of(0, 0, 0, 0, 0)));
     }
     
     players.values().forEach(player -> assertEquals(0, player.getHand().size()));
@@ -180,7 +192,8 @@ public class GameProcessorTest
     players.values().forEach(player -> assertEquals(1, player.getTable().size()));
     playerConsumers.values().forEach(consumer -> assertEquals(1, consumer.table.size()));
     
-    for (Player player : players.values()) {
+    for (Player player : players.values())
+    {
       eventDispatcher.process(new Event(gameUUID, player.getUUID(), Event.Type.SELL, 0));
     }
     
@@ -191,12 +204,14 @@ public class GameProcessorTest
   }
   
   @Test
-  void testBuy() throws Exception {
+  void testBuy() throws Exception
+  {
     gameProcessor.processPreFight();
     
     players.values().forEach(player -> player.setMoney(player.getBuyPrice()));
     
-    for (Player player : players.values()) {
+    for (Player player : players.values())
+    {
       eventDispatcher.process(new Event(gameUUID, player.getUUID(), Event.Type.BUY, 0));
     }
     
@@ -206,7 +221,7 @@ public class GameProcessorTest
     players.values().forEach(player -> assertEquals(1, player.getHand().size()));
     playerConsumers.values().forEach(consumer -> assertEquals(1, consumer.hand.size()));
   }
-
+  
   @Test
   void testStartArmorHealth() throws Exception
   {
@@ -222,7 +237,8 @@ public class GameProcessorTest
     
     players.values().forEach(player -> player.setMoney(5));
     
-    for (Player player : players.values()) {
+    for (Player player : players.values())
+    {
       eventDispatcher.process(new Event(gameUUID, player.getUUID(), Event.Type.LVL));
     }
     
@@ -241,7 +257,8 @@ public class GameProcessorTest
     
     gameProcessor.process();
     
-    for (Player player : players.values()) {
+    for (Player player : players.values())
+    {
       eventDispatcher.process(new Event(gameUUID, player.getUUID(), Event.Type.RESET_TAVERN));
     }
     
@@ -260,7 +277,8 @@ public class GameProcessorTest
       assertFalse(isFreezed);
     }));
     
-    for (Player player : players.values()) {
+    for (Player player : players.values())
+    {
       eventDispatcher.process(new Event(gameUUID, player.getUUID(), Event.Type.FREEZE));
     }
     
@@ -301,7 +319,7 @@ public class GameProcessorTest
     player1.addToTable(new Alleycat());
     player1.addToTable(new AccordoTron());
     
-    eventDispatcher.process(new Event(gameUUID, player1.getUUID(), Event.Type.MOVE, List.of(0,1)));
+    eventDispatcher.process(new Event(gameUUID, player1.getUUID(), Event.Type.MOVE, List.of(0, 1)));
     
     assertEquals(new Alleycat().getName(), player1.getTable().get(0).getName());
     assertEquals(new Cat().getName(), player1.getTable().get(1).getName());
@@ -324,10 +342,10 @@ public class GameProcessorTest
     int maxMoneyInit = player1.getMaxMoney();
     
     player1.addToHand(Card.of(new StrikeOil()));
-    eventDispatcher.process(new Event(gameUUID, player1.getUUID(), Event.Type.PLAY, List.of(0,0,0,0,0)));
+    eventDispatcher.process(new Event(gameUUID, player1.getUUID(), Event.Type.PLAY, List.of(0, 0, 0, 0, 0)));
     
-    assertEquals(maxMoneyInit+1, player1.getMaxMoney());
-    assertEquals(maxMoneyInit+1, player1Consumer.maxGold);
+    assertEquals(maxMoneyInit + 1, player1.getMaxMoney());
+    assertEquals(maxMoneyInit + 1, player1Consumer.maxGold);
   }
   
   @Test
@@ -339,16 +357,168 @@ public class GameProcessorTest
     tripleReward.build();
     player1.addToHand(Card.of(tripleReward));
     
-    assertEquals(new TripleReward().getName(), ((Map)(player1Consumer.hand.get(0).get(Card.F_ENTITY))).get(Entity.F_NAME));
-
-    eventDispatcher.process(new Event(gameUUID, player1.getUUID(), Event.Type.PLAY, List.of(0,0,0,0,0)));
-
+    assertEquals(new TripleReward().getName(), ((Map) (player1Consumer.hand.get(0).get(Card.F_ENTITY))).get(Entity.F_NAME));
+    
+    eventDispatcher.process(new Event(gameUUID, player1.getUUID(), Event.Type.PLAY, List.of(0, 0, 0, 0, 0)));
+    
     Optional<String> key = player1Consumer.waiters.keySet().stream().findFirst();
     assertTrue(key.isPresent());
-
+    
     assertTrue(player1Consumer.hand.isEmpty());
     
     eventDispatcher.process(new Event(gameUUID, player1.getUUID(), Event.Type.RES, new SenderWaiterDataRes(key.get(), 0)));
-    assertNotEquals(new TripleReward().getName(), ((Map)(player1Consumer.hand.get(0).get(Card.F_ENTITY))).get(Entity.F_NAME));
+    assertNotEquals(new TripleReward().getName(), ((Map) (player1Consumer.hand.get(0).get(Card.F_ENTITY))).get(Entity.F_NAME));
+  }
+  
+  @Test
+  void testFightScenario() throws Exception
+  {
+    player1.setLevel(1);
+    player1.getTable().clear();
+    Cat unit = new Cat();
+    unit.setAttack(10);
+    unit.setHealth(10);
+    player1.getTable().add(unit);
+    
+    player2.setLevel(1);
+    player2.getTable().clear();
+    Cat unit2 = new Cat();
+    player2.getTable().add(unit2);
+    
+    gameProcessor.games.get(gameUUID).setFights(List.of(new Fight(game, player1, player2)));
+    gameProcessor.processFight();
+    
+    //TODO: Start End Fight от FightTable
+    
+    processQueue(player1Consumer);
+    processQueue(player2Consumer);
+    
+    assertEquals(((Player.START_HEALTH + Player.START_ARMOR) - 2), player2.getFullHealth());
+    
+    assertEquals(((Player.START_HEALTH + Player.START_ARMOR) - 2), player2Consumer.health + player2Consumer.armor);
+  }
+  
+  private void processQueue(MockConsumer consumer)
+  {
+    Optional<Map> ev = consumer.processFight();
+    assertTrue(ev.isPresent());
+    
+    Cat catExpected = new Cat();
+    catExpected.setAttack(10);
+    catExpected.setHealth(10);
+    catExpected.setMaxHealth(10);
+    
+    Cat cat2Expected = new Cat();
+    cat2Expected.setAttack(1);
+    cat2Expected.setHealth(1);
+    cat2Expected.setMaxHealth(1);
+    
+    FightEvent evExpected = makeEvent(player1, FightEvent.Type.START, null,
+        List.of(catExpected),
+        List.of(cat2Expected));
+    
+    assertEqualsEvents(ev.get(), evExpected);
+    
+    ev = consumer.processFight();
+    assertTrue(ev.isPresent());
+    
+    evExpected = makeEvent(player1, FightEvent.Type.ON_START_FIGHT, List.of(catExpected),
+            List.of(catExpected),
+            List.of(cat2Expected));
+    
+    assertEqualsEvents(ev.get(), evExpected);
+    
+    ev = consumer.processFight();
+    assertTrue(ev.isPresent());
+    
+    evExpected = makeEvent(player2, FightEvent.Type.ON_START_FIGHT, List.of(cat2Expected),
+            List.of(cat2Expected),
+            List.of(catExpected));
+    
+    assertEqualsEvents(ev.get(), evExpected);
+    
+    ev = consumer.processFight();
+    assertTrue(ev.isPresent());
+    
+    catExpected = new Cat();
+    catExpected.setAttack(10);
+    catExpected.setHealth(9);
+    catExpected.setMaxHealth(10);
+    
+    cat2Expected = new Cat();
+    cat2Expected.setAttack(1);
+    cat2Expected.setHealth(-9);
+    cat2Expected.setMaxHealth(1);
+    evExpected = makeEvent(player1, FightEvent.Type.ON_ATTACK, null,
+        List.of(catExpected),
+        List.of(cat2Expected));
+    
+    assertEqualsEvents(ev.get(), evExpected);
+    
+    ev = consumer.processFight();
+    assertTrue(ev.isPresent());
+    
+    evExpected = makeEvent(player2, FightEvent.Type.ON_ATTACKED, null,
+            List.of(cat2Expected),
+            List.of(catExpected));
+    
+    assertEqualsEvents(ev.get(), evExpected);
+    
+    ev = consumer.processFight();
+    assertTrue(ev.isPresent());
+    
+    evExpected = makeEvent(player2, FightEvent.Type.ON_DEAD, List.of(cat2Expected),
+            List.of(cat2Expected),
+            List.of());
+    
+    assertEqualsEvents(ev.get(), evExpected);
+    
+    ev = consumer.processFight();
+    assertTrue(ev.isPresent());
+    
+    evExpected = makeEvent(player1, FightEvent.Type.ON_END_FIGHT, List.of(catExpected),
+            List.of(catExpected),
+            List.of());
+    
+    assertEqualsEvents(ev.get(), evExpected);
+    
+    ev = consumer.processFight();
+    assertTrue(ev.isPresent());
+    
+    evExpected = makeEvent(player1, FightEvent.Type.END, null,
+            List.of(catExpected),
+            List.of(cat2Expected));
+    
+    assertEqualsEvents(ev.get(), evExpected);
+    
+    ev = consumer.processFight();
+    assertFalse(ev.isPresent());
+  }
+  
+  private FightEvent makeEvent(Player player, FightEvent.Type type, List<Object> data, List list1, List list2)
+  {
+    return new FightEvent(
+        type,
+        list1,
+        list2,
+        data,
+        player);
+  }
+  
+  private void assertEqualsEvents(Map ev, FightEvent evExpected)
+  {
+    assertEquals(ev.get(FightEvent.F_TYPE), evExpected.getType().toString());
+    assertEquals(((Map<String, String>) ev.get(FightEvent.F_PLAYER)).get(Player.F_UUID), evExpected.getPlayer().getUUID());
+    
+    for (int i = 0; i < ((List<Map<String, Object>>) ev.get(FightEvent.F_PLAYER_UNITS)).size(); i++)
+    {
+      Unit unit = evExpected.getPlayerUnits().get(i);
+      Map<String, Object> unit2 = ((List<Map<String, Object>>) ev.get(FightEvent.F_PLAYER_UNITS)).get(0);
+      
+      assertEquals(unit.getName(), unit2.get(Unit.F_NAME));
+      assertEquals(unit.getAttack(), unit2.get(Unit.F_ATTACK));
+      assertEquals(unit.getHealth(), unit2.get(Unit.F_HEALTH));
+      assertEquals(unit.getMaxHealth(), unit2.get(Unit.F_MAX_HEALTH));
+    }
   }
 }

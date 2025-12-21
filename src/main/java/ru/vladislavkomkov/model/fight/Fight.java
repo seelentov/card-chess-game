@@ -2,7 +2,9 @@ package ru.vladislavkomkov.model.fight;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.entity.unit.Unit;
@@ -24,6 +26,8 @@ public class Fight
   int player2Turn = 0;
   int turn = 0;
   
+  List<FightEvent> history = new ArrayList<>();
+  
   public Fight(Game game, Player player1, Player player2)
   {
     this.game = game;
@@ -31,6 +35,25 @@ public class Fight
     this.player2 = player2;
     
     setup();
+  }
+  
+  public void addToHistory(FightEvent.Type event, Player player, List<Object> data)
+  {
+    List<Unit> playerUnits = player1 == player ? player1Units : player2Units;
+    List<Unit> enemyUnits = player1 == player ? player2Units : player1Units;
+    
+    history.add(new FightEvent(
+        event,
+        playerUnits.stream()
+            .filter(Objects::nonNull)
+            .map(Unit::clone)
+            .collect(Collectors.toCollection(ArrayList::new)),
+        enemyUnits.stream()
+            .filter(Objects::nonNull)
+            .map(Unit::clone)
+            .collect(Collectors.toCollection(ArrayList::new)),
+        data,
+        player));
   }
   
   public void addToFightTable(Player player, Unit unit, Unit parent)
@@ -79,7 +102,7 @@ public class Fight
     if (turn >= TURN_LIMIT)
     {
       afterFight();
-      return Optional.of(new FightInfo(player1, player2, FightInfo.Result.DRAW, 0));
+      return Optional.of(new FightInfo(player1, player2, FightInfo.Result.DRAW, 0, history));
     }
     
     if (player1Units.isEmpty() || player2Units.isEmpty())
@@ -127,6 +150,8 @@ public class Fight
     {
       turn = RandUtils.getRand(1);
     }
+    
+    addToHistory(FightEvent.Type.START, player1, null);
   }
   
   Optional<FightInfo> handleFightEnd()
@@ -134,7 +159,7 @@ public class Fight
     if (player1Units.isEmpty() && player2Units.isEmpty())
     {
       afterFight();
-      return Optional.of(new FightInfo(player1, player2, FightInfo.Result.DRAW, 0));
+      return Optional.of(new FightInfo(player1, player2, FightInfo.Result.DRAW, 0, history));
     }
     
     boolean isPlayer1Win = player2Units.isEmpty();
@@ -148,7 +173,7 @@ public class Fight
     afterFight();
     
     FightInfo.Result result = isPlayer1Win ? FightInfo.Result.PLAYER1_WIN : FightInfo.Result.PLAYER2_WIN;
-    return Optional.of(new FightInfo(player1, player2, result, damage));
+    return Optional.of(new FightInfo(player1, player2, result, damage, history));
   }
   
   Optional<FightInfo> processTurn(boolean isPlayer1Turn)
@@ -312,6 +337,7 @@ public class Fight
   
   void afterFight()
   {
+
   }
   
   public int getTurn()

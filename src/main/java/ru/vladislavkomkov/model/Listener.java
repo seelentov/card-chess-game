@@ -184,7 +184,7 @@ public class Listener implements Cloneable
         (action) -> action.process(game, fight, player1, player2, unit, attacker));
   }
   
-  public void processOnSellListeners(Game game, Fight fight, Player player, Entity entity)
+  public void processOnSellListeners(Game game, Fight fight, Player player, Unit entity)
   {
     ListenerUtils.processActionListeners(
         onSellListeners,
@@ -228,12 +228,12 @@ public class Listener implements Cloneable
     processGlobalListeners(onIncLevelListeners, game, fight, player);
   }
   
-  public void processOnAppearListeners(Game game, Fight fight, Player player, Entity entity)
+  public void processOnAppearListeners(Game game, Fight fight, Player player, Unit entity)
   {
     processPrepareListeners(onAppearListeners, game, fight, player, entity);
   }
   
-  public void processOnDisappearListeners(Game game, Fight fight, Player player, Entity entity)
+  public void processOnDisappearListeners(Game game, Fight fight, Player player, Unit entity)
   {
     processPrepareListeners(onDisappearListeners, game, fight, player, entity);
   }
@@ -255,7 +255,7 @@ public class Listener implements Cloneable
       Game game,
       Fight fight,
       Player player,
-      Entity entity)
+      Unit entity)
   {
     ListenerUtils.processActionListeners(
         listeners,

@@ -25,6 +25,10 @@ public class ObjectUtils
   
   public static byte[] writeValue(Object object)
   {
+    if(object == null){
+      return null;
+    }
+    
     try
     {
       return mapper.writeValueAsBytes(object);

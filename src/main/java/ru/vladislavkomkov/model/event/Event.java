@@ -219,7 +219,7 @@ public class Event
     LOSE,
     START,
     TABLE,
-    FIGHT_TABLE,
+    FIGHT,
     HAND,
     TAVERN
   }

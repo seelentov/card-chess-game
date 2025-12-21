@@ -8,6 +8,8 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javafx.util.Pair;
 import ru.vladislavkomkov.controller.sender.Sender;
 import ru.vladislavkomkov.model.Game;
@@ -33,6 +35,8 @@ public class Player
   
   public static final int START_HEALTH = 30;
   public static final int START_ARMOR = 0;
+  
+  public final static String F_UUID = "uuid";
   
   public static final Map<Integer, Integer> INC_LEVEL_PRICE_MAP = Map.of(
       1, 5,
@@ -61,6 +65,12 @@ public class Player
   Game game;
   final Map<String, Consumer<Integer>> senderWaiters = new HashMap<>();
   Sender sender;
+  
+  public Player()
+  {
+    uuid = "";
+    tavern = null;
+  }
   
   public Player(Game game)
   {
@@ -165,6 +175,7 @@ public class Player
     senderWaiters.clear();
   }
   
+  @JsonProperty(F_UUID)
   public String getUUID()
   {
     return uuid;
@@ -205,7 +216,7 @@ public class Player
   
   public boolean addToTable(Unit unit, int index)
   {
-    return addToTable(unit,index, false);
+    return addToTable(unit, index, false);
   }
   
   public boolean addToTable(Unit unit, int index, boolean withoutOne)
@@ -246,7 +257,7 @@ public class Player
   {
     if (game != null)
     {
-      unit.onDisappear(game, null,this);
+      unit.onDisappear(game, null, this);
       table.removeIf(unit1 -> unit1 == unit);
       sendMessage(Event.Type.TABLE, table);
     }
@@ -256,7 +267,7 @@ public class Player
   {
     if (index >= 0 && index < table.size())
     {
-      table.get(index).onDisappear(game, null,this);
+      table.get(index).onDisappear(game, null, this);
       table.remove(index);
     }
   }
@@ -275,7 +286,7 @@ public class Player
   {
     if (force || hand.size() < HAND_LIMIT)
     {
-      card.getEntity().onHandled(game, null,this);
+      card.getEntity().onHandled(game, null, this);
       hand.add(card);
     }
     
@@ -342,7 +353,7 @@ public class Player
     }
     
     Unit unit = table.get(index);
-    unit.onSell(game,null, this);
+    unit.onSell(game, null, this);
     sendMessage(Event.Type.TABLE, table);
     sendMessage(Event.Type.MONEY, money);
   }
@@ -376,7 +387,7 @@ public class Player
   public void resetTavern(boolean saveFreezed)
   {
     tavern.reset(level, saveFreezed);
-    listener.processOnResetTavernListeners(game, null,this);
+    listener.processOnResetTavernListeners(game, null, this);
     
     sendMessage(Event.Type.FREEZE, tavern.isFreeze());
     sendMessage(Event.Type.TAVERN, tavern.getCards());
@@ -484,9 +495,15 @@ public class Player
     return level;
   }
   
+  public void setLevel(int level)
+  {
+    this.level = level;
+  }
+  
   public void incLevel()
   {
     incLevel(false);
+    sendMessage(Event.Type.LVL, level);
   }
   
   public void incLevel(boolean free)
@@ -498,7 +515,7 @@ public class Player
       if (price <= money)
       {
         level++;
-        listener.processOnIncTavernLevelListener(game, null,this);
+        listener.processOnIncTavernLevelListener(game, null, this);
         decMoney(price);
         sendMessage(Event.Type.LVL, level);
         statistic.counters.resetIncLevelDecreaser();
@@ -513,6 +530,11 @@ public class Player
     int calcedPrice = basePrice - statistic.counters.getIncLevelDecreaser();
     
     return Math.max(calcedPrice, 0);
+  }
+  
+  public int getFullHealth()
+  {
+    return getHealth() + getArmor();
   }
   
   public int getHealth()
@@ -640,15 +662,16 @@ public class Player
     return health > 0;
   }
   
-  //TODO: DEEP COPY
-  public List<Unit> cloneTable() {
+  // TODO: DEEP COPY
+  public List<Unit> cloneTable()
+  {
     return table.stream()
-            .filter(Objects::nonNull)
-            .map(Unit::clone)
-            .collect(Collectors.toCollection(ArrayList::new));
+        .filter(Objects::nonNull)
+        .map(Unit::clone)
+        .collect(Collectors.toCollection(ArrayList::new));
   }
   
-  //TODO: DEEP COPY
+  // TODO: DEEP COPY
   public List<Card> cloneHand()
   {
     return new ArrayList<>(hand);

@@ -1,13 +1,14 @@
 package ru.vladislavkomkov.controller.sender;
 
-import java.util.*;
-import java.util.function.Consumer;
+import static ru.vladislavkomkov.model.fight.FightEvent.F_TYPE;
 
-import kotlin.collections.ArrayDeque;
-import ru.vladislavkomkov.model.card.Card;
-import ru.vladislavkomkov.model.entity.unit.Unit;
+import java.util.*;
+
 import ru.vladislavkomkov.model.event.Event;
 import ru.vladislavkomkov.model.event.data.SenderWaiterDataReq;
+import ru.vladislavkomkov.model.fight.FightEvent;
+import ru.vladislavkomkov.model.fight.FightInfo;
+import ru.vladislavkomkov.model.player.Player;
 
 public class MockConsumer
 {
@@ -31,8 +32,21 @@ public class MockConsumer
   
   public Map<String, Object> waiters = new HashMap<>();
   
-  public MockConsumer()
+  public boolean inFight = false;
+  
+  public Queue<Map> scenario = new ArrayDeque<>();
+  
+  public boolean isPlayer1 = false;
+  public List<Map> inFightTable = new ArrayList<>();
+  public List<Map> inFightTableEnemy = new ArrayList<>();
+  
+  public boolean isConnected = false;
+  
+  String UUID;
+  
+  public MockConsumer(String UUID)
   {
+    this.UUID = UUID;
   }
   
   public Object getWaiter(String key)
@@ -44,6 +58,9 @@ public class MockConsumer
   {
     switch (event.getType())
     {
+      case CONNECTED -> {
+        this.isConnected = true;
+      }
       case START -> {
         this.isGameStarted = true;
       }
@@ -81,6 +98,44 @@ public class MockConsumer
         SenderWaiterDataReq waiter = event.getData(SenderWaiterDataReq.class);
         waiters.put(waiter.getKey(), waiter.getData());
       }
+      case FIGHT -> {
+        Map<String, Map<String, Object>> info = event.getData(Map.class);
+        this.inFight = true;
+        if (info.get(FightInfo.F_PLAYER_1).get(Player.F_UUID).equals(this.UUID))
+        {
+          isPlayer1 = true;
+        }
+        else if (info.get(FightInfo.F_PLAYER_2).get(Player.F_UUID).equals(this.UUID))
+        {
+          isPlayer1 = false;
+        }
+        else
+        {
+          throw new RuntimeException("Wrong players");
+        }
+        
+        this.scenario = new LinkedList<>((List) info.get(FightInfo.F_HISTORY));
+      }
     }
+  }
+  
+  public Optional<Map> processFight()
+  {
+    Map ev = scenario.poll();
+    
+    if (ev == null)
+    {
+      return Optional.empty();
+    }
+    
+    boolean isThisPlayer = ((Map<String, String>) ev.get(FightEvent.F_PLAYER)).get(Player.F_UUID).equals(UUID);
+    
+    List<Map> inFightTable = (List<Map>) ev.get(FightEvent.F_PLAYER_UNITS);
+    List<Map> inFightTableEnemy = (List<Map>) ev.get(FightEvent.F_ENEMY_UNITS);
+    
+    this.inFightTable = isThisPlayer ? inFightTable : inFightTableEnemy;
+    this.inFightTableEnemy = isThisPlayer ? inFightTableEnemy : inFightTable;
+    
+    return Optional.of(ev);
   }
 }

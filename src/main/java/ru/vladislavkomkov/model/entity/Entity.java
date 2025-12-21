@@ -1,6 +1,7 @@
 package ru.vladislavkomkov.model.entity;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -11,6 +12,7 @@ import ru.vladislavkomkov.consts.Listeners;
 import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.Listener;
+import ru.vladislavkomkov.model.fight.FightEvent;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.UUIDUtils;
 
@@ -67,6 +69,10 @@ public abstract class Entity implements Cloneable
   public void onHandled(Game game, Fight fight, Player player)
   {
     listener.processOnHandledListeners(game, fight, player, this);
+    if (fight != null)
+    {
+      fight.addToHistory(FightEvent.Type.ON_HANDLED, player, List.of(this));
+    }
   }
   
   public void onPlayed(Game game, Fight fight, Player player)
@@ -102,6 +108,10 @@ public abstract class Entity implements Cloneable
   public void onPlayed(Game game, Fight fight, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2, boolean auto)
   {
     listener.processOnPlayedListeners(game, fight, player, this, index, isTavernIndex, index2, isTavernIndex2, auto);
+    if (fight != null)
+    {
+      fight.addToHistory(FightEvent.Type.ON_PLAYED, player, List.of(this, index, isTavernIndex, index2, isTavernIndex2, auto));
+    }
   }
   
   protected <T> void processListeners(Map<String, T> listeners, Consumer<T> actionMove, Player player)
@@ -176,12 +186,16 @@ public abstract class Entity implements Cloneable
   }
   
   @Override
-  public Entity clone() {
-    try {
+  public Entity clone()
+  {
+    try
+    {
       Entity clonedEntity = (Entity) super.clone();
       clonedEntity.listener = this.listener.clone();
       return clonedEntity;
-    } catch (CloneNotSupportedException e) {
+    }
+    catch (CloneNotSupportedException e)
+    {
       throw new AssertionError("Clone not supported", e);
     }
   }
