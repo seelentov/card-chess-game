@@ -70,10 +70,6 @@ public class EventDispatcher
     
     switch (event.getType())
     {
-      case CONNECTED -> {
-        playerUUID = game.addPlayer();
-        // game.setPlayerSender(playerUUID, new WebSocketSender(conn));
-      }
       case BUY -> {
         game.buyTavernCard(playerUUID, event.getDataAsInt());
       }

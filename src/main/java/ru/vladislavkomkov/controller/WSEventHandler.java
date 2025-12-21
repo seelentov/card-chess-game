@@ -11,6 +11,7 @@ import org.java_websocket.server.WebSocketServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ru.vladislavkomkov.controller.sender.WebSocketSender;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.event.Event;
 
@@ -51,11 +52,18 @@ public class WSEventHandler extends WebSocketServer
     try
     {
       Event event = new Event(buffer);
+      Game game = games.get(event.getGameUUID());
+      String playerUUID = event.getPlayerUUID();
       
-      String key = event.getPlayerUUID() + "_" + event.getGameUUID();
+      if (event.getType() == Event.Type.CONNECTED)
+      {
+        game.setPlayerSender(playerUUID, new WebSocketSender(conn));
+        return;
+      }
+      
+      String key = playerUUID + "_" + event.getGameUUID();
       if (!eventDispatchers.containsKey(key))
       {
-        Game game = games.get(event.getGameUUID());
         eventDispatchers.put(key, new EventDispatcher(game));
       }
       
