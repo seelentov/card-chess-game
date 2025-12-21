@@ -23,6 +23,7 @@ import ru.vladislavkomkov.controller.sender.MockSender;
 import ru.vladislavkomkov.controller.sender.MockWebSocketClient;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.card.Card;
+import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
 import ru.vladislavkomkov.model.event.Event;
 import ru.vladislavkomkov.model.player.Player;
@@ -119,8 +120,8 @@ public class WSEventHandlerIntegrationTest
     player.getTavern().getCards().add(new Tavern.Slot(Card.of(new Cat())));
     client.send(new Event(gameUUID, playerUUID, Event.Type.BUY, 0).getBytes());
     
-    assertTrue(waitForCondition(() -> consumer.hand.isEmpty(), 2000));
-    assertTrue(waitForCondition(() -> consumer.hand.get(0).get(Card.F_ENTITY), 2000));
+    assertTrue(waitForCondition(() -> !consumer.hand.isEmpty(), 2000));
+    assertTrue(waitForCondition(() -> ((Map<String,String>)consumer.hand.get(0).get(Card.F_ENTITY)).get(Unit.F_NAME).equals(new Cat().getName()), 2000));
   }
   
   private boolean waitForCondition(BooleanSupplier condition, long timeoutMs) throws InterruptedException
