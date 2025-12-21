@@ -37,8 +37,9 @@ public class MockWebSocketClient extends WebSocketClient
   @Override
   public void onMessage(ByteBuffer bytes)
   {
-    log.info("Received binary message of {} bytes", bytes.remaining());
-    consumer.consume(new Event(bytes));
+    Event event = new Event(bytes);
+    log.info("Received message {}", event);
+    consumer.consume(event);
   }
   
   @Override
