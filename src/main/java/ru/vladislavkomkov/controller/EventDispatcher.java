@@ -5,6 +5,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.java_websocket.WebSocket;
 import org.slf4j.Logger;
@@ -18,13 +20,15 @@ import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.event.Event;
 import ru.vladislavkomkov.model.event.data.SenderWaiterDataRes;
 
-public class EventDispatcher
+public class EventDispatcher implements AutoCloseable
 {
   static final Integer QUEUE_LENGTH = 1_000;
   static final Logger log = LoggerFactory.getLogger(EventDispatcher.class);
   ExecutorService executor = Executors.newSingleThreadExecutor();
   BlockingQueue<Event> queue = new ArrayBlockingQueue<>(QUEUE_LENGTH);
-  
+
+  volatile AtomicBoolean isStoped = new AtomicBoolean(false);
+
   Game game;
   
   public EventDispatcher(Game game)
@@ -39,7 +43,7 @@ public class EventDispatcher
     if (!withoutExecutor)
       executor.submit(() -> {
         
-        while (true)
+        while (!isStoped.get())
         {
           Event ev = null;
           
@@ -126,5 +130,11 @@ public class EventDispatcher
       }
         default -> throw new RuntimeException("Unexpected event type: " + event.getType());
     }
+  }
+
+
+  @Override
+  public void close() throws Exception {
+    this.isStoped.set(true);
   }
 }

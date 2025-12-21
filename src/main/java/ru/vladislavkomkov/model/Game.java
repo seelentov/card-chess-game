@@ -59,6 +59,11 @@ public class Game implements AutoCloseable
     this.uuid = uuid;
   }
   
+  public Map<String, Player> getPlayers()
+  {
+    return players;
+  }
+  
   public String addPlayer()
   {
     String key = UUIDUtils.generateKey();
@@ -73,7 +78,9 @@ public class Game implements AutoCloseable
   
   public void removePlayer(String key)
   {
+    Player player = players.get(key);
     players.remove(key);
+    player.sendMessage(Event.Type.DISCONNECTED);
   }
   
   public void setPlayerSender(String playerUUID, Sender sender)

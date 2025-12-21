@@ -61,6 +61,9 @@ public class MockConsumer
       case CONNECTED -> {
         this.isConnected = true;
       }
+      case DISCONNECTED -> {
+        this.isConnected = false;
+      }
       case START -> {
         this.isGameStarted = true;
       }

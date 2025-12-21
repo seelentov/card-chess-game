@@ -50,11 +50,13 @@ public class WSEventHandlerIntegrationTest
   private WSEventHandler handler;
   
   CountDownLatch connectLatch = new CountDownLatch(2);
+  CountDownLatch disconnectLatch = new CountDownLatch(2);
+  CountDownLatch startLatch = new CountDownLatch(1);
   
   @BeforeEach
   void setUp() throws Exception
   {
-    port = 11111;
+    port = 0;
     Game game = new Game(gameUUID);
     
     player = new Player(playerUUID, game);
@@ -68,15 +70,34 @@ public class WSEventHandlerIntegrationTest
     Map<String, Game> games = new HashMap<>();
     games.put(gameUUID, game);
     
-    handler = new WSEventHandler(port, games);
+    handler = new WSEventHandler(port, games)
+    {
+      @Override
+      public void onStart()
+      {
+        super.onStart();
+        startLatch.countDown();
+      }
+    };
     port = handler.getPort();
+    
+    handler.start();
+    assertTrue(startLatch.await(10, TimeUnit.SECONDS));
     
     client = new MockWebSocketClient(new URI("ws://localhost:" + handler.getPort()), consumer)
     {
       @Override
       public void onOpen(ServerHandshake handshakedata)
       {
+        super.onOpen(handshakedata);
         connectLatch.countDown();
+      }
+      
+      @Override
+      public void onClose(int code, String reason, boolean remote)
+      {
+        super.onClose(code, reason, remote);
+        disconnectLatch.countDown();
       }
     };
     client2 = new MockWebSocketClient(new URI("ws://localhost:" + handler.getPort()), consumer2)
@@ -84,11 +105,18 @@ public class WSEventHandlerIntegrationTest
       @Override
       public void onOpen(ServerHandshake handshakedata)
       {
+        super.onOpen(handshakedata);
         connectLatch.countDown();
+      }
+      
+      @Override
+      public void onClose(int code, String reason, boolean remote)
+      {
+        super.onClose(code, reason, remote);
+        disconnectLatch.countDown();
       }
     };
     
-    handler.start();
     client.connect();
     client2.connect();
     
@@ -96,8 +124,29 @@ public class WSEventHandlerIntegrationTest
   }
   
   @AfterEach
-  void tearDown()
+  void tearDown() throws Exception
   {
+    if (client != null)
+    {
+      client.close();
+    }
+    
+    if (client2 != null)
+    {
+      client2.close();
+    }
+    
+    assertTrue(disconnectLatch.await(10, TimeUnit.SECONDS));
+    
+    if (handler != null)
+    {
+      handler.stop();
+    }
+    
+    if (gameProcessor != null)
+    {
+      gameProcessor.close();
+    }
   }
   
   @Test
@@ -108,20 +157,31 @@ public class WSEventHandlerIntegrationTest
     
     client.send(new Event(gameUUID, playerUUID, Event.Type.CONNECTED).getBytes());
     
-    assertTrue(waitForCondition(() -> consumer.isConnected, 2000));
+    assertTrue(waitForCondition(() -> consumer.isConnected, 10000));
     assertNotNull(player.getSender());
   }
-  
+
   @Test
-  void testSendEvent() throws Exception {
+  void testSendEventConsumeEvent() throws Exception
+  {
     testConnect();
-    
+
     player.getTavern().getCards().clear();
     player.getTavern().getCards().add(new Tavern.Slot(Card.of(new Cat())));
+    player.setMoney(player.getBuyPrice());
     client.send(new Event(gameUUID, playerUUID, Event.Type.BUY, 0).getBytes());
-    
-    assertTrue(waitForCondition(() -> !consumer.hand.isEmpty(), 2000));
-    assertTrue(waitForCondition(() -> ((Map<String,String>)consumer.hand.get(0).get(Card.F_ENTITY)).get(Unit.F_NAME).equals(new Cat().getName()), 2000));
+
+    assertTrue(waitForCondition(() -> !consumer.hand.isEmpty(), 10000));
+    assertTrue(waitForCondition(() -> ((Map<String, String>) consumer.hand.get(0).get(Card.F_ENTITY)).get(Unit.F_NAME).equals(new Cat().getName()), 2000));
+  }
+
+  @Test
+  void testDisconnect() throws Exception
+  {
+    testConnect();
+
+    client.send(new Event(gameUUID, playerUUID, Event.Type.DISCONNECTED).getBytes());
+    assertTrue(waitForCondition(() -> !consumer.isConnected, 10000));
   }
   
   private boolean waitForCondition(BooleanSupplier condition, long timeoutMs) throws InterruptedException

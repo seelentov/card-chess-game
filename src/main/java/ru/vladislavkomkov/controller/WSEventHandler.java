@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import ru.vladislavkomkov.controller.sender.WebSocketSender;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.event.Event;
+import ru.vladislavkomkov.model.player.Player;
 
 public class WSEventHandler extends WebSocketServer
 {
@@ -52,13 +53,44 @@ public class WSEventHandler extends WebSocketServer
     try
     {
       Event event = new Event(buffer);
+
+      log.info("Message received: {}", event);
+      if (!games.containsKey(event.getGameUUID()))
+      {
+        throw new RuntimeException("Game " + event.getGameUUID() + " doesn't exist");
+      }
+      
       Game game = games.get(event.getGameUUID());
+      
       String playerUUID = event.getPlayerUUID();
       
       if (event.getType() == Event.Type.CONNECTED)
       {
+        if (game.getPlayers().containsKey(playerUUID))
+        {
+          game.setPlayerSender(playerUUID, new WebSocketSender(conn));
+          log.info("Player connected: {} - {}", playerUUID, game.getUUID());
+          return;
+        }
+        
+        clearUserFromGames(playerUUID);
+        
+        game.addPlayer(playerUUID, new Player(playerUUID, game));
         game.setPlayerSender(playerUUID, new WebSocketSender(conn));
+        
         return;
+      }
+      
+      if (event.getType() == Event.Type.DISCONNECTED)
+      {
+        game.removePlayer(playerUUID);
+        log.info("Player disconnected: {} - {}", playerUUID, game.getUUID());
+        return;
+      }
+      
+      if (game.getPlayers().values().stream().noneMatch(player -> player.getUUID().equals(playerUUID)))
+      {
+        throw new RuntimeException("Player " + playerUUID + " doesn't exist");
       }
       
       String key = playerUUID + "_" + event.getGameUUID();
@@ -85,5 +117,27 @@ public class WSEventHandler extends WebSocketServer
   public void onStart()
   {
     log.info("Start socket on {}", getPort());
+  }
+  
+  @Override
+  public void stop() throws InterruptedException
+  {
+    eventDispatchers.values().forEach(eventDispatcher -> {
+      try
+      {
+        eventDispatcher.close();
+      }
+      catch (Exception ex)
+      {
+        log.error("Failed close event dispatcher", ex);
+      }
+    });
+
+    super.stop();
+  }
+  
+  private void clearUserFromGames(String uuid)
+  {
+    games.values().forEach(game -> game.removePlayer(uuid));
   }
 }

@@ -321,7 +321,7 @@ public class ListenerTest extends GamePlayerTestCase
   {
     testListener(
         player.listener.onStartFightListeners,
-        () -> game.processStartFight(null, player, player2),
+        () -> game.processStartFight(new Fight(game, player, player2), player, player2),
         (game1, fight, player1, player2) -> testAction(),
         once);
   }
@@ -342,7 +342,7 @@ public class ListenerTest extends GamePlayerTestCase
   {
     testListener(
         player.listener.onEndFightListeners,
-        () -> game.processEndFight(null, player, player2),
+        () -> game.processEndFight(new Fight(game, player, player2), player, player2),
         (game1, fight, player1, player2) -> testAction(),
         once);
   }

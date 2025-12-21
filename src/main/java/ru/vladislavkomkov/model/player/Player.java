@@ -340,7 +340,7 @@ public class Player
     {
       decMoney(buyPrice);
       addToHand(tavern.buy(index));
-      
+
       sendMessage(Event.Type.TAVERN, tavern.getCards());
     }
   }

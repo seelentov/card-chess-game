@@ -74,7 +74,7 @@ public class UnitTest extends GamePlayerTestCase
     };
     
     player.addToTable(unit, 0);
-    game.processStartFight(null, player, player2);
+    game.processStartFight(new Fight(game, player,player2), player, player2);
     
     assertEquals(moneyStart + (moneyStep), player.getMoney());
   }
@@ -96,7 +96,7 @@ public class UnitTest extends GamePlayerTestCase
     };
     
     player.addToTable(unit, 0);
-    game.processEndFight(null, player, player2);
+    game.processEndFight(new Fight(game, player,player2), player, player2);
     
     assertEquals(moneyStart + (moneyStep), player.getMoney());
   }

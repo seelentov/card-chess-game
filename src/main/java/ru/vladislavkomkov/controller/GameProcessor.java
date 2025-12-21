@@ -4,13 +4,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ru.vladislavkomkov.model.Game;
 
-public class GameProcessor
+public class GameProcessor implements AutoCloseable
 {
   static final Logger log = LoggerFactory.getLogger(GameProcessor.class);
   
@@ -18,7 +19,9 @@ public class GameProcessor
   final ExecutorService executor = Executors.newCachedThreadPool();
   
   final int preFightTimer;
-  
+
+  volatile AtomicBoolean isStoped = new AtomicBoolean(false);
+
   public GameProcessor(Map<String, Game> games)
   {
     this(games, Integer.MAX_VALUE);
@@ -47,7 +50,7 @@ public class GameProcessor
     game.sendStartGame();
     
     executor.submit(() -> {
-      while (true)
+      while (!isStoped.get())
       {
         try
         {
@@ -147,5 +150,10 @@ public class GameProcessor
   {
     game.doFight();
     game.incTurn();
+  }
+
+  @Override
+  public void close() throws Exception {
+    isStoped.set(true);
   }
 }

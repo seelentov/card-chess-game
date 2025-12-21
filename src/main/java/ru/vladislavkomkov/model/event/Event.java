@@ -167,38 +167,14 @@ public class Event
         "gameUUID='" + gameUUID + '\'' +
         ", playerUUID='" + playerUUID + '\'' +
         ", type=" + type +
-        ", data=" + Arrays.toString(data) +
+        ", data=" + new String(data, StandardCharsets.UTF_8)+
         '}';
-  }
-  
-  @Override
-  public boolean equals(Object o)
-  {
-    if (this == o)
-      return true;
-    if (o == null || getClass() != o.getClass())
-      return false;
-    
-    Event event = (Event) o;
-    return gameUUID.equals(event.gameUUID) &&
-        playerUUID.equals(event.playerUUID) &&
-        type == event.type &&
-        Arrays.equals(data, event.data);
-  }
-  
-  @Override
-  public int hashCode()
-  {
-    int result = gameUUID.hashCode();
-    result = 31 * result + playerUUID.hashCode();
-    result = 31 * result + type.hashCode();
-    result = 31 * result + Arrays.hashCode(data);
-    return result;
   }
   
   public enum Type
   {
     CONNECTED,
+    DISCONNECTED,
     ERROR,
     BUY,
     PLAY,

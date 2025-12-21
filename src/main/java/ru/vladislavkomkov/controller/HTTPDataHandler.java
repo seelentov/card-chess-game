@@ -14,7 +14,7 @@ import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.util.JWTUtils;
 import ru.vladislavkomkov.util.UUIDUtils;
 
-public class HTTPDataHandler
+public class HTTPDataHandler implements AutoCloseable
 {
   static final String UUID_KEY = "UUID";
   static final Logger log = LoggerFactory.getLogger(HTTPDataHandler.class);
@@ -111,7 +111,12 @@ public class HTTPDataHandler
     context.status(201);
     context.json(response);
   }
-  
+
+  @Override
+  public void close() throws Exception {
+    app.stop();
+  }
+
   public class KeyRequest
   {
     String key;
