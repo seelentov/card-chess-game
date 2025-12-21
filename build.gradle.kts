@@ -1,9 +1,11 @@
 plugins {
-    id("java")
+    java
+    application
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 group = "ru.vladislavkomkov"
-version = "1.0-SNAPSHOT"
+version = "1.0"
 
 repositories {
     mavenCentral()
@@ -30,4 +32,13 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+application {
+    mainClass.set("ru.vladislavkomkov.controller.Server")
+}
+
+tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
+    archiveClassifier.set("")
+    mergeServiceFiles()
 }
