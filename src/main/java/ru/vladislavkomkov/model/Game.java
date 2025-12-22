@@ -12,8 +12,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
+import ru.vladislavkomkov.controller.GameProcessor;
 import ru.vladislavkomkov.controller.sender.Sender;
 import ru.vladislavkomkov.model.event.Event;
 import ru.vladislavkomkov.model.fight.Fight;
@@ -26,6 +29,7 @@ import ru.vladislavkomkov.util.UUIDUtils;
 
 public class Game implements AutoCloseable
 {
+  
   public static final int PLAYERS_COUNT = 8;
   public static final int FIGHTS_COUNT = 4;
   
@@ -33,282 +37,433 @@ public class Game implements AutoCloseable
   final ExecutorService executor = Executors.newFixedThreadPool(FIGHTS_COUNT);
   List<Fight> fights = new ArrayList<>();
   final List<FightInfo> fightHistory = new CopyOnWriteArrayList<>();
-  final Map<String, Player> players;
   
+  final Map<String, Player> players;
+  private final ReadWriteLock playersLock = new ReentrantReadWriteLock();
+  private final boolean acceptingNewPlayers;
+
   State state = State.LOBBY;
   int turn = 1;
   
   public Game()
   {
-    this(new HashMap<>(), UUIDUtils.generateKey());
+    this(new HashMap<>(), UUIDUtils.generateKey(), true);
   }
-  
+
   public Game(Map<String, Player> players)
   {
-    this(players, UUIDUtils.generateKey());
+    this(players, UUIDUtils.generateKey(), true);
   }
-  
+
   public Game(String uuid)
   {
-    this(new HashMap<>(), uuid);
+    this(new HashMap<>(), uuid, true);
   }
-  
-  public Game(Map<String, Player> players, String uuid)
+
+  public Game(Map<String, Player> players,String uuid)
+  {
+    this(players, uuid, true);
+  }
+
+
+  private Game(Map<String, Player> players, String uuid, boolean acceptingNewPlayers)
   {
     this.players = players;
     this.uuid = uuid;
+    this.acceptingNewPlayers = acceptingNewPlayers;
   }
   
   public Map<String, Player> getPlayers()
   {
-    return players;
+    playersLock.readLock().lock();
+    try
+    {
+      return new HashMap<>(players);
+    }
+    finally
+    {
+      playersLock.readLock().unlock();
+    }
   }
   
   public String addPlayer()
   {
-    String key = UUIDUtils.generateKey();
-    addPlayer(key, new Player(key, this));
-    return key;
+    playersLock.writeLock().lock();
+    try
+    {
+      if (!acceptingNewPlayers)
+      {
+        throw new IllegalStateException("Cannot add player: game already started");
+      }
+      String key = UUIDUtils.generateKey();
+      addPlayerInternal(key, new Player(key, this));
+      return key;
+    }
+    finally
+    {
+      playersLock.writeLock().unlock();
+    }
   }
   
   public void addPlayer(String UUID, Player player)
+  {
+    playersLock.writeLock().lock();
+    try
+    {
+      if (!acceptingNewPlayers)
+      {
+        throw new IllegalStateException("Cannot add player: game already started");
+      }
+      addPlayerInternal(UUID, player);
+    }
+    finally
+    {
+      playersLock.writeLock().unlock();
+    }
+  }
+  
+  private void addPlayerInternal(String UUID, Player player)
   {
     players.put(UUID, player);
   }
   
   public void removePlayer(String key)
   {
-    Player player = players.get(key);
-    players.remove(key);
+    Player player;
+    playersLock.writeLock().lock();
+    try
+    {
+      player = players.remove(key);
+      if (player == null)
+        return;
+    }
+    finally
+    {
+      playersLock.writeLock().unlock();
+    }
     player.sendMessage(Event.Type.DISCONNECTED);
   }
   
   public void setPlayerSender(String playerUUID, Sender sender)
   {
-    Player player = players.get(playerUUID);
+    Player player;
+    playersLock.readLock().lock();
+    try
+    {
+      player = players.get(playerUUID);
+      if (player == null)
+      {
+        throw new IllegalArgumentException("Player not found: " + playerUUID);
+      }
+    }
+    finally
+    {
+      playersLock.readLock().unlock();
+    }
     player.setSender(sender);
     player.sendMessage(Event.Type.CONNECTED);
   }
   
+  public void startGame(GameProcessor processor)
+  {
+    playersLock.writeLock().lock();
+    try
+    {
+      if (state != State.LOBBY)
+      {
+        throw new IllegalStateException("Game already started");
+      }
+      if (players.size() % 2 != 0)
+      {
+        throw new IllegalStateException("Users count not % 2");
+      }
+
+      processor.start(getUUID());
+    }
+    finally
+    {
+      playersLock.writeLock().unlock();
+    }
+  }
+  
   public void sendPreFightTimer(int ms)
   {
-    players.forEach((key, player) -> player.sendMessage(Event.Type.PRE_FIGHT_TIMER, ms));
+    playersLock.readLock().lock();
+    try
+    {
+      players.forEach((key, player) -> player.sendMessage(Event.Type.PRE_FIGHT_TIMER, ms));
+    }
+    finally
+    {
+      playersLock.readLock().unlock();
+    }
   }
   
   public void sendStartGame()
   {
-    players.forEach((key, player) -> player.sendMessage(Event.Type.START));
+    playersLock.readLock().lock();
+    try
+    {
+      players.forEach((key, player) -> player.sendMessage(Event.Type.START));
+    }
+    finally
+    {
+      playersLock.readLock().unlock();
+    }
   }
   
   public void doTurnBegin()
   {
-    players.values().forEach(Player::sendArmorHealth);
-    
-    clearSenderWaiters();
-    state = State.PREPARE;
-    
-    for (Player player : players.values())
+    playersLock.readLock().lock();
+    try
     {
-      if (turn != 1)
-      {
-        if (player.getMaxMoneyBase() < Player.MAX_MONEY)
-        {
-          player.incMaxMoney();
-        }
-        player.statistic.counters.incrementIncLevelDecreaser();
-      }
+      players.values().forEach(Player::sendArmorHealth);
+      clearSenderWaiters();
+      state = State.PREPARE;
       
-      player.resetMoney();
-      player.resetTavern(true);
-      processStartTurn(player);
+      for (Player player : players.values())
+      {
+        if (turn != 1)
+        {
+          if (player.getMaxMoneyBase() < Player.MAX_MONEY)
+          {
+            player.incMaxMoney();
+          }
+          player.statistic.counters.incrementIncLevelDecreaser();
+        }
+        player.resetMoney();
+        player.resetTavern(true);
+        processStartTurn(player);
+      }
+    }
+    finally
+    {
+      playersLock.readLock().unlock();
     }
   }
   
   public void doTurnEnd()
   {
-    for (Player player : players.values())
+    playersLock.readLock().lock();
+    try
     {
-      processEndTurn(player);
+      for (Player player : players.values())
+      {
+        processEndTurn(player);
+      }
+    }
+    finally
+    {
+      playersLock.readLock().unlock();
     }
   }
   
   public void doFight()
   {
-    state = State.FIGHT;
-    
-    List<CompletableFuture<?>> fightFutures = new ArrayList<>();
-    
-    for (Fight fight : fights)
+    playersLock.readLock().lock();
+    try
     {
-      fightFutures.add(CompletableFuture.supplyAsync(() -> {
-        boolean isPlayerFirst = RandUtils.getRand(1) == 0;
-        
-        Player player = isPlayerFirst ? fight.getPlayer1() : fight.getPlayer2();
-        Player player2 = isPlayerFirst ? fight.getPlayer2() : fight.getPlayer1();
-        
-        processStartFight(fight, player, player2);
-        processStartFight(fight, player2, player);
-        
-        Optional<FightInfo> result;
-        do
-        {
-          result = fight.doTurn();
-        }
-        while (result.isEmpty());
-        
-        if (!player.isAlive())
-        {
-          player.sendMessage(Event.Type.LOSE);
-        }
-        else if (!player2.isAlive())
-        {
-          player2.sendMessage(Event.Type.LOSE);
-        }
-        
-        processEndFight(fight, player, player2);
-        processEndFight(fight, player2, player);
-        
-        fight.addToHistory(FightEvent.Type.END, player, null);
-        
-        fightHistory.add(result.get());
-        
-        FightInfo info = result.get();
-        
-        player.sendMessage(Event.Type.FIGHT, info);
-        
-        player2.sendMessage(Event.Type.FIGHT, info);
-        
-        return null;
-      }, executor));
+      state = State.FIGHT;
+      
+      List<CompletableFuture<?>> fightFutures = new ArrayList<>();
+      
+      for (Fight fight : fights)
+      {
+        fightFutures.add(CompletableFuture.supplyAsync(() -> {
+          boolean isPlayerFirst = RandUtils.getRand(1) == 0;
+          Player player = isPlayerFirst ? fight.getPlayer1() : fight.getPlayer2();
+          Player player2 = isPlayerFirst ? fight.getPlayer2() : fight.getPlayer1();
+          
+          processStartFight(fight, player, player2);
+          processStartFight(fight, player2, player);
+          
+          Optional<FightInfo> result;
+          do
+          {
+            result = fight.doTurn();
+          }
+          while (result.isEmpty());
+          
+          if (!player.isAlive())
+          {
+            player.sendMessage(Event.Type.LOSE);
+          }
+          else if (!player2.isAlive())
+          {
+            player2.sendMessage(Event.Type.LOSE);
+          }
+          
+          processEndFight(fight, player, player2);
+          processEndFight(fight, player2, player);
+          
+          fight.addToHistory(FightEvent.Type.END, player, null);
+          fightHistory.add(result.get());
+          
+          FightInfo info = result.get();
+          player.sendMessage(Event.Type.FIGHT, info);
+          player2.sendMessage(Event.Type.FIGHT, info);
+          
+          return null;
+        }, executor));
+      }
+      
+      CompletableFuture<Void> allOf = CompletableFuture.allOf(
+          fightFutures.toArray(new CompletableFuture[0]));
+      allOf.join();
     }
-    
-    CompletableFuture<Void> allOf = CompletableFuture.allOf(
-        fightFutures.toArray(new CompletableFuture[0]));
-    
-    allOf.join();
+    finally
+    {
+      playersLock.readLock().unlock();
+    }
   }
   
   public void setFights(List<Fight> fights)
   {
     this.fights = fights;
   }
-  
-  public boolean calcFights()
-  {
-    Queue<Player> alive = newPlayerQueue(true);
-    Queue<Player> dead = newPlayerQueue(false);
-    
-    if (alive.size() < 2)
-    {
-      Player player = alive.peek();
-      
-      if (player != null)
-      {
-        player.sendMessage(Event.Type.WIN);
+
+  public boolean calcFights() {
+    playersLock.readLock().lock();
+    try {
+      Queue<Player> alive = newPlayerQueue(true);
+      Queue<Player> dead = newPlayerQueue(false);
+
+      if (alive.size() < 2) {
+        Player player = alive.peek();
+        if (player != null) {
+          player.sendMessage(Event.Type.WIN);
+          state = State.END;
+        }
+        return true;
       }
-      
-      return true;
-    }
-    
-    fights.clear();
-    
-    List<Player> players = new ArrayList<>(alive);
-    Map<String, Map<String, Integer>> fightCounts = new HashMap<>();
-    
-    for (Player player : players)
-    {
-      fightCounts.put(player.getUUID(), new HashMap<>());
-    }
-    
-    for (FightInfo fightInfo : fightHistory)
-    {
-      String p1 = fightInfo.player1.getUUID();
-      String p2 = fightInfo.player2.getUUID();
-      
-      fightCounts.get(p1).put(p2, fightCounts.get(p1).getOrDefault(p2, 0) + 1);
-      fightCounts.get(p2).put(p1, fightCounts.get(p2).getOrDefault(p1, 0) + 1);
-    }
-    
-    List<Player> availablePlayers = new ArrayList<>(players);
-    Collections.shuffle(availablePlayers);
-    
-    while (availablePlayers.size() >= 2)
-    {
-      Player player1 = availablePlayers.remove(0);
-      Player player2 = findOpponent(player1, availablePlayers, fightCounts, players);
-      
-      if (player2 != null)
-      {
-        availablePlayers.remove(player2);
-        fights.add(new Fight(this, player1, player2));
+
+      fights.clear();
+
+      List<Player> playersList = new ArrayList<>(alive);
+      Map<String, Map<String, Integer>> fightCounts = new HashMap<>();
+
+      for (Player player : playersList) {
+        fightCounts.put(player.getUUID(), new HashMap<>());
       }
-      else if (!availablePlayers.isEmpty())
-      {
-        player2 = availablePlayers.remove(0);
-        fights.add(new Fight(this, player1, player2));
+
+      for (FightInfo fightInfo : fightHistory) {
+        String p1 = fightInfo.player1.getUUID();
+        String p2 = fightInfo.player2.getUUID();
+        fightCounts.get(p1).merge(p2, 1, Integer::sum);
+        fightCounts.get(p2).merge(p1, 1, Integer::sum);
       }
+
+      List<Player> availablePlayers = new ArrayList<>(playersList);
+      Collections.shuffle(availablePlayers);
+
+      // Если нечётное число живых — добавляем одного мёртвого (если есть)
+      if (availablePlayers.size() % 2 != 0 && !dead.isEmpty()) {
+        Player dummyOpponent = dead.poll(); // берём любого мёртвого
+        availablePlayers.add(dummyOpponent);
+      }
+
+      while (availablePlayers.size() >= 2) {
+        Player player1 = availablePlayers.remove(0);
+        Player player2 = findOpponent(player1, availablePlayers, fightCounts, playersList);
+
+        if (player2 != null) {
+          availablePlayers.remove(player2);
+          fights.add(new Fight(this, player1, player2));
+        } else if (!availablePlayers.isEmpty()) {
+          player2 = availablePlayers.remove(0);
+          fights.add(new Fight(this, player1, player2));
+        }
+      }
+
+      long aliveCount = players.values().stream().filter(Player::isAlive).count();
+      if (aliveCount <= 1) {
+        Player winner = players.values().stream().filter(Player::isAlive).findFirst().orElse(null);
+        if (winner != null) {
+          winner.sendMessage(Event.Type.WIN);
+        }
+        state = State.END;
+        return true;
+      }
+
+      return false;
+    } finally {
+      playersLock.readLock().unlock();
     }
-    
-    if (!availablePlayers.isEmpty())
-    {
-      Player lonelyPlayer = availablePlayers.get(0);
-      lonelyPlayer.sendMessage(Event.Type.WIN);
-    }
-    
-    return false;
   }
   
   public void doSenderWaiter(String uuid, String key, Integer param)
   {
     Player player = getPlayer(uuid);
-    player.doSenderWaiter(key, param);
+    if (player != null)
+      player.doSenderWaiter(key, param);
   }
   
   public void buyTavernCard(String uuid, int index)
   {
     Player player = getPlayer(uuid);
-    player.buyCard(index);
+    if (player != null)
+      player.buyCard(index);
   }
   
   public void playCard(String uuid, int indexCard, int indexCast, boolean isTavernCast, int indexCast2, boolean isTavernCast2)
   {
     Player player = getPlayer(uuid);
-    player.playCard(indexCard, indexCast, isTavernCast, indexCast2, isTavernCast2);
+    if (player != null)
+      player.playCard(indexCard, indexCast, isTavernCast, indexCast2, isTavernCast2);
   }
   
   public void sellCard(String uuid, int index)
   {
     Player player = getPlayer(uuid);
-    player.sellCard(index);
+    if (player != null)
+      player.sellCard(index);
   }
   
   public void lvlUp(String uuid)
   {
     Player player = getPlayer(uuid);
-    player.incLevel();
+    if (player != null)
+      player.incLevel();
   }
   
   public void resetTavern(String uuid)
   {
     Player player = getPlayer(uuid);
-    player.resetTavernManual();
+    if (player != null)
+      player.resetTavernManual();
   }
   
   public void moveTable(String uuid, int index, int index2)
   {
     Player player = getPlayer(uuid);
-    player.moveTable(index, index2);
+    if (player != null)
+      player.moveTable(index, index2);
   }
   
   public void freezeTavern(String uuid)
   {
     Player player = getPlayer(uuid);
-    player.freezeTavern();
+    if (player != null)
+      player.freezeTavern();
+  }
+  
+  private Player getPlayer(String uuid)
+  {
+    playersLock.readLock().lock();
+    try
+    {
+      return players.get(uuid);
+    }
+    finally
+    {
+      playersLock.readLock().unlock();
+    }
   }
   
   public void processStartTurn(Player player)
   {
-    ListenerUtils.processGlobalActionListeners(player.listener.onStartTurnListeners, this, null, player);
+    ListenerUtils.processGlobalActionListeners(
+        player.listener.onStartTurnListeners, this, null, player);
     player.doForAll(unit -> unit.onStartTurn(this, null, player));
     player.removeTempBuffs();
     player.calcTriplets();
@@ -316,36 +471,41 @@ public class Game implements AutoCloseable
   
   public void processEndTurn(Player player)
   {
-    ListenerUtils.processGlobalActionListeners(player.listener.onEndTurnListeners, this, null, player);
+    ListenerUtils.processGlobalActionListeners(
+        player.listener.onEndTurnListeners, this, null, player);
     player.clearSpellCraft();
     player.doForAll(unit -> unit.onEndTurn(this, null, player));
   }
   
   public void processStartFight(Fight fight, Player player, Player player2)
   {
-    ListenerUtils.processFightActionListeners(player.listener.onStartFightListeners, this, fight, player, player2);
+    ListenerUtils.processFightActionListeners(
+        player.listener.onStartFightListeners, this, fight, player, player2);
     fight.getFightTable(player).forEach(unit -> unit.onStartFight(this, fight, player, player2));
   }
   
   public void processEndFight(Fight fight, Player player, Player player2)
   {
-    ListenerUtils.processFightActionListeners(player.listener.onEndFightListeners, this, fight, player, player2);
+    ListenerUtils.processFightActionListeners(
+        player.listener.onEndFightListeners, this, fight, player, player2);
     fight.getFightTable(player).forEach(unit -> unit.onEndFight(this, fight, player, player2));
-    
   }
   
-  Player getPlayer(String uuid)
+  public void clearSenderWaiters()
   {
-    return players.get(uuid);
+    playersLock.readLock().lock();
+    try
+    {
+      players.values().forEach(Player::clearSenderWaiters);
+      players.values().forEach(player -> player.sendMessage(Event.Type.CLEAR_WAITERS));
+    }
+    finally
+    {
+      playersLock.readLock().unlock();
+    }
   }
   
-  void clearSenderWaiters()
-  {
-    players.values().forEach(Player::clearSenderWaiters);
-    players.values().forEach(player -> player.sendMessage(Event.Type.CLEAR_WAITERS));
-  }
-  
-  Player findOpponent(
+  private Player findOpponent(
       Player player,
       List<Player> availablePlayers,
       Map<String, Map<String, Integer>> fightCounts,
@@ -380,7 +540,6 @@ public class Game implements AutoCloseable
     {
       Player bestOpponent = null;
       int minFights = Integer.MAX_VALUE;
-      
       for (Player opponent : availablePlayers)
       {
         int fightsWithOpponent = playerFights.getOrDefault(opponent.getUUID(), 0);
@@ -390,15 +549,15 @@ public class Game implements AutoCloseable
           bestOpponent = opponent;
         }
       }
-      
       return bestOpponent;
     }
     
     return null;
   }
   
-  Queue<Player> newPlayerQueue(boolean isAlive)
+  private Queue<Player> newPlayerQueue(boolean isAlive)
   {
+    // Вызывается ТОЛЬКО под read/write lock
     return players.values().stream()
         .filter(player -> isAlive == player.isAlive())
         .collect(Collectors.toCollection(ArrayDeque::new));

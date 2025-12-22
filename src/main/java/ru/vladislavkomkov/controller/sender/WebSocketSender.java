@@ -4,6 +4,8 @@ import org.java_websocket.WebSocket;
 
 import ru.vladislavkomkov.model.event.Event;
 
+import java.util.concurrent.CompletableFuture;
+
 public class WebSocketSender implements Sender
 {
   WebSocket conn;
@@ -16,13 +18,15 @@ public class WebSocketSender implements Sender
   @Override
   public void send(byte[] data)
   {
-    try
-    {
-      conn.send(data);
-    }
-    catch (Exception ex)
-    {
-      conn.send(new Event(null, null, Event.Type.ERROR, ex.getMessage()).getBytes());
-    }
+    CompletableFuture.runAsync(() -> {
+      try
+      {
+        conn.send(data);
+      }
+      catch (Exception ex)
+      {
+        conn.send(new Event(null, null, Event.Type.ERROR, ex.getMessage()).getBytes());
+      }
+    });
   }
 }

@@ -83,7 +83,7 @@ public class WSEventHandler extends WebSocketServer
       
       if (event.getType() == Event.Type.DISCONNECTED)
       {
-        game.removePlayer(playerUUID);
+        game.getPlayers().get(playerUUID).sendMessage(Event.Type.DISCONNECTED);
         log.info("Player disconnected: {} - {}", playerUUID, game.getUUID());
         return;
       }

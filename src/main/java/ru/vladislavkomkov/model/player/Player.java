@@ -662,7 +662,6 @@ public class Player
     return health > 0;
   }
   
-  // TODO: DEEP COPY
   public List<Unit> cloneTable()
   {
     return table.stream()
@@ -671,7 +670,6 @@ public class Player
         .collect(Collectors.toCollection(ArrayList::new));
   }
   
-  // TODO: DEEP COPY
   public List<Card> cloneHand()
   {
     return new ArrayList<>(hand);

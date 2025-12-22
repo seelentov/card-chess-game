@@ -388,8 +388,6 @@ public class GameProcessorTest
     gameProcessor.games.get(gameUUID).setFights(List.of(new Fight(game, player1, player2)));
     gameProcessor.processFight();
     
-    //TODO: Start End Fight от FightTable
-    
     processQueue(player1Consumer);
     processQueue(player2Consumer);
     

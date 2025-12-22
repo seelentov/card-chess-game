@@ -471,7 +471,7 @@ public class FightTest extends GamePlayerTestCase
     players.put("7", new Player("7", game));
     players.put("8", new Player("8", game));
     
-    Game game = new Game(players, "");
+    Game game = new Game(players);
     
     for (int i = 1; i <= 20; i++)
     {

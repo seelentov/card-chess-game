@@ -26,9 +26,9 @@ public class EventDispatcher implements AutoCloseable
   static final Logger log = LoggerFactory.getLogger(EventDispatcher.class);
   ExecutorService executor = Executors.newSingleThreadExecutor();
   BlockingQueue<Event> queue = new ArrayBlockingQueue<>(QUEUE_LENGTH);
-
+  
   volatile AtomicBoolean isStoped = new AtomicBoolean(false);
-
+  
   Game game;
   
   public EventDispatcher(Game game)
@@ -71,6 +71,16 @@ public class EventDispatcher implements AutoCloseable
   void process(Event event)
   {
     String playerUUID = event.getPlayerUUID();
+
+    if (!game.getPlayers().containsKey(playerUUID))
+    {
+      throw new IllegalArgumentException("Player not exist");
+    }
+    
+    if (!game.getPlayers().get(playerUUID).isAlive())
+    {
+      throw new IllegalArgumentException("Player is dead");
+    }
     
     switch (event.getType())
     {
@@ -128,13 +138,13 @@ public class EventDispatcher implements AutoCloseable
         SenderWaiterDataRes data = event.getData(SenderWaiterDataRes.class);
         game.doSenderWaiter(playerUUID, data.getKey(), data.getParam());
       }
-        default -> throw new RuntimeException("Unexpected event type: " + event.getType());
+      default -> throw new RuntimeException("Unexpected event type: " + event.getType());
     }
   }
-
-
+  
   @Override
-  public void close() throws Exception {
+  public void close() throws Exception
+  {
     this.isStoped.set(true);
   }
 }
