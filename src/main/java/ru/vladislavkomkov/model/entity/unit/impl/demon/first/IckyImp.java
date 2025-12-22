@@ -22,6 +22,8 @@ public class IckyImp extends Unit
     maxHealth = 1;
     actualHealth = 1;
     
+    isTavern = true;
+    
     level = 1;
     
     listener.onDeadListeners.put(

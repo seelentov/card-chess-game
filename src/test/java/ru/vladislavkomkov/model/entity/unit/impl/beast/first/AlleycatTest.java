@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
+import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.UnitTestCase;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
@@ -82,7 +83,7 @@ public class AlleycatTest extends UnitTestCase
       player.addToTable(new Imp());
     }
     
-    unit.onPlayed(game, null,player);
+    unit.onPlayed(game, null, player);
     
     assertEquals(new Imp().getName(), player.cloneTable().get(0).getName());
     assertEquals(new Alleycat().getName(), player.cloneTable().get(1).getName());
@@ -94,8 +95,17 @@ public class AlleycatTest extends UnitTestCase
   }
   
   @Test
-  void testGold()
+  void testPlayBetween()
   {
+    player.addToTable(new Alleycat());
+    player.addToTable(new Cat());
     
+    player.addToHand(Card.of(new Alleycat()));
+    player.playCard(0, 1);
+    
+    assertEquals(new Alleycat().getName(), player.getTable().get(0).getName());
+    assertEquals(new Alleycat().getName(), player.getTable().get(1).getName());
+    assertEquals(new Cat().getName(), player.getTable().get(2).getName());
+    assertEquals(new Cat().getName(), player.getTable().get(2).getName());
   }
 }

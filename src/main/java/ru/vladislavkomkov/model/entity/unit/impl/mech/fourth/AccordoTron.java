@@ -4,8 +4,12 @@ import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
 
 import java.util.List;
 
+import ru.vladislavkomkov.model.Game;
+import ru.vladislavkomkov.model.entity.Entity;
 import ru.vladislavkomkov.model.entity.unit.Type;
 import ru.vladislavkomkov.model.entity.unit.Unit;
+import ru.vladislavkomkov.model.fight.Fight;
+import ru.vladislavkomkov.model.player.Player;
 
 public class AccordoTron extends Unit
 {
@@ -28,8 +32,8 @@ public class AccordoTron extends Unit
     isMagnet = true;
     
     listener.onStartTurnListeners.put(
-        KEY_CORE,
-        (game, fight, player) -> player.addMoney(GOLD));
+            KEY_CORE,
+            (game, fight, player) -> player.addMoney(GOLD));
   }
   
   @Override

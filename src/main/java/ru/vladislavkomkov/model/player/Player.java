@@ -94,20 +94,70 @@ public class Player
     this.tavern = new Tavern(spellsPool, unitsPool);
   }
   
+  public void sendFullStat()
+  {
+    sendArmorHealth();
+    
+    sendMaxMoney();
+    sendMoney();
+    sendFreeze();
+    sendLevel();
+    sendHand();
+    sendTavern();
+    sendTable();
+    sendHealth();
+    sendArmor();
+  }
+  
   public void sendArmorHealth()
   {
     sendHealth();
     sendArmor();
   }
   
-  public void sendArmor()
+  public void sendMaxMoney()
   {
-    sendMessage(Event.Type.ARMOR, armor);
+    sendMessage(Event.Type.MAX_MONEY, getMaxMoney());
+  }
+  
+  public void sendMoney()
+  {
+    sendMessage(Event.Type.MONEY, getMoney());
+  }
+  
+  public void sendFreeze()
+  {
+    sendMessage(Event.Type.FREEZE, getTavern().isFreeze());
+  }
+  
+  public void sendLevel()
+  {
+    sendMessage(Event.Type.LVL, getLevel());
+  }
+  
+  public void sendHand()
+  {
+    sendMessage(Event.Type.HAND, getHand());
+  }
+  
+  public void sendTavern()
+  {
+    sendMessage(Event.Type.TAVERN, getTavern().getCards());
+  }
+  
+  public void sendTable()
+  {
+    sendMessage(Event.Type.TABLE, getTable());
   }
   
   public void sendHealth()
   {
-    sendMessage(Event.Type.HEALTH, health);
+    sendMessage(Event.Type.HEALTH, getHealth());
+  }
+  
+  public void sendArmor()
+  {
+    sendMessage(Event.Type.ARMOR, getArmor());
   }
   
   public void sendMessage(Event.Type type)
@@ -211,7 +261,7 @@ public class Player
     Unit unit = table.remove(fromIndex);
     table.add(toIndex, unit);
     
-    sendMessage(Event.Type.MOVE, table);
+    sendTable();
   }
   
   public boolean addToTable(Unit unit, int index)
@@ -238,7 +288,7 @@ public class Player
     }
     
     unit.onAppear(game, null, this);
-    sendMessage(Event.Type.TABLE, table);
+    sendTable();
     
     return true;
   }
@@ -259,7 +309,7 @@ public class Player
     {
       unit.onDisappear(game, null, this);
       table.removeIf(unit1 -> unit1 == unit);
-      sendMessage(Event.Type.TABLE, table);
+      sendTable();
     }
   }
   
@@ -277,6 +327,12 @@ public class Player
     return table.indexOf(unit);
   }
   
+  public void addToTavern(Entity entity)
+  {
+    tavern.add(Card.of(entity));
+    sendTavern();
+  }
+  
   public void addToHand(Card card)
   {
     addToHand(card, false);
@@ -291,13 +347,12 @@ public class Player
     }
     
     calcTriplets();
-    sendMessage(Event.Type.HAND, hand);
   }
   
   public void clearSpellCraft()
   {
     hand.removeIf(card -> card.getEntity() instanceof SpellCraft);
-    sendMessage(Event.Type.HAND, hand);
+    sendHand();
   }
   
   public void playCard(int indexCard)
@@ -331,17 +386,43 @@ public class Player
     hand.get(indexCard).play(game, this, index, isTavernIndex, index2, isTavernIndex2);
     hand.remove(indexCard);
     
-    sendMessage(Event.Type.HAND, hand);
+    sendHand();
   }
   
   public void buyCard(int index)
   {
-    if (money >= buyPrice && hand.size() < HAND_LIMIT)
+    boolean success = false;
+    
+    if (tavern.getCards().size() <= index)
     {
-      decMoney(buyPrice);
+      return;
+    }
+    
+    boolean isSpell = tavern.getCards().get(index).getEntity() instanceof Spell;
+    if (isSpell)
+    {
+      int price = tavern.getCards().get(index).getEntity().getLevel();
+      
+      if (money >= price && hand.size() < HAND_LIMIT)
+      {
+        decMoney(price);
+        success = true;
+      }
+    }
+    else
+    {
+      if (money >= buyPrice && hand.size() < HAND_LIMIT)
+      {
+        decMoney(buyPrice);
+        success = true;
+      }
+    }
+    
+    if (success)
+    {
       addToHand(tavern.buy(index));
-
-      sendMessage(Event.Type.TAVERN, tavern.getCards());
+      
+      sendTavern();
     }
   }
   
@@ -354,29 +435,32 @@ public class Player
     
     Unit unit = table.get(index);
     unit.onSell(game, null, this);
-    sendMessage(Event.Type.TABLE, table);
-    sendMessage(Event.Type.MONEY, money);
+    sendTavern();
+    sendMoney();
   }
   
   public void freezeTavern()
   {
     tavern.setFreeze(!tavern.isFreeze());
-    sendMessage(Event.Type.TAVERN, tavern.getCards());
-    sendMessage(Event.Type.FREEZE, tavern.isFreeze());
+    sendTavern();
+    sendFreeze();
   }
   
   public void resetTavernManual()
   {
-    if (statistic.counters.getFreeTavernResetCount() <= 0)
+    if (money < resetTavernPrice)
     {
-      money -= resetTavernPrice;
+      return;
     }
+    
+    money -= resetTavernPrice;
+    sendMoney();
     
     tavern.setFreeze(false);
     resetTavern();
     
-    sendMessage(Event.Type.TAVERN, tavern.getCards());
-    sendMessage(Event.Type.FREEZE, tavern.isFreeze());
+    sendTavern();
+    sendFreeze();
   }
   
   public void resetTavern()
@@ -389,8 +473,8 @@ public class Player
     tavern.reset(level, saveFreezed);
     listener.processOnResetTavernListeners(game, null, this);
     
-    sendMessage(Event.Type.FREEZE, tavern.isFreeze());
-    sendMessage(Event.Type.TAVERN, tavern.getCards());
+    sendTavern();
+    sendFreeze();
   }
   
   public void calcTriplets()
@@ -413,6 +497,9 @@ public class Player
       }
     }
     while (foundTriplets);
+    
+    sendHand();
+    sendTable();
   }
   
   Map<String, List<Pair<Boolean, Integer>>> calculateCardIndexes()
@@ -503,7 +590,7 @@ public class Player
   public void incLevel()
   {
     incLevel(false);
-    sendMessage(Event.Type.LVL, level);
+    sendLevel();
   }
   
   public void incLevel(boolean free)
@@ -517,7 +604,7 @@ public class Player
         level++;
         listener.processOnIncTavernLevelListener(game, null, this);
         decMoney(price);
-        sendMessage(Event.Type.LVL, level);
+        sendLevel();
         statistic.counters.resetIncLevelDecreaser();
       }
     }
@@ -607,13 +694,13 @@ public class Player
   public void incMaxMoney(int amount)
   {
     maxMoney += amount;
-    sendMessage(Event.Type.MAX_MONEY, getMaxMoney());
+    sendMaxMoney();
   }
   
   public void resetMoney()
   {
     money = getMaxMoney();
-    sendMessage(Event.Type.MONEY, money);
+    sendMoney();
   }
   
   public void addMoney()
@@ -624,13 +711,13 @@ public class Player
   public void addMoney(int amount)
   {
     money += amount;
-    sendMessage(Event.Type.MONEY, money);
+    sendMoney();
   }
   
   public void decMoney(int amount)
   {
     money = Math.max(money - amount, 0);
-    sendMessage(Event.Type.MONEY, money);
+    sendMoney();
   }
   
   public void doForAll(Consumer<Unit> consumer)

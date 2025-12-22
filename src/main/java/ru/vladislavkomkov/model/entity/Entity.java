@@ -22,6 +22,7 @@ public abstract class Entity implements Cloneable
   public final static String F_NAME = "name";
   public final static String F_DESCRIPTION = "description";
   public final static String F_IS_GOLD = "is_gold";
+  public final static String F_LVL = "lvl";
   
   protected Listener listener = new Listener();
   
@@ -56,6 +57,7 @@ public abstract class Entity implements Cloneable
             player));
   }
   
+  @JsonProperty(F_LVL)
   public int getLevel()
   {
     return level;

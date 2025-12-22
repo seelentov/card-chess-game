@@ -162,6 +162,10 @@ public class Game implements AutoCloseable
     }
     player.setSender(sender);
     player.sendMessage(Event.Type.CONNECTED);
+    players.values().forEach(Player::sendFullStat);
+    if(getState() != State.LOBBY){
+      player.sendMessage(Event.Type.START);
+    }
   }
   
   public void startGame(GameProcessor processor)
@@ -217,7 +221,7 @@ public class Game implements AutoCloseable
     playersLock.readLock().lock();
     try
     {
-      players.values().forEach(Player::sendArmorHealth);
+      players.values().forEach(Player::sendFullStat);
       clearSenderWaiters();
       state = State.PREPARE;
       
@@ -270,6 +274,8 @@ public class Game implements AutoCloseable
       for (Fight fight : fights)
       {
         fightFutures.add(CompletableFuture.supplyAsync(() -> {
+          fight.setup();
+          
           boolean isPlayerFirst = RandUtils.getRand(1) == 0;
           Player player = isPlayerFirst ? fight.getPlayer1() : fight.getPlayer2();
           Player player2 = isPlayerFirst ? fight.getPlayer2() : fight.getPlayer1();
@@ -278,6 +284,7 @@ public class Game implements AutoCloseable
           processStartFight(fight, player2, player);
           
           Optional<FightInfo> result;
+          
           do
           {
             result = fight.doTurn();
@@ -368,10 +375,10 @@ public class Game implements AutoCloseable
 
         if (player2 != null) {
           availablePlayers.remove(player2);
-          fights.add(new Fight(this, player1, player2));
+          fights.add(new Fight(this, player1, player2, false));
         } else if (!availablePlayers.isEmpty()) {
           player2 = availablePlayers.remove(0);
-          fights.add(new Fight(this, player1, player2));
+          fights.add(new Fight(this, player1, player2, false));
         }
       }
 

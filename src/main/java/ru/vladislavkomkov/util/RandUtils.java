@@ -49,4 +49,9 @@ public class RandUtils
     
     throw new RuntimeException("Level not found");
   }
+  
+  public static boolean getRandBool()
+  {
+    return getRand(1) == 1;
+  }
 }

@@ -23,6 +23,8 @@ public class HummingBird extends Unit
     maxHealth = 4;
     actualHealth = 4;
     
+    isTavern = true;
+    
     type = List.of(Type.BEAST);
     
     listener.onStartFightListeners.put(

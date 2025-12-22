@@ -16,4 +16,9 @@ public abstract class Spell extends Entity
   }
   
   public abstract void build();
+  
+  @Override
+  public Spell clone() {
+    return (Spell) super.clone();
+  }
 }

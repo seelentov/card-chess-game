@@ -11,6 +11,7 @@ import ru.vladislavkomkov.model.player.Player;
 public class Card<T extends Entity>
 {
   public final static String F_ENTITY = "entity";
+  public final static String F_IS_SPELL = "is_spell";
 
 
   final T entity;
@@ -40,6 +41,7 @@ public class Card<T extends Entity>
     return entity;
   }
   
+  @JsonProperty(F_IS_SPELL)
   public boolean isSpell()
   {
     return entity instanceof Spell;

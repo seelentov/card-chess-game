@@ -69,14 +69,19 @@ public class WSEventHandler extends WebSocketServer
         if (game.getPlayers().containsKey(playerUUID))
         {
           game.setPlayerSender(playerUUID, new WebSocketSender(conn));
-          log.info("Player connected: {} - {}", playerUUID, game.getUUID());
+          log.info("Player already connected: {} - {}", playerUUID, game.getUUID());
           return;
+        }
+        
+        if(game.getPlayers().size() >= Game.PLAYERS_COUNT){
+          throw new RuntimeException("Game lobby is full");
         }
         
         clearUserFromGames(playerUUID);
         
         game.addPlayer(playerUUID, new Player(playerUUID, game));
         game.setPlayerSender(playerUUID, new WebSocketSender(conn));
+        log.info("Player connected: {} - {}", playerUUID, game.getUUID());
         
         return;
       }
@@ -84,6 +89,7 @@ public class WSEventHandler extends WebSocketServer
       if (event.getType() == Event.Type.DISCONNECTED)
       {
         game.getPlayers().get(playerUUID).sendMessage(Event.Type.DISCONNECTED);
+        game.getPlayers().get(playerUUID).setSender(null);
         log.info("Player disconnected: {} - {}", playerUUID, game.getUUID());
         return;
       }

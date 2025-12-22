@@ -28,13 +28,20 @@ public class Fight
   
   List<FightEvent> history = new ArrayList<>();
   
-  public Fight(Game game, Player player1, Player player2)
+  public Fight(Game game, Player player1, Player player2){
+    this(game, player1, player2, true);
+  }
+  
+  public Fight(Game game, Player player1, Player player2, boolean isSetup)
   {
     this.game = game;
     this.player1 = player1;
     this.player2 = player2;
     
-    setup();
+    if (isSetup)
+    {
+      setup();
+    }
   }
   
   public void addToHistory(FightEvent.Type event, Player player, List<Object> data)
@@ -114,7 +121,7 @@ public class Fight
     return processTurn(isPlayer1Turn);
   }
   
-  void setup()
+  public void setup()
   {
     this.player1Units = new ArrayList<>();
     this.player2Units = new ArrayList<>();
@@ -337,7 +344,7 @@ public class Fight
   
   void afterFight()
   {
-
+    
   }
   
   public int getTurn()

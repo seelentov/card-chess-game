@@ -385,7 +385,7 @@ public class GameProcessorTest
     Cat unit2 = new Cat();
     player2.getTable().add(unit2);
     
-    gameProcessor.games.get(gameUUID).setFights(List.of(new Fight(game, player1, player2)));
+    gameProcessor.games.get(gameUUID).setFights(List.of(new Fight(game, player1, player2, false)));
     gameProcessor.processFight();
     
     processQueue(player1Consumer);
@@ -394,6 +394,21 @@ public class GameProcessorTest
     assertEquals(((Player.START_HEALTH + Player.START_ARMOR) - 2), player2.getFullHealth());
     
     assertEquals(((Player.START_HEALTH + Player.START_ARMOR) - 2), player2Consumer.health + player2Consumer.armor);
+  }
+  
+  @Test
+  void testPlayBetween()
+  {
+    player1.addToTable(new Alleycat());
+    player1.addToTable(new Cat());
+    
+    player1.addToHand(Card.of(new Alleycat()));
+    player1.playCard(0, 1);
+    
+    assertEquals(new Alleycat().getName(), player1Consumer.table.get(0).get(Unit.F_NAME));
+    assertEquals(new Alleycat().getName(), player1Consumer.table.get(1).get(Unit.F_NAME));
+    assertEquals(new Cat().getName(), player1Consumer.table.get(2).get(Unit.F_NAME));
+    assertEquals(new Cat().getName(), player1Consumer.table.get(3).get(Unit.F_NAME));
   }
   
   private void processQueue(MockConsumer consumer)

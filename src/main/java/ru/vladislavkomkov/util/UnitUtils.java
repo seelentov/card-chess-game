@@ -10,12 +10,12 @@ public class UnitUtils
 {
   public static List<Unit> getAll()
   {
-    return Units.units;
+    return Units.units.stream().map(Unit::clone).toList();
   };
   
   public static List<Unit> getTavern()
   {
-    return Units.tavernUnits;
+    return Units.tavernUnits.stream().map(Unit::clone).toList();
   };
   
   public static List<Unit> getByTavern(int lvl)
@@ -29,9 +29,8 @@ public class UnitUtils
     return getByTavern(lvl, units);
   }
   
-  
   public static List<Unit> getByTavern(int lvl, List<Unit> pool)
   {
-    return pool.stream().filter(unit -> unit.getLevel() == lvl).toList();
+    return pool.stream().filter(unit -> unit.getLevel() == lvl).map(Unit::clone).toList();
   };
 }

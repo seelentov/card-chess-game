@@ -17,6 +17,7 @@ import ru.vladislavkomkov.model.entity.spell.impl.spellcraft.impl.DeepBlues;
 import ru.vladislavkomkov.model.entity.unit.impl.beast.first.Alleycat;
 import ru.vladislavkomkov.model.entity.unit.impl.mech.fourth.AccordoTron;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
+import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cubling;
 import ru.vladislavkomkov.util.SpellUtils;
 
 public class TavernTest
@@ -72,10 +73,12 @@ public class TavernTest
   }
   
   @Test
-  void testSpellFreezed() {
+  void testSpellFreezed()
+  {
     Tavern tavern = new Tavern();
     
-    for (int j = 0; j < 1000; j++) {
+    for (int j = 0; j < 1000; j++)
+    {
       tavern.cards.add(new Tavern.Slot(Card.of(new Cat())));
       tavern.cards.add(new Tavern.Slot(Card.of(new Alleycat())));
       tavern.cards.add(new Tavern.Slot(Card.of(new AccordoTron())));
@@ -146,6 +149,27 @@ public class TavernTest
       assertFalse(tavern.cards.get(1).getEntity() instanceof Spell);
       assertFalse(tavern.cards.get(2).getEntity() instanceof Spell);
       assertFalse(tavern.cards.get(3).getEntity() instanceof Spell);
+    }
+  }
+  
+  @Test
+  void testTwoFreeze()
+  {
+    Tavern tavern = new Tavern();
+    
+    for (int j = 0; j < 1000; j++)
+    {
+      tavern.cards.add(new Tavern.Slot(Card.of(new Cat()), true));
+      tavern.cards.add(new Tavern.Slot(Card.of(new Cubling())));
+      tavern.cards.add(new Tavern.Slot(Card.of(new Cat()), true));
+      tavern.cards.add(new Tavern.Slot(Card.of(new Cubling())));
+      
+      tavern.reset(1);
+      
+      assertEquals(new Cat().getName(), tavern.cards.get(0).getEntity().getName());
+      assertEquals(new Cat().getName(), tavern.cards.get(1).getEntity().getName());
+      assertNotEquals(new Cubling().getName(), tavern.cards.get(2).getEntity().getName());
+      assertNotEquals(new Cubling().getName(), tavern.cards.get(3).getEntity().getName());
     }
   }
 }

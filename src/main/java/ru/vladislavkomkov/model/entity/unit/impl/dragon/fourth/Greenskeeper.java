@@ -21,6 +21,8 @@ public class Greenskeeper extends Unit
     maxHealth = 5;
     actualHealth = 5;
     
+    isTavern = true;
+    
     level = 4;
     
     listener.onAttackListeners.put(
@@ -32,7 +34,7 @@ public class Greenskeeper extends Unit
             Unit unit = units.get(i);
             if (unit.isAnswerOnPlayed())
             {
-              unit.onPlayed(game, fight, player, RandUtils.getRand(units.size()), RandUtils.getRand(units.size()));
+              unit.onPlayed(game, fight, player, RandUtils.getRand(units.size()), RandUtils.getRandBool(), RandUtils.getRand(units.size()), RandUtils.getRandBool(), true);
               break;
             }
           }
@@ -47,7 +49,7 @@ public class Greenskeeper extends Unit
     gold.getListener().onAttackListeners.put(
         KEY_CORE,
         (game, fight, player, player2, unit1, attacked) -> {
-            List<Unit> units = fight != null ? fight.getFightTable(player) : player.cloneTable();
+          List<Unit> units = fight != null ? fight.getFightTable(player) : player.cloneTable();
           for (int i = units.size() - 1; i >= 0; i--)
           {
             Unit u = units.get(i);

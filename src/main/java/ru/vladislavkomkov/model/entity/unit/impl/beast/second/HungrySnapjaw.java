@@ -25,6 +25,8 @@ public class HungrySnapjaw extends Unit
     maxHealth = 2;
     actualHealth = 2;
     
+    isTavern = true;
+    
     type = List.of(Type.BEAST);
     
     listener.onPlayedListeners.put(

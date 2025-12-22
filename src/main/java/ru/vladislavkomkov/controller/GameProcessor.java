@@ -124,9 +124,10 @@ public class GameProcessor implements AutoCloseable
     
     game.sendPreFightTimer(preFightTimer);
     
-    if (preFightTimer > 0)
-    {
-      Thread.sleep(preFightTimer);
+    while (preFightTimer > 0) {
+      Thread.sleep(1000);
+      preFightTimer = Math.max(0, preFightTimer - 1000);
+      game.sendPreFightTimer(preFightTimer);
     }
 
     game.doTurnEnd();

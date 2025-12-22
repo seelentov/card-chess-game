@@ -23,6 +23,8 @@ public class RisenRider extends Unit
     maxHealth = 1;
     actualHealth = 1;
     
+    isTavern = true;
+    
     level = 1;
   }
 }
