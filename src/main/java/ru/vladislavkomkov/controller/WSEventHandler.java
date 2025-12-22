@@ -53,7 +53,7 @@ public class WSEventHandler extends WebSocketServer
     try
     {
       Event event = new Event(buffer);
-
+      
       log.info("Message received: {}", event);
       if (!games.containsKey(event.getGameUUID()))
       {
@@ -68,12 +68,23 @@ public class WSEventHandler extends WebSocketServer
       {
         if (game.getPlayers().containsKey(playerUUID))
         {
+          if (!game.getPlayers().get(playerUUID).isAlive())
+          {
+            throw new RuntimeException("Player is lose");
+          }
+          
           game.setPlayerSender(playerUUID, new WebSocketSender(conn));
-          log.info("Player already connected: {} - {}", playerUUID, game.getUUID());
+          log.info("Player reconnected: {} - {}", playerUUID, game.getUUID());
           return;
         }
         
-        if(game.getPlayers().size() >= Game.PLAYERS_COUNT){
+        if (game.getState() != Game.State.LOBBY)
+        {
+          throw new RuntimeException("Game already started");
+        }
+        
+        if (game.getPlayers().size() >= Game.PLAYERS_COUNT)
+        {
           throw new RuntimeException("Game lobby is full");
         }
         
@@ -138,7 +149,7 @@ public class WSEventHandler extends WebSocketServer
         log.error("Failed close event dispatcher", ex);
       }
     });
-
+    
     super.stop();
   }
   

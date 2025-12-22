@@ -56,6 +56,7 @@ public class GameProcessor implements AutoCloseable
         {
           if (process(game))
           {
+            games.remove(game.getUUID());
             break;
           }
         }
