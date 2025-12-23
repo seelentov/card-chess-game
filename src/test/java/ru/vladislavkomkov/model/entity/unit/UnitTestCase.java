@@ -36,7 +36,7 @@ public abstract class UnitTestCase extends GamePlayerTestCase
     setUp();
     
     player.addToTable(unit, 0);
-    Unit unit2 = (Unit) unit.newThis();
+    Unit unit2 = (Unit) unit.newBase();
     player2.addToTable(unit2, 0);
     
     if (unit.isRebirth)
@@ -59,11 +59,11 @@ public abstract class UnitTestCase extends GamePlayerTestCase
     assertEquals(0, player.cloneHand().size());
     assertEquals(1, player.getUnitsCount());
     
-    player.addToHand(Card.of(unit.newThis()));
+    player.addToHand(Card.of(unit.newBase()));
     assertEquals(1, player.cloneHand().size());
     assertEquals(1, player.getUnitsCount());
     
-    player.addToHand(Card.of(unit.newThis()));
+    player.addToHand(Card.of(unit.newBase()));
     assertEquals(1, player.cloneHand().size());
     assertEquals(0, player.getUnitsCount());
     
@@ -80,7 +80,7 @@ public abstract class UnitTestCase extends GamePlayerTestCase
     setUp();
     
     player.addToTable(unit, 0);
-    Unit unit2 = (Unit) unit.newThis();
+    Unit unit2 = (Unit) unit.newBase();
     player2.addToTable(unit2, 0);
     
     int unitBeginHP = unit.getHealth();

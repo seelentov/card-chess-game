@@ -6,16 +6,12 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import org.java_websocket.WebSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
-import ru.vladislavkomkov.controller.sender.Sender;
-import ru.vladislavkomkov.controller.sender.WebSocketSender;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.event.Event;
 import ru.vladislavkomkov.model.event.data.SenderWaiterDataRes;
@@ -71,7 +67,7 @@ public class EventDispatcher implements AutoCloseable
   void process(Event event)
   {
     String playerUUID = event.getPlayerUUID();
-
+    
     if (!game.getPlayers().containsKey(playerUUID))
     {
       throw new IllegalArgumentException("Player not exist");
@@ -92,28 +88,15 @@ public class EventDispatcher implements AutoCloseable
         {
         });
         
-        if (data.size() < 5)
+        if (data.isEmpty())
         {
-          throw new IllegalArgumentException("Expected " + 5 + " arguments, but got " + data.size());
-        }
-        
-        if (data.get(2) != 0 && data.get(2) != 1)
-        {
-          throw new IllegalArgumentException("Expected 0/1 arguments, but got " + data.get(2));
-        }
-        
-        if (data.get(4) != 0 && data.get(4) != 1)
-        {
-          throw new IllegalArgumentException("Expected 0/1 arguments, but got " + data.get(2));
+          throw new IllegalArgumentException("Empty data");
         }
         
         game.playCard(
             playerUUID,
             data.get(0),
-            data.get(1),
-            data.get(2) == 1,
-            data.get(3),
-            data.get(4) == 1);
+            data.subList(1, data.size()));
       }
       case SELL -> {
         game.sellCard(playerUUID, event.getDataAsInt());
@@ -138,7 +121,7 @@ public class EventDispatcher implements AutoCloseable
         SenderWaiterDataRes data = event.getData(SenderWaiterDataRes.class);
         game.doSenderWaiter(playerUUID, data.getKey(), data.getParam());
       }
-      default -> throw new RuntimeException("Unexpected event type: " + event.getType());
+      default -> throw new RuntimeException("Unexpected event unitType: " + event.getType());
     }
   }
   

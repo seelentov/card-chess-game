@@ -2,14 +2,16 @@ package ru.vladislavkomkov.model.entity.unit.impl.dragon.fourth;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
-import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.UnitTestCase;
 import ru.vladislavkomkov.model.entity.unit.impl.beast.first.Alleycat;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
+import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.player.Player;
 
 public class GreenskeeperTest extends UnitTestCase
@@ -17,7 +19,7 @@ public class GreenskeeperTest extends UnitTestCase
   @Test
   void testDefault()
   {
-    super.testDefault(new Alleycat());
+    super.testDefault(new Greenskeeper());
   }
   
   @Test
@@ -41,7 +43,13 @@ public class GreenskeeperTest extends UnitTestCase
         }
         
         @Override
-        public void onPlayed(Game game, Fight fight, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2, boolean auto)
+        public void buildFace(Player player)
+        {
+          
+        }
+        
+        @Override
+        public void onPlayed(Game game, Fight fight, Player player, List<Integer> input, boolean auto)
         {
           player.addMoney(finalI * moneyStep);
         }
@@ -60,9 +68,17 @@ public class GreenskeeperTest extends UnitTestCase
     
     player.addToTable(gk);
     player.addToTable(new Alleycat());
+    player.addToTable(new Cat());
+    player.addToTable(new Cat());
+    player.addToTable(new Alleycat());
     
     gk.onAttack(game, null, player, player2, new Cat());
     
+    assertEquals(new Greenskeeper().getName(), player.getTable().get(0).getName());
+    assertEquals(new Alleycat().getName(), player.getTable().get(1).getName());
     assertEquals(new Cat().getName(), player.getTable().get(2).getName());
+    assertEquals(new Cat().getName(), player.getTable().get(3).getName());
+    assertEquals(new Alleycat().getName(), player.getTable().get(4).getName());
+    assertEquals(new Cat().getName(), player.getTable().get(5).getName());
   }
 }

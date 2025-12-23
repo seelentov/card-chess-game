@@ -12,8 +12,8 @@ public class FightEvent
   public final static String F_TYPE = "type";
   public final static String F_PLAYER = "player";
   
-  public final static String F_PLAYER_UNITS = "playerUnits";
-  public final static String F_ENEMY_UNITS = "enemyUnits";
+  public final static String F_PLAYER_UNITS = "player_units";
+  public final static String F_ENEMY_UNITS = "enemy_units";
   public final static String F_DATA = "data";
   
   public final Type type;

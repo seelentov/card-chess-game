@@ -9,6 +9,7 @@ import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.spell.Spell;
 import ru.vladislavkomkov.model.entity.spell.impl.spellcraft.SpellCraftTestCase;
 import ru.vladislavkomkov.model.entity.unit.Unit;
+import ru.vladislavkomkov.model.player.Player;
 
 public class DeepBluesTest extends SpellCraftTestCase
 {
@@ -36,6 +37,11 @@ public class DeepBluesTest extends SpellCraftTestCase
     
     Unit unit = new Unit()
     {
+      @Override
+      public void buildFace(Player player)
+      {
+        
+      }
     };
     
     player.addToTable(unit, unitIndex);

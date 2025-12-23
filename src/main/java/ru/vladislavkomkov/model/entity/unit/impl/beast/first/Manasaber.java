@@ -4,10 +4,10 @@ import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
 
 import java.util.List;
 
-import ru.vladislavkomkov.model.entity.unit.Type;
 import ru.vladislavkomkov.model.entity.unit.Unit;
-import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
+import ru.vladislavkomkov.model.entity.unit.UnitType;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cubling;
+import ru.vladislavkomkov.model.player.Player;
 
 public class Manasaber extends Unit
 {
@@ -22,9 +22,7 @@ public class Manasaber extends Unit
     maxHealth = 1;
     actualHealth = 1;
     
-    type = List.of(Type.BEAST);
-    
-    isAnswerOnDead = true;
+    unitType = List.of(UnitType.BEAST);
     
     listener.onDeadListeners.put(
         KEY_CORE,
@@ -51,7 +49,6 @@ public class Manasaber extends Unit
   public Unit buildGold(Unit unit, Unit unit2, Unit unit3)
   {
     Unit gold = super.buildGold(unit, unit2, unit3);
-    
     gold.setDescription("Deathrattle: Summon two 0/2 Cublings with Taunt");
     gold.getListener().onDeadListeners.put(
         KEY_CORE,
@@ -76,4 +73,9 @@ public class Manasaber extends Unit
     return gold;
   }
   
+  @Override
+  public void buildFace(Player player)
+  {
+    
+  }
 }

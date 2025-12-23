@@ -9,9 +9,9 @@ import java.util.function.Supplier;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import ru.vladislavkomkov.consts.Listeners;
-import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.Listener;
+import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.fight.FightEvent;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.UUIDUtils;
@@ -19,19 +19,27 @@ import ru.vladislavkomkov.util.UUIDUtils;
 public abstract class Entity implements Cloneable
 {
   public final static String F_ID = "id";
+  
   public final static String F_NAME = "name";
   public final static String F_DESCRIPTION = "description";
+  
   public final static String F_IS_GOLD = "is_gold";
+  public final static String F_IS_SPELL = "is_spell";
+  
   public final static String F_LVL = "lvl";
+  
+  public final static String F_PLAY_TYPE = "play_type";
   
   protected Listener listener = new Listener();
   
-  protected int ID = System.identityHashCode(this);
+  protected String ID = UUIDUtils.generateKey();
   protected String name = this.getClass().getSimpleName();
   protected String description = "";
   protected int level = 1;
   protected boolean isTavern = false;
   protected boolean isGold;
+  
+  protected List<PlayPair> playType = List.of();
   
   public Entity()
   {
@@ -41,21 +49,15 @@ public abstract class Entity implements Cloneable
   public Entity(boolean isGold)
   {
     this.isGold = isGold;
-    
-    listener.onPlayedListeners.put(
-        UUIDUtils.generateKey(),
-        (game, fight, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto) -> processListeners(
-            player.listener.onPlayedListeners,
-            (action) -> action.process(game, null, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto),
-            player));
-    
-    listener.onHandledListeners.put(
-        UUIDUtils.generateKey(),
-        (game, fight, player, entity) -> processListeners(
-            player.listener.onHandledListeners,
-            (action) -> action.process(game, null, player, entity),
-            player));
   }
+  
+  @JsonProperty(F_PLAY_TYPE)
+  public List<PlayPair> getPlayUnitType()
+  {
+    return playType;
+  }
+  
+  public abstract void buildFace(Player player);
   
   @JsonProperty(F_LVL)
   public int getLevel()
@@ -70,6 +72,11 @@ public abstract class Entity implements Cloneable
   
   public void onHandled(Game game, Fight fight, Player player)
   {
+    processListeners(
+        player.listener.onHandledListeners,
+        (action) -> action.process(game, null, player, this),
+        player);
+    
     listener.processOnHandledListeners(game, fight, player, this);
     if (fight != null)
     {
@@ -79,40 +86,41 @@ public abstract class Entity implements Cloneable
   
   public void onPlayed(Game game, Fight fight, Player player)
   {
-    onPlayed(game, fight, player, 0, false);
+    onPlayed(game, fight, player, 0);
   }
   
   public void onPlayed(Game game, Fight fight, Player player, int index)
   {
-    onPlayed(game, fight, player, index, false, 0);
+    onPlayed(game, fight, player, index, false);
   }
   
   public void onPlayed(Game game, Fight fight, Player player, int index, int index2)
   {
-    onPlayed(game, fight, player, index, false, index2);
+    onPlayed(game, fight, player, List.of(index, 0, index2, 0));
+    ;
   }
   
   public void onPlayed(Game game, Fight fight, Player player, int index, boolean isTavernIndex)
   {
-    onPlayed(game, fight, player, index, isTavernIndex, 0);
+    onPlayed(game, fight, player, List.of(index, isTavernIndex ? 1 : 0));
   }
   
-  public void onPlayed(Game game, Fight fight, Player player, int index, boolean isTavernIndex, int index2)
+  public void onPlayed(Game game, Fight fight, Player player, List<Integer> input)
   {
-    onPlayed(game, fight, player, index, isTavernIndex, index2, false);
+    onPlayed(game, fight, player, input, false);
   }
   
-  public void onPlayed(Game game, Fight fight, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2)
+  public void onPlayed(Game game, Fight fight, Player player, List<Integer> input, boolean auto)
   {
-    onPlayed(game, fight, player, index, isTavernIndex, index2, isTavernIndex2, false);
-  }
-  
-  public void onPlayed(Game game, Fight fight, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2, boolean auto)
-  {
-    listener.processOnPlayedListeners(game, fight, player, this, index, isTavernIndex, index2, isTavernIndex2, auto);
+    processListeners(
+        player.listener.onPlayedListeners,
+        (action) -> action.process(game, fight, player, this, input, auto),
+        player);
+    
+    listener.processOnPlayedListeners(game, fight, player, this, input, auto);
     if (fight != null)
     {
-      fight.addToHistory(FightEvent.Type.ON_PLAYED, player, List.of(this, index, isTavernIndex, index2, isTavernIndex2, auto));
+      fight.addToHistory(FightEvent.Type.ON_PLAYED, player, List.of(input, auto));
     }
   }
   
@@ -134,7 +142,7 @@ public abstract class Entity implements Cloneable
   }
   
   @JsonProperty(F_ID)
-  public int getID()
+  public String getID()
   {
     return ID;
   }
@@ -155,7 +163,7 @@ public abstract class Entity implements Cloneable
     return description;
   }
   
-  public Entity newThis()
+  public Entity newBase()
   {
     Supplier<? extends Entity> supplier = () -> {
       try
@@ -169,6 +177,19 @@ public abstract class Entity implements Cloneable
     };
     
     return supplier.get();
+  }
+  
+  public Entity newGold()
+  {
+    Entity u = this.newBase();
+    u.setIsGold(true);
+    
+    return u;
+  }
+  
+  public Entity newThis()
+  {
+    return isGold ? newGold() : newBase();
   }
   
   @JsonProperty(F_IS_GOLD)
@@ -201,4 +222,12 @@ public abstract class Entity implements Cloneable
       throw new AssertionError("Clone not supported", e);
     }
   }
+  
+  protected String generateKey()
+  {
+    return UUIDUtils.generateKey(getID() + "_");
+  }
+  
+  @JsonProperty(F_IS_SPELL)
+  public abstract boolean isSpell();
 }

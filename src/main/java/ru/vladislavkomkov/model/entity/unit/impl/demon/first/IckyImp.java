@@ -4,10 +4,10 @@ import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
 
 import java.util.List;
 
-import ru.vladislavkomkov.model.entity.unit.Type;
 import ru.vladislavkomkov.model.entity.unit.Unit;
-import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cubling;
+import ru.vladislavkomkov.model.entity.unit.UnitType;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.demon.first.Imp;
+import ru.vladislavkomkov.model.player.Player;
 
 public class IckyImp extends Unit
 {
@@ -15,7 +15,7 @@ public class IckyImp extends Unit
   {
     description = "Deathrattle: Summon two 1/1 Imps";
     
-    type = List.of(Type.DEMON);
+    unitType = List.of(UnitType.DEMON);
     
     attack = 1;
     
@@ -73,5 +73,11 @@ public class IckyImp extends Unit
         });
     
     return gold;
+  }
+  
+  @Override
+  public void buildFace(Player player)
+  {
+    
   }
 }

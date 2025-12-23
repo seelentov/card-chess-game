@@ -107,6 +107,7 @@ public class Player
     sendTable();
     sendHealth();
     sendArmor();
+    sendLvlIncPrice();
   }
   
   public void sendArmorHealth()
@@ -118,6 +119,11 @@ public class Player
   public void sendMaxMoney()
   {
     sendMessage(Event.Type.MAX_MONEY, getMaxMoney());
+  }
+  
+  public void sendLvlIncPrice()
+  {
+    sendMessage(Event.Type.LVL_PRICE, getIncLevelPrice());
   }
   
   public void sendMoney()
@@ -137,17 +143,17 @@ public class Player
   
   public void sendHand()
   {
-    sendMessage(Event.Type.HAND, getHand());
+    sendMessage(Event.Type.HAND, getHand().stream().peek(card -> card.getEntity().buildFace(this)).toList());
   }
   
   public void sendTavern()
   {
-    sendMessage(Event.Type.TAVERN, getTavern().getCards());
+    sendMessage(Event.Type.TAVERN, getTavern().getCards().stream().peek(slot -> slot.getEntity().buildFace(this)).toList());
   }
   
   public void sendTable()
   {
-    sendMessage(Event.Type.TABLE, getTable());
+    sendMessage(Event.Type.TABLE, getTable().stream().peek(entity -> entity.buildFace(this)).toList());
   }
   
   public void sendHealth()
@@ -357,25 +363,25 @@ public class Player
   
   public void playCard(int indexCard)
   {
-    playCard(indexCard, 0, false, 0, false);
+    playCard(indexCard, 0);
   }
   
   public void playCard(int indexCard, int index)
   {
-    playCard(indexCard, index, false, 0, false);
+    playCard(indexCard, index, 0);
+  }
+  
+  public void playCard(int indexCard, int index, int index2)
+  {
+    playCard(indexCard, List.of(index, 0, index2, 0));
   }
   
   public void playCard(int indexCard, int index, boolean isTavernIndex)
   {
-    playCard(indexCard, index, isTavernIndex, 0, false);
+    playCard(indexCard, List.of(index, isTavernIndex ? 1 : 0));
   }
   
-  public void playCard(int indexCard, int index, boolean isTavernIndex, int index2)
-  {
-    playCard(indexCard, index, isTavernIndex, index2, false);
-  }
-  
-  public void playCard(int indexCard, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2)
+  public void playCard(int indexCard, List<Integer> input)
   {
     if (indexCard < 0 || indexCard >= hand.size())
     {
@@ -383,8 +389,10 @@ public class Player
           "Index " + indexCard + " not existed in hand with length " + hand.size());
     }
     
-    hand.get(indexCard).play(game, this, index, isTavernIndex, index2, isTavernIndex2);
-    hand.remove(indexCard);
+    if (hand.get(indexCard).play(game, this, input))
+    {
+      hand.remove(indexCard);
+    }
     
     sendHand();
   }
@@ -657,6 +665,13 @@ public class Player
     
     armor = Math.max(armor - damage, 0);
     health -= piercingDamage;
+    
+    if (!isAlive())
+    {
+      sendMessage(Event.Type.LOSE);
+      sendMessage(Event.Type.DISCONNECTED);
+      return;
+    }
     
     sendArmorHealth();
   }

@@ -86,6 +86,8 @@ public class Fight
     {
       table.add(indexParent + 1, unit);
     }
+    
+    unit.onAppear(game, this, player);
   }
   
   public List<Unit> getFightTable(Player player)

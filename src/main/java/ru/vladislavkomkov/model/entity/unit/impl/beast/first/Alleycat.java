@@ -4,10 +4,10 @@ import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
 
 import java.util.List;
 
-import ru.vladislavkomkov.consts.Units;
-import ru.vladislavkomkov.model.entity.unit.Type;
 import ru.vladislavkomkov.model.entity.unit.Unit;
+import ru.vladislavkomkov.model.entity.unit.UnitType;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
+import ru.vladislavkomkov.model.player.Player;
 
 public class Alleycat extends Unit
 {
@@ -22,13 +22,11 @@ public class Alleycat extends Unit
     maxHealth = 1;
     actualHealth = 1;
     
-    type = List.of(Type.BEAST);
-    
-    isAnswerOnPlayed = true;
+    unitType = List.of(UnitType.BEAST);
     
     listener.onPlayedListeners.put(
         KEY_CORE,
-        (game, fight, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto) -> {
+        (game, fight, player, entity, input, auto) -> {
           if (fight != null)
           {
             fight.addToFightTable(player, new Cat(), (Unit) entity);
@@ -49,7 +47,7 @@ public class Alleycat extends Unit
     gold.setDescription("Summon a 2/2 Cat");
     gold.getListener().onPlayedListeners.put(
         KEY_CORE,
-        (game, fight, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto) -> {
+        (game, fight, player, entity, input, auto) -> {
           if (fight != null)
           {
             fight.addToFightTable(player, new Cat().newGold(), (Unit) entity);
@@ -62,5 +60,11 @@ public class Alleycat extends Unit
         });
     
     return gold;
+  }
+  
+  @Override
+  public void buildFace(Player player)
+  {
+    
   }
 }

@@ -58,8 +58,7 @@ public class PlayerTest extends GamePlayerTestCase
       }
       
       @Override
-      public void onPlayed(Game game, Fight fight, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2, boolean auto)
-      {
+      public void onPlayed(Game game, Fight fight, Player player, List<Integer> input, boolean auto) {
         player.addMoney(moneyTest);
       }
     }));

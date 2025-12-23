@@ -1,11 +1,12 @@
 package ru.vladislavkomkov.model.entity.unit.impl.beast.second;
 
-import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
-
 import java.util.List;
 
-import ru.vladislavkomkov.model.entity.unit.Type;
+import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.entity.unit.Unit;
+import ru.vladislavkomkov.model.entity.unit.UnitType;
+import ru.vladislavkomkov.model.fight.Fight;
+import ru.vladislavkomkov.model.player.Player;
 
 public class HummingBird extends Unit
 {
@@ -25,23 +26,7 @@ public class HummingBird extends Unit
     
     isTavern = true;
     
-    type = List.of(Type.BEAST);
-    
-    listener.onStartFightListeners.put(
-        KEY_CORE,
-        (game, fight, player, player2) -> {
-          if (fight == null)
-          {
-            return;
-          }
-          for (Unit unit : fight.getFightTable(player))
-          {
-            if (unit.isType(Type.BEAST))
-            {
-              unit.incAttack(ATTACK_BOOST);
-            }
-          }
-        });
+    unitType = List.of(UnitType.BEAST);
   }
   
   @Override
@@ -50,22 +35,19 @@ public class HummingBird extends Unit
     Unit gold = super.buildGold(unit1, unit2, unit3);
     
     gold.setDescription("Start of Combat: For the rest of this combat, your Beasts have +2 Attack");
-    gold.getListener().onStartFightListeners.put(
-        KEY_CORE,
-        (game, fight, player, player2) -> {
-          if (fight == null)
-          {
-            return;
-          }
-          for (Unit unit : fight.getFightTable(player))
-          {
-            if (unit.isType(Type.BEAST))
-            {
-              unit.incAttack(ATTACK_BOOST * 2);
-            }
-          }
-        });
-    
     return gold;
+  }
+  
+  @Override
+  public void onStartFight(Game game, Fight fight, Player player, Player player2)
+  {
+    fight.getFightTable(player).forEach(unit -> unit.incAttack(!isGold() ? ATTACK_BOOST : ATTACK_BOOST * 2));
+    super.onStartFight(game, fight, player, player2);
+  }
+  
+  @Override
+  public void buildFace(Player player)
+  {
+    
   }
 }

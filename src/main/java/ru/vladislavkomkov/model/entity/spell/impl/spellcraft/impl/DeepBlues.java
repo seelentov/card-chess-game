@@ -2,9 +2,12 @@ package ru.vladislavkomkov.model.entity.spell.impl.spellcraft.impl;
 
 import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
 
-import ru.vladislavkomkov.model.Game;
+import java.util.List;
+
+import ru.vladislavkomkov.model.entity.PlayType;
 import ru.vladislavkomkov.model.entity.spell.impl.spellcraft.SpellCraft;
 import ru.vladislavkomkov.model.entity.unit.Buff;
+import ru.vladislavkomkov.model.entity.PlayPair;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.player.Player;
 
@@ -25,6 +28,8 @@ public class DeepBlues extends SpellCraft
   {
     super(isGold);
     build();
+    
+    playType = List.of(new PlayPair(PlayType.TAVERN_FRENDLY));
   }
   
   @Override
@@ -34,20 +39,26 @@ public class DeepBlues extends SpellCraft
     
     listener.onPlayedListeners.put(
         KEY_CORE,
-        (game, fight, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto) -> {
+        (game, fight, player, entity, input, auto) -> {
           
           int multi = calcMulti(player);
           int attackBonus = getAttackBoost(multi);
           int hpBonus = getHealthBoost(multi);
           
+          if(input.size() < 2){
+              return;
+          }
+          
+          boolean isTavernIndex = input.get(1) == 1;
+          
           Unit unit;
           if (!isTavernIndex)
           {
-            unit = player.getTable().get(index);
+            unit = player.getTable().get(input.get(0));
           }
           else
           {
-            unit = (Unit) player.getTavern().getCards().get(index).getCard().getEntity();
+            unit = (Unit) player.getTavern().getCards().get(input.get(0)).getCard().getEntity();
           }
           
           unit.addBuff(
@@ -60,7 +71,7 @@ public class DeepBlues extends SpellCraft
                     unit1.decAttack(attackBonus);
                     unit1.decHealth(hpBonus);
                   },
-                  description));
+                  getDescription(player)));
                   
           player.statistic.played.onlyBluesPlayed++;
         });
@@ -82,7 +93,8 @@ public class DeepBlues extends SpellCraft
   public String getDescription(Player player)
   {
     int multi = calcMulti(player);
-    return String.format(description, getAttackBoost(multi), getHealthBoost(multi));
+    String formatDescription = "Give a minion +%d/+%d until next turn. Improve your future Deep Blues.";
+    return String.format(formatDescription, getAttackBoost(multi), getHealthBoost(multi));
   }
   
   int getAttackBoost(int multi)
@@ -93,5 +105,11 @@ public class DeepBlues extends SpellCraft
   int getHealthBoost(int multi)
   {
     return (isGold ? HEALTH_BOOST_GOLD : HEALTH_BOOST) * multi;
+  }
+  
+  @Override
+  public void buildFace(Player player)
+  {
+    description = getDescription(player);
   }
 }

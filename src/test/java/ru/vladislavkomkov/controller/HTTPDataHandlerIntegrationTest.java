@@ -15,11 +15,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.player.Player;
@@ -175,7 +176,7 @@ public class HTTPDataHandlerIntegrationTest extends IntegrationTestCase
     
     HttpRequest startRequest = HttpRequest.newBuilder()
             .uri(URI.create("http://localhost:" + port + "/games/" + gameUUID + "/start"))
-            .header("Content-Type", "application/json")
+        .header("Content-UnitType", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
             .build();
     
@@ -223,7 +224,7 @@ public class HTTPDataHandlerIntegrationTest extends IntegrationTestCase
     
     HttpRequest startRequest = HttpRequest.newBuilder()
             .uri(URI.create("http://localhost:" + port + "/games/" + gameUUID + "/start"))
-            .header("Content-Type", "application/json")
+        .header("Content-UnitType", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
             .build();
     

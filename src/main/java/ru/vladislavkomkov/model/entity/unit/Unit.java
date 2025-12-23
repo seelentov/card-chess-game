@@ -5,14 +5,15 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.Entity;
+import ru.vladislavkomkov.model.entity.PlayPair;
+import ru.vladislavkomkov.model.entity.PlayType;
 import ru.vladislavkomkov.model.entity.spell.impl.TripleReward;
+import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.fight.FightEvent;
 import ru.vladislavkomkov.model.player.Player;
-import ru.vladislavkomkov.util.UUIDUtils;
 
 public abstract class Unit extends Entity
 {
@@ -28,9 +29,10 @@ public abstract class Unit extends Entity
   public final static String F_IS_DISGUISE = "is_disguise";
   
   public final static String F_BUFFS = "buffs";
+  public final static String F_TYPE = "type";
   
   List<Buff> buffs = new ArrayList<>();
-  protected List<Type> type = new ArrayList<>();
+  protected List<UnitType> unitType = new ArrayList<>();
   
   protected int attack = 0;
   protected int maxHealth = 1;
@@ -42,76 +44,15 @@ public abstract class Unit extends Entity
   protected boolean isMagnet = false;
   protected boolean isDisguise = false;
   
-  protected boolean isAnswerOnPlayed = false;
-  protected boolean isAnswerOnDead = false;
+  protected boolean isAnswerOnPlayed = true;
+  protected boolean isAnswerOnStartTurn = true;
+  protected boolean isAnswerOnDead = true;
   
   public Unit()
   {
     super();
     
-    listener.onSellListeners.put(
-        UUIDUtils.generateKey(),
-        (game, fight, player, entity) -> {
-          player.listener.removeListener((Unit) entity);
-          player.addMoney(1);
-          player.removeFromTable((Unit) entity);
-          processListeners(player.listener.onSellListeners, (action) -> action.process(game, null, player, entity), player);
-        });
-    
-    listener.onAppearListeners.put(
-        UUIDUtils.generateKey(),
-        (game, fight, player, entity) -> {
-          processListeners(player.listener.onAppearListeners, (action) -> action.process(game, null, player, entity), player);
-        });
-    
-    listener.onDisappearListeners.put(
-        UUIDUtils.generateKey(),
-        (game, fight, player, entity) -> {
-          processListeners(player.listener.onDisappearListeners, (action) -> action.process(game, null, player, entity), player);
-        });
-    
-    listener.onAttackedListeners.put(
-        UUIDUtils.generateKey(),
-        (game, fight, player, player2, unit, attacker) -> {
-          processListeners(player.listener.onAttackedListeners, (action) -> action.process(game, null, player, player2, unit, attacker), player);
-          if (unit.isBubbled)
-          {
-            unit.isBubbled = false;
-          }
-          else
-          {
-            unit.actualHealth -= attacker.getAttack();
-          }
-        });
-    
-    listener.onAttackListeners.put(
-        UUIDUtils.generateKey(),
-        (game, fight, player, player2, unit, attacked) -> {
-          processListeners(player.listener.onAttackListeners, (action) -> action.process(game, null, player, player2, unit, attacked), player);
-          if (unit.isBubbled)
-          {
-            unit.isBubbled = false;
-          }
-          else
-          {
-            unit.actualHealth -= attacked.getAttack();
-          }
-        });
-    
-    listener.onDeadListeners.put(
-        UUIDUtils.generateKey(),
-        (game, fight, player, player2, unit, attacker) -> {
-          processListeners(player.listener.onDeadListeners, (action) -> action.process(game, null, player, player2, unit, attacker), player);
-          List table = fight != null ? fight.getFightTable(player) : player.getTable();
-          if (unit.isRebirth)
-          {
-            unit.isRebirth = false;
-            if (table.size() < Player.TABLE_LIMIT)
-            {
-              unit.actualHealth = 1;
-            }
-          }
-        });
+    playType = List.of(new PlayPair(PlayType.TABLE));
   }
   
   @JsonProperty(F_ATTACK)
@@ -213,6 +154,11 @@ public abstract class Unit extends Entity
     return isMagnet;
   }
   
+  public void setIsMagnet(boolean isMagnet)
+  {
+    this.isMagnet = isMagnet;
+  }
+  
   @JsonProperty(F_IS_BUBBLED)
   public boolean isBubbled()
   {
@@ -230,20 +176,71 @@ public abstract class Unit extends Entity
     return isRebirth;
   }
   
+  public void setIsRebirth(boolean isRebirth)
+  {
+    this.isRebirth = isRebirth;
+  }
+  
   public boolean isAnswerOnPlayed()
   {
-    return isAnswerOnPlayed;
+    if (!isAnswerOnPlayed)
+    {
+      return false;
+    }
+    
+    return !listener.onPlayedListeners.isEmpty();
+  }
+  
+  public void setIsAnswerOnPlayed(boolean isAnswerOnPlayed)
+  {
+    this.isAnswerOnPlayed = isAnswerOnPlayed;
+  }
+  
+  public boolean isAnswerOnStartTurn()
+  {
+    if (!isAnswerOnStartTurn)
+    {
+      return false;
+    }
+    
+    return !listener.onStartTurnListeners.isEmpty();
+  }
+  
+  public void setIsAnswerOnStartTurn(boolean isAnswerOnStartTurn)
+  {
+    this.isAnswerOnStartTurn = isAnswerOnStartTurn;
   }
   
   public boolean isAnswerOnDead()
   {
-    return isAnswerOnDead;
+    if (!isAnswerOnDead)
+    {
+      return false;
+    }
+    
+    return !listener.onDeadListeners.isEmpty();
+  }
+  
+  public void setIsAnswerOnDead(boolean isAnswerOnDead)
+  {
+    this.isAnswerOnDead = isAnswerOnDead;
+  }
+  
+  @JsonProperty(F_TYPE)
+  public List<UnitType> getType()
+  {
+    return unitType;
   }
   
   @JsonProperty(F_BUFFS)
   public List<Buff> getBuffs()
   {
     return buffs;
+  }
+  
+  public void addBuff(List<Buff> buff)
+  {
+    buff.forEach(this::addBuff);
   }
   
   public void addBuff(Buff buff)
@@ -261,23 +258,6 @@ public abstract class Unit extends Entity
     buffs.removeIf(buff -> buff.getRollback() != null);
   }
   
-  public void magnetize(Unit unit)
-  {
-    if (!unit.isType(Type.MECH) || type.stream().noneMatch(unit::isType))
-    {
-      return;
-    }
-    
-    unit.getBuffs().forEach(this::addBuff);
-    Unit u = unit.isGold() ? unit.newGold() : unit.newThis();
-    this.incAttack(u.getAttack());
-    this.incHealth(u.getHealth());
-    this.addBuff(new Buff(
-        unit1 -> listener.push(unit1.listener.newCoreListener(false)),
-        null,
-        unit.getDescription()));
-  }
-  
   public void removeCoreListeners()
   {
     listener.removeCoreListener();
@@ -285,6 +265,11 @@ public abstract class Unit extends Entity
   
   public void onSell(Game game, Fight fight, Player player)
   {
+    player.listener.removeListener((Unit) this);
+    player.addMoney(1);
+    player.removeFromTable((Unit) this);
+    processListeners(player.listener.onSellListeners, (action) -> action.process(game, null, player, this), player);
+    
     listener.processOnSellListeners(game, fight, player, this);
     if (fight != null)
     {
@@ -330,6 +315,16 @@ public abstract class Unit extends Entity
   
   public void onAttacked(Game game, Fight fight, Player player, Player player2, Unit attacker)
   {
+    processListeners(player.listener.onAttackedListeners, (action) -> action.process(game, null, player, player2, this, attacker), player);
+    if (this.isBubbled)
+    {
+      this.isBubbled = false;
+    }
+    else
+    {
+      this.actualHealth -= attacker.getAttack();
+    }
+    
     listener.processOnAttackedListeners(game, fight, player, player2, this, attacker);
     if (fight != null)
     {
@@ -339,6 +334,16 @@ public abstract class Unit extends Entity
   
   public void onAttack(Game game, Fight fight, Player player, Player player2, Unit attacked)
   {
+    processListeners(player.listener.onAttackListeners, (action) -> action.process(game, null, player, player2, this, attacked), player);
+    if (this.isBubbled)
+    {
+      this.isBubbled = false;
+    }
+    else
+    {
+      this.actualHealth -= attacked.getAttack();
+    }
+    
     listener.processOnAttackListeners(game, fight, player, player2, this, attacked);
     if (fight != null)
     {
@@ -348,6 +353,17 @@ public abstract class Unit extends Entity
   
   public void onDead(Game game, Fight fight, Player player, Player player2, Unit attacker)
   {
+    processListeners(player.listener.onDeadListeners, (action) -> action.process(game, null, player, player2, this, attacker), player);
+    List table = fight != null ? fight.getFightTable(player) : player.getTable();
+    if (this.isRebirth)
+    {
+      this.isRebirth = false;
+      if (table.size() < Player.TABLE_LIMIT)
+      {
+        this.actualHealth = 1;
+      }
+    }
+    
     listener.processOnDeadListeners(game, fight, player, player2, this, attacker);
     if (fight != null)
     {
@@ -357,6 +373,8 @@ public abstract class Unit extends Entity
   
   public void onAppear(Game game, Fight fight, Player player)
   {
+    processListeners(player.listener.onAppearListeners, (action) -> action.process(game, null, player, this), player);
+    
     listener.processOnAppearListeners(game, fight, player, this);
     if (fight != null)
     {
@@ -366,6 +384,8 @@ public abstract class Unit extends Entity
   
   public void onDisappear(Game game, Fight fight, Player player)
   {
+    processListeners(player.listener.onDisappearListeners, (action) -> action.process(game, null, player, this), player);
+    
     listener.processOnDisappearListeners(game, fight, player, this);
     if (fight != null)
     {
@@ -374,9 +394,9 @@ public abstract class Unit extends Entity
   }
   
   @Override
-  public void onPlayed(Game game, Fight fight, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2, boolean auto)
+  public void onPlayed(Game game, Fight fight, Player player, List<Integer> input, boolean auto)
   {
-    super.onPlayed(game, fight, player, index, isTavernIndex, index2, isTavernIndex2, auto);
+    super.onPlayed(game, fight, player, input, auto);
     if (this.isGold())
     {
       player.addToHand(Card.of(new TripleReward(player.getLevel() + 1)));
@@ -385,12 +405,12 @@ public abstract class Unit extends Entity
   
   public Unit buildGold()
   {
-    return buildGold(this.newThis(), this.newThis(), this.newThis());
+    return buildGold(this, this.newBase(), this.newBase());
   }
   
   public Unit buildGold(Unit unit)
   {
-    return buildGold(unit.newThis(), unit.newThis(), unit.newThis());
+    return buildGold(unit, unit.newBase(), unit.newBase());
   }
   
   public Unit buildGold(List<Unit> units)
@@ -405,7 +425,7 @@ public abstract class Unit extends Entity
   
   public Unit buildGold(Unit unit, Unit unit2, Unit unit3)
   {
-    Unit entity = this.newThis();
+    Unit entity = this.newBase();
     entity.setAttack(entity.getAttack() * 2);
     entity.setHealth(entity.getHealth() * 2);
     
@@ -419,25 +439,41 @@ public abstract class Unit extends Entity
     return entity;
   }
   
+  public Unit newBase()
+  {
+    return (Unit) super.newBase();
+  }
+  
+  public Unit newGold()
+  {
+    Unit u = (Unit) super.newGold();
+    
+    u.setHealth(u.getHealth() * 2);
+    u.setAttack(u.getAttack() * 2);
+    
+    return u;
+  }
+  
   public Unit newThis()
   {
     return (Unit) super.newThis();
   }
   
-  public Unit newGold()
+  public boolean isType(UnitType unitType)
   {
-    Unit u = (Unit) this.newThis();
-    
-    u.setHealth(u.getHealth() * 2);
-    u.setAttack(u.getAttack() * 2);
-    u.setIsGold(true);
-    
-    return u;
+    return this.unitType.contains(unitType);
   }
   
-  public boolean isType(Type type)
+  public boolean isType(List<UnitType> unitType)
   {
-    return this.type.contains(type);
+    for (UnitType unitType1 : unitType)
+    {
+      if (isType(unitType1))
+      {
+        return true;
+      }
+    }
+    return false;
   }
   
   @Override
@@ -451,8 +487,19 @@ public abstract class Unit extends Entity
       clonedUnit.buffs.add(buff.clone());
     }
     
-    clonedUnit.type = new ArrayList<>(this.type);
+    clonedUnit.unitType = new ArrayList<>(this.unitType);
     
     return clonedUnit;
+  }
+  
+  @Override
+  public boolean isSpell() {
+    return false;
+  }
+  
+  @Override
+  public void buildFace(Player player)
+  {
+    
   }
 }

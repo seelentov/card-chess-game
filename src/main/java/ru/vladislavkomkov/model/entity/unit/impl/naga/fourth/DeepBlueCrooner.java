@@ -2,6 +2,7 @@ package ru.vladislavkomkov.model.entity.unit.impl.naga.fourth;
 
 import ru.vladislavkomkov.model.entity.spell.impl.spellcraft.impl.DeepBlues;
 import ru.vladislavkomkov.model.entity.unit.impl.naga.SpellCrafter;
+import ru.vladislavkomkov.model.player.Player;
 
 public class DeepBlueCrooner extends SpellCrafter
 {
@@ -16,5 +17,11 @@ public class DeepBlueCrooner extends SpellCrafter
     
     maxHealth = 3;
     actualHealth = 3;
+  }
+  
+  @Override
+  public void buildFace(Player player)
+  {
+    super.buildFace(player);
   }
 }

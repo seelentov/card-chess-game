@@ -166,7 +166,7 @@ public class Event
     return "Event{" +
         "gameUUID='" + gameUUID + '\'' +
         ", playerUUID='" + playerUUID + '\'' +
-        ", type=" + type +
+        ", unitType=" + type +
         ", data=" + new String(data, StandardCharsets.UTF_8)+
         '}';
   }
@@ -181,6 +181,7 @@ public class Event
     SELL,
     FREEZE,
     LVL,
+    LVL_PRICE,
     MOVE,
     RES,
     RESET_TAVERN,

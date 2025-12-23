@@ -10,6 +10,7 @@ import java.util.Set;
 import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.spell.Spell;
 import ru.vladislavkomkov.model.entity.unit.Unit;
+import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.RandUtils;
 import ru.vladislavkomkov.util.UnitUtils;
 
@@ -34,7 +35,7 @@ public class TripleReward extends Spell
   {
     listener.onPlayedListeners.put(
         KEY_CORE,
-        (game, fight, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto) -> {
+        (game, fight, player, entity, input, auto) -> {
           List<Unit> allUnits = UnitUtils.getByTavern(player.getLevel(), player.getTavern().getUnitsPool());
           
           if (allUnits.isEmpty())
@@ -45,7 +46,7 @@ public class TripleReward extends Spell
           while (allUnits.size() < 3)
           {
             allUnits = new ArrayList<>(allUnits);
-            allUnits.add(allUnits.get(0).newThis());
+            allUnits.add(allUnits.get(0).newBase());
           }
           
           Set<Integer> setInts = new HashSet<>();
@@ -70,5 +71,11 @@ public class TripleReward extends Spell
             player.addToHand(Card.of(units.get(param)));
           }, units);
         });
+  }
+  
+  @Override
+  public void buildFace(Player player)
+  {
+    
   }
 }

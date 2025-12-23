@@ -1,5 +1,7 @@
 package ru.vladislavkomkov.model.card;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import ru.vladislavkomkov.model.Game;
@@ -26,13 +28,25 @@ public class Card<T extends Entity>
     return new Card<>(entity);
   }
   
-  public void play(Game game, Player player, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2)
+  public boolean play(Game game, Player player, List<Integer> input)
   {
     if (entity instanceof Unit unit)
     {
-      player.addToTable(unit, index);
+      if(input.isEmpty()){
+        return false;
+      }
+      
+      if (player.addToTable(unit, input.get(0)))
+      {
+        entity.onPlayed(game, null, player, input, false);
+      }
     }
-    entity.onPlayed(game, null, player, index, isTavernIndex, index2, isTavernIndex2, false);
+    else
+    {
+      entity.onPlayed(game, null, player, input, false);
+    }
+    
+    return true;
   }
 
   @JsonProperty(F_ENTITY)

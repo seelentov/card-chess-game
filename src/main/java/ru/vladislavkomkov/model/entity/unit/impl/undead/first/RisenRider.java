@@ -2,8 +2,9 @@ package ru.vladislavkomkov.model.entity.unit.impl.undead.first;
 
 import java.util.List;
 
-import ru.vladislavkomkov.model.entity.unit.Type;
 import ru.vladislavkomkov.model.entity.unit.Unit;
+import ru.vladislavkomkov.model.entity.unit.UnitType;
+import ru.vladislavkomkov.model.player.Player;
 
 public class RisenRider extends Unit
 {
@@ -16,7 +17,7 @@ public class RisenRider extends Unit
     isTaunt = true;
     isRebirth = true;
     
-    type = List.of(Type.UNDEAD);
+    unitType = List.of(UnitType.UNDEAD);
     
     attack = 2;
     
@@ -26,5 +27,11 @@ public class RisenRider extends Unit
     isTavern = true;
     
     level = 1;
+  }
+  
+  @Override
+  public void buildFace(Player player)
+  {
+    
   }
 }

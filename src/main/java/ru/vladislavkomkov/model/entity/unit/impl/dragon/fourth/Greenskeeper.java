@@ -4,8 +4,9 @@ import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
 
 import java.util.List;
 
-import ru.vladislavkomkov.model.entity.unit.Type;
 import ru.vladislavkomkov.model.entity.unit.Unit;
+import ru.vladislavkomkov.model.entity.unit.UnitType;
+import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.RandUtils;
 
 public class Greenskeeper extends Unit
@@ -14,7 +15,7 @@ public class Greenskeeper extends Unit
   {
     description = "Rally: Trigger your right-most Battlecry";
     
-    type = List.of(Type.DRAGON);
+    unitType = List.of(UnitType.DRAGON);
     
     attack = 4;
     
@@ -34,7 +35,7 @@ public class Greenskeeper extends Unit
             Unit unit = units.get(i);
             if (unit.isAnswerOnPlayed())
             {
-              unit.onPlayed(game, fight, player, RandUtils.getRand(units.size()), RandUtils.getRandBool(), RandUtils.getRand(units.size()), RandUtils.getRandBool(), true);
+              unit.onPlayed(game, fight, player, RandUtils.getRand(units.size()), true);
               break;
             }
           }
@@ -63,5 +64,11 @@ public class Greenskeeper extends Unit
         });
     
     return gold;
+  }
+  
+  @Override
+  public void buildFace(Player player)
+  {
+    
   }
 }

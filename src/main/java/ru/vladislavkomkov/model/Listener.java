@@ -71,11 +71,34 @@ public class Listener implements Cloneable
     push(listener, false);
   }
   
-  public void push(Listener listener, boolean isDeduplication)
+  public void push(Listener listener, boolean convertCore)
   {
     for (int i = 0; i < listeners.size(); i++)
     {
-      listeners.get(i).putAll(listener.listeners.get(i));
+      Map<String, ?> sourceMap = listener.listeners.get(i);
+      Map<String, ?> targetMap = listeners.get(i);
+      
+      if (convertCore)
+      {
+        for (Map.Entry<String, ?> entry : sourceMap.entrySet())
+        {
+          String key = entry.getKey();
+          Object value = entry.getValue();
+          if (KEY_CORE.equals(key))
+          {
+            String newKey = UUIDUtils.generateKeyCore();
+            ((Map<String, Object>) targetMap).put(newKey, value);
+          }
+          else
+          {
+            ((Map<String, Object>) targetMap).put(key, value);
+          }
+        }
+      }
+      else
+      {
+        ((Map<String, Object>) targetMap).putAll(sourceMap);
+      }
     }
   }
   
@@ -122,16 +145,13 @@ public class Listener implements Cloneable
       Fight fight,
       Player player,
       Entity entity,
-      int index,
-      boolean isTavernIndex,
-      int index2,
-      boolean isTavernIndex2,
+      List<Integer> input,
       boolean auto)
   {
     ListenerUtils.processActionListeners(
         onPlayedListeners,
         player,
-        (action) -> action.process(game, fight, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto));
+        (action) -> action.process(game, fight, player, entity, input, auto));
   }
   
   public void processOnHandledListeners(Game game, Fight fight, Player player, Entity entity)

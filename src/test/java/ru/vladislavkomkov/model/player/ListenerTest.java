@@ -3,6 +3,8 @@ package ru.vladislavkomkov.model.player;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 import ru.vladislavkomkov.GamePlayerTestCase;
@@ -122,7 +124,7 @@ public class ListenerTest extends GamePlayerTestCase
     testListener(
         player.listener.onPlayedListeners,
         () -> unit.onPlayed(game, null, player, 0),
-        (Game game, Fight fight, Player player, Entity entity, int index, boolean isTavernIndex, int index2, boolean isTavernIndex2, boolean auto) -> testAction(),
+        (Game game, Fight fight, Player player, Entity entity, List<Integer> input, boolean auto) -> testAction(),
         once);
   }
   

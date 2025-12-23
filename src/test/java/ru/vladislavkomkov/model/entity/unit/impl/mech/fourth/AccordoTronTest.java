@@ -4,9 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-import ru.vladislavkomkov.model.entity.unit.impl.mech.MechTestCase;
+import ru.vladislavkomkov.model.entity.unit.UnitTestCase;
 
-public class AccordoTronTest extends MechTestCase
+public class AccordoTronTest extends UnitTestCase
 {
   @Test
   void testDefault()

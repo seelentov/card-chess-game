@@ -291,15 +291,6 @@ public class Game implements AutoCloseable
           }
           while (result.isEmpty());
           
-          if (!player.isAlive())
-          {
-            player.sendMessage(Event.Type.LOSE);
-          }
-          else if (!player2.isAlive())
-          {
-            player2.sendMessage(Event.Type.LOSE);
-          }
-          
           processEndFight(fight, player, player2);
           processEndFight(fight, player2, player);
           
@@ -412,11 +403,11 @@ public class Game implements AutoCloseable
       player.buyCard(index);
   }
   
-  public void playCard(String uuid, int indexCard, int indexCast, boolean isTavernCast, int indexCast2, boolean isTavernCast2)
+  public void playCard(String uuid, int indexCard, List<Integer> input)
   {
     Player player = getPlayer(uuid);
     if (player != null)
-      player.playCard(indexCard, indexCast, isTavernCast, indexCast2, isTavernCast2);
+      player.playCard(indexCard, input);
   }
   
   public void sellCard(String uuid, int index)

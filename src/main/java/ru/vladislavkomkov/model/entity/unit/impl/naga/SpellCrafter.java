@@ -1,13 +1,13 @@
 package ru.vladislavkomkov.model.entity.unit.impl.naga;
 
-import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
-
 import java.util.List;
 
+import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.spell.impl.spellcraft.SpellCraft;
-import ru.vladislavkomkov.model.entity.unit.Type;
 import ru.vladislavkomkov.model.entity.unit.Unit;
+import ru.vladislavkomkov.model.entity.unit.UnitType;
+import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.player.Player;
 
 public abstract class SpellCrafter extends Unit
@@ -20,15 +20,7 @@ public abstract class SpellCrafter extends Unit
     description = "Spellcraft: " + spellcraft.getDescription();
     this.spellcraft = spellcraft;
     
-    type = List.of(Type.NAGA);
-    
-    listener.onStartTurnListeners.put(
-        KEY_CORE,
-        (game, fight, player) -> addSpellCraft(player));
-    
-    listener.onPlayedListeners.put(
-        KEY_CORE,
-        (game, fight, player, entity, index, isTavernIndex, index2, isTavernIndex2, auto) -> addSpellCraft(player));
+    unitType = List.of(UnitType.NAGA);
   }
   
   public SpellCraft getSpellcraft()
@@ -44,6 +36,26 @@ public abstract class SpellCrafter extends Unit
       spellcraft.build();
     }
     
-    player.addToHand(Card.of(spellcraft));
+    player.addToHand(Card.of(spellcraft), true);
+  }
+  
+  @Override
+  public void onStartTurn(Game game, Fight fight, Player player)
+  {
+    super.onStartTurn(game, fight, player);
+    addSpellCraft(player);
+  }
+  
+  @Override
+  public void onPlayed(Game game, Fight fight, Player player, List<Integer> input, boolean auto)
+  {
+    super.onPlayed(game, fight, player, input, auto);
+    addSpellCraft(player);
+  }
+  
+  @Override
+  public void buildFace(Player player)
+  {
+    description = "Spellcraft: " + spellcraft.getDescription(player);
   }
 }

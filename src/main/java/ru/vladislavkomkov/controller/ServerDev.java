@@ -26,7 +26,7 @@ public class ServerDev
             portWS = Integer.parseInt(args[1]);
         }
         
-        GameProcessor processor = new GameProcessor(games, 2000);
+        GameProcessor processor = new GameProcessor(games);
         HTTPDataHandler httpDataHandler = new HTTPDataHandler(portHttp, games, processor);
         WSEventHandler wsEventHandler = new WSEventHandler(portWS, games);
         

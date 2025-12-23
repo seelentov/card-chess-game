@@ -1,17 +1,18 @@
 package ru.vladislavkomkov.model.entity.unit;
 
-public enum Type
+public enum UnitType
 {
   BEAST("Beast"),
   NAGA("Naga"),
   DRAGON("Dragon"),
   UNDEAD("Undead"),
   DEMON("Demon"),
-  MECH("Mech");
+  MECH("Mech"),
+  ALL("All");
   
   final String type;
   
-  Type(final String type)
+  UnitType(final String type)
   {
     this.type = type;
   }

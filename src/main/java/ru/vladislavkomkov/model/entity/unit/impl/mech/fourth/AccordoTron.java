@@ -4,14 +4,12 @@ import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
 
 import java.util.List;
 
-import ru.vladislavkomkov.model.Game;
-import ru.vladislavkomkov.model.entity.Entity;
-import ru.vladislavkomkov.model.entity.unit.Type;
 import ru.vladislavkomkov.model.entity.unit.Unit;
-import ru.vladislavkomkov.model.fight.Fight;
+import ru.vladislavkomkov.model.entity.unit.UnitType;
+import ru.vladislavkomkov.model.entity.unit.impl.mech.Magnetized;
 import ru.vladislavkomkov.model.player.Player;
 
-public class AccordoTron extends Unit
+public class AccordoTron extends Magnetized
 {
   public static int GOLD = 1;
   
@@ -27,13 +25,13 @@ public class AccordoTron extends Unit
     maxHealth = 5;
     actualHealth = 5;
     
-    type = List.of(Type.MECH);
+    unitType = List.of(UnitType.MECH);
     
     isMagnet = true;
     
     listener.onStartTurnListeners.put(
-            KEY_CORE,
-            (game, fight, player) -> player.addMoney(GOLD));
+        KEY_CORE,
+        (game, fight, player) -> player.addMoney(GOLD));
   }
   
   @Override
@@ -46,5 +44,11 @@ public class AccordoTron extends Unit
         (game, fight, player) -> player.addMoney(GOLD * 2));
     
     return gold;
+  }
+  
+  @Override
+  public void buildFace(Player player)
+  {
+    
   }
 }
