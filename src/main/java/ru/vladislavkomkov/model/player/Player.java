@@ -29,7 +29,10 @@ import ru.vladislavkomkov.util.UnitUtils;
 public class Player
 {
   public static final int MAX_LEVEL = 6;
+  
   public static final int MAX_MONEY = 10;
+  public static final int START_MONEY = 3;
+  
   public static final int TABLE_LIMIT = 7;
   public static final int HAND_LIMIT = 10;
   
@@ -57,7 +60,7 @@ public class Player
   int maxHealth = START_HEALTH;
   int armor = START_ARMOR;
   int money = 0;
-  int maxMoney = 3;
+  int maxMoney = START_MONEY;
   int level = 1;
   int buyPrice = 3;
   int resetTavernPrice = 1;
@@ -353,6 +356,7 @@ public class Player
     }
     
     calcTriplets();
+    sendHand();
   }
   
   public void clearSpellCraft()
@@ -394,7 +398,7 @@ public class Player
       hand.remove(indexCard);
     }
     
-    sendHand();
+    sendFullStat();
   }
   
   public void buyCard(int index)

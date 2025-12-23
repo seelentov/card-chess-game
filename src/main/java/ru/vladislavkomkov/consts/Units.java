@@ -29,20 +29,20 @@ public class Units
   
   static void setupUnits()
   {
-    units.add(new Alleycat());
-    units.add(new Cat());
-    units.add(new Manasaber());
-    units.add(new Cubling());
-    units.add(new HummingBird());
-    
-    units.add(new RisenRider());
-    
-    units.add(new IckyImp());
-    units.add(new Imp());
-    
-    units.add(new Greenskeeper());
-    
-    units.add(new AccordoTron());
+//    units.add(new Alleycat());
+//    units.add(new Cat());
+//    units.add(new Manasaber());
+//    units.add(new Cubling());
+//    units.add(new HummingBird());
+//
+//    units.add(new RisenRider());
+//
+//    units.add(new IckyImp());
+//    units.add(new Imp());
+//
+//    units.add(new Greenskeeper());
+//
+//    units.add(new AccordoTron());
     
     units.add(new DeepBlueCrooner());
   }
