@@ -209,7 +209,7 @@ public class Player
     }
   }
   
-  public void putSenderWaiter(Consumer<Integer> consumer, Object data)
+  public void putSenderWaiter(Consumer<Integer> consumer, List<Card> data)
   {
     String key = UUIDUtils.generateKey();
     senderWaiters.put(key, consumer);
@@ -393,9 +393,12 @@ public class Player
           "Index " + indexCard + " not existed in hand with length " + hand.size());
     }
     
-    if (hand.get(indexCard).play(game, this, input))
+    Card cardTemp = hand.get(indexCard);
+    hand.remove(indexCard);
+    
+    if (!cardTemp.play(game, this, input))
     {
-      hand.remove(indexCard);
+      hand.add(indexCard, cardTemp);
     }
     
     sendFullStat();
@@ -467,10 +470,10 @@ public class Player
     
     money -= resetTavernPrice;
     sendMoney();
-    
+
     tavern.setFreeze(false);
     resetTavern();
-    
+
     sendTavern();
     sendFreeze();
   }
@@ -484,7 +487,7 @@ public class Player
   {
     tavern.reset(level, saveFreezed);
     listener.processOnResetTavernListeners(game, null, this);
-    
+
     sendTavern();
     sendFreeze();
   }
@@ -509,7 +512,7 @@ public class Player
       }
     }
     while (foundTriplets);
-    
+
     sendHand();
     sendTable();
   }

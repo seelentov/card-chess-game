@@ -14,9 +14,13 @@ public class Card<T extends Entity>
 {
   public final static String F_ENTITY = "entity";
   public final static String F_IS_SPELL = "is_spell";
-
-
+  
   final T entity;
+  
+  public Card()
+  {
+    this(null);
+  }
   
   public Card(T entity)
   {
@@ -32,7 +36,8 @@ public class Card<T extends Entity>
   {
     if (entity instanceof Unit unit)
     {
-      if(input.isEmpty()){
+      if (input.isEmpty())
+      {
         return false;
       }
       
@@ -48,7 +53,7 @@ public class Card<T extends Entity>
     
     return true;
   }
-
+  
   @JsonProperty(F_ENTITY)
   public T getEntity()
   {

@@ -123,6 +123,8 @@ public class EventDispatcher implements AutoCloseable
       }
       default -> throw new RuntimeException("Unexpected event unitType: " + event.getType());
     }
+
+    game.getPlayers().get(playerUUID).sendFullStat();
   }
   
   @Override

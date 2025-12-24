@@ -98,8 +98,8 @@ public class MockConsumer
         this.timer = event.getDataAsInt();
       }
       case WAIT_REQ -> {
-        SenderWaiterDataReq waiter = event.getData(SenderWaiterDataReq.class);
-        waiters.put(waiter.getKey(), waiter.getData());
+        Map waiter = event.getData(Map.class);
+        waiters.put((String) waiter.get(SenderWaiterDataReq.F_KEY), waiter.get(SenderWaiterDataReq.F_DATA));
       }
       case FIGHT -> {
         Map<String, Map<String, Object>> info = event.getData(Map.class);

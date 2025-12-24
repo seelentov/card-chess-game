@@ -57,10 +57,10 @@ public class TripleReward extends Spell
           
           List<Integer> ints = setInts.stream().toList();
           
-          List<Unit> units = List.of(
-              allUnits.get(ints.get(0)),
-              allUnits.get(ints.get(1)),
-              allUnits.get(ints.get(2)));
+          List<Card> units = List.of(
+              Card.of(allUnits.get(ints.get(0))),
+              Card.of(allUnits.get(ints.get(1))),
+              Card.of(allUnits.get(ints.get(2))));
           
           player.putSenderWaiter((param) -> {
             if (param < 0 || param > 3)
@@ -68,7 +68,7 @@ public class TripleReward extends Spell
               param = RandUtils.getRand(1, 3);
             }
             
-            player.addToHand(Card.of(units.get(param)));
+            player.addToHand(Card.of(units.get(param).getEntity()));
           }, units);
         });
   }
