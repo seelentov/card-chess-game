@@ -90,6 +90,28 @@ public class Fight
     unit.onAppear(game, this, player);
   }
   
+  public void addToFightTable(Player player, Unit unit, int index)
+  {
+    List<Unit> table = getFightTable(player);
+    
+    if (table.size() == Player.TABLE_LIMIT)
+    {
+      return;
+    }
+    
+    
+    if ((index) >= table.size())
+    {
+      table.add(unit);
+    }
+    else
+    {
+      table.add(index, unit);
+    }
+    
+    unit.onAppear(game, this, player);
+  }
+  
   public List<Unit> getFightTable(Player player)
   {
     if (player == player1)
@@ -251,29 +273,6 @@ public class Fight
     
     attacker.onAttack(game, this, turnPlayer1, turnPlayer2, attacked);
     attacked.onAttacked(game, this, turnPlayer2, turnPlayer1, attacker);
-    
-    handleUnitDeath(isPlayer1Turn, attacker, turnPlayer1, turnPlayer2, attacked);
-    handleUnitDeath(!isPlayer1Turn, attacked, turnPlayer2, turnPlayer1, attacker);
-  }
-  
-  void handleUnitDeath(boolean isPlayer1Unit, Unit unit, Player unitOwner, Player opponent, Unit otherUnit)
-  {
-    if (unit.isDead())
-    {
-      unit.onDead(game, this, unitOwner, opponent, otherUnit);
-      
-      if (unit.isDead())
-      {
-        if (isPlayer1Unit)
-        {
-          player1Units.removeIf(o -> o == unit);
-        }
-        else
-        {
-          player2Units.removeIf(o -> o == unit);
-        }
-      }
-    }
   }
   
   int calcAttack(List<Unit> units)

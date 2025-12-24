@@ -316,14 +316,10 @@ public abstract class Unit extends Entity
   public void onAttacked(Game game, Fight fight, Player player, Player player2, Unit attacker)
   {
     processListeners(player.listener.onAttackedListeners, (action) -> action.process(game, null, player, player2, this, attacker), player);
-    if (this.isBubbled)
-    {
-      this.isBubbled = false;
-    }
-    else
-    {
-      this.actualHealth -= attacker.getAttack();
-    }
+    
+    processDamage(attacker);
+    
+    processOnDead(game, fight, player, player2, attacker);
     
     listener.processOnAttackedListeners(game, fight, player, player2, this, attacker);
     if (fight != null)
@@ -335,14 +331,10 @@ public abstract class Unit extends Entity
   public void onAttack(Game game, Fight fight, Player player, Player player2, Unit attacked)
   {
     processListeners(player.listener.onAttackListeners, (action) -> action.process(game, null, player, player2, this, attacked), player);
-    if (this.isBubbled)
-    {
-      this.isBubbled = false;
-    }
-    else
-    {
-      this.actualHealth -= attacked.getAttack();
-    }
+    
+    processDamage(attacked);
+    
+    processOnDead(game, fight, player, player2, attacked);
     
     listener.processOnAttackListeners(game, fight, player, player2, this, attacked);
     if (fight != null)
@@ -351,20 +343,52 @@ public abstract class Unit extends Entity
     }
   }
   
+  public void processDamage(Unit attackedOrAttacker)
+  {
+    if (this.isBubbled)
+    {
+      this.isBubbled = false;
+    }
+    else
+    {
+      this.actualHealth -= attackedOrAttacker.getAttack();
+    }
+  }
+  
+  private void processOnDead(Game game, Fight fight, Player player, Player player2, Unit attackedOrAttacker)
+  {
+    List<Unit> table = fight != null ? fight.getFightTable(player) : player.getTable();
+    int indexOfThis = table.indexOf(this);
+    
+    if (isDead())
+    {
+      onDead(game, fight, player, player2, attackedOrAttacker);
+      
+      if (isRebirth())
+      {
+        this.actualHealth = 1;
+        
+        if (fight != null)
+        {
+          fight.addToFightTable(player, this, indexOfThis);
+        }
+        else
+        {
+          player.addToTable(this, indexOfThis);
+        }
+      }
+    }
+  }
+  
   public void onDead(Game game, Fight fight, Player player, Player player2, Unit attacker)
   {
     processListeners(player.listener.onDeadListeners, (action) -> action.process(game, null, player, player2, this, attacker), player);
-    List table = fight != null ? fight.getFightTable(player) : player.getTable();
-    if (this.isRebirth)
-    {
-      this.isRebirth = false;
-      if (table.size() < Player.TABLE_LIMIT)
-      {
-        this.actualHealth = 1;
-      }
-    }
     
     listener.processOnDeadListeners(game, fight, player, player2, this, attacker);
+    
+    List<Unit> table = fight != null ? fight.getFightTable(player) : player.getTable();
+    table.removeIf(unit -> unit == this);
+    
     if (fight != null)
     {
       fight.addToHistory(FightEvent.Type.ON_DEAD, player, List.of(this, attacker));
@@ -376,6 +400,7 @@ public abstract class Unit extends Entity
     processListeners(player.listener.onAppearListeners, (action) -> action.process(game, null, player, this), player);
     
     listener.processOnAppearListeners(game, fight, player, this);
+    
     if (fight != null)
     {
       fight.addToHistory(FightEvent.Type.ON_APPEAR, player, List.of(this));
@@ -387,6 +412,7 @@ public abstract class Unit extends Entity
     processListeners(player.listener.onDisappearListeners, (action) -> action.process(game, null, player, this), player);
     
     listener.processOnDisappearListeners(game, fight, player, this);
+    
     if (fight != null)
     {
       fight.addToHistory(FightEvent.Type.ON_DISAPPEAR, player, List.of(this));
@@ -399,7 +425,7 @@ public abstract class Unit extends Entity
     super.onPlayed(game, fight, player, input, auto);
     if (this.isGold())
     {
-      player.addToHand(Card.of(new TripleReward(player.getLevel() + 1)));
+      player.addToHand(Card.of(new TripleReward(player.getLevel() + 1)), true);
     }
   }
   
@@ -493,7 +519,8 @@ public abstract class Unit extends Entity
   }
   
   @Override
-  public boolean isSpell() {
+  public boolean isSpell()
+  {
     return false;
   }
   
