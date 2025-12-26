@@ -24,9 +24,9 @@ public class IckyImpTest extends UnitTestCase
     player.addToTable(unit, -1);
     unit.onDead(game, null,player, player2, new Cat());
     
-    assertEquals(3, player.getUnitsCount());
+    assertEquals(2, player.getUnitsCount());
+    assertEquals(new Imp().getName(), player.cloneTable().get(0).getName());
     assertEquals(new Imp().getName(), player.cloneTable().get(1).getName());
-    assertEquals(new Imp().getName(), player.cloneTable().get(2).getName());
   }
   
   @Test
@@ -36,16 +36,15 @@ public class IckyImpTest extends UnitTestCase
     player.addToTable(unit, -1);
     unit.onDead(game, null,player, player2, new Cat());
     
-    assertEquals(3, player.getUnitsCount());
-    assertEquals(new IckyImp().getName(), player.cloneTable().get(0).getName());
+    assertEquals(2, player.getUnitsCount());
+    assertEquals(new Imp().getName(), player.cloneTable().get(0).getName());
     assertEquals(new Imp().getName(), player.cloneTable().get(1).getName());
-    assertEquals(new Imp().getName(), player.cloneTable().get(2).getName());
     
+    assertEquals(new Imp().getAttack() * 2, player.cloneTable().get(0).getAttack());
+    assertEquals(new Imp().getHealth() * 2, player.cloneTable().get(0).getHealth());
+
     assertEquals(new Imp().getAttack() * 2, player.cloneTable().get(1).getAttack());
     assertEquals(new Imp().getHealth() * 2, player.cloneTable().get(1).getHealth());
-    
-    assertEquals(new Imp().getAttack() * 2, player.cloneTable().get(2).getAttack());
-    assertEquals(new Imp().getHealth() * 2, player.cloneTable().get(2).getHealth());
   }
   
   @Test

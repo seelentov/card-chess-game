@@ -11,10 +11,10 @@ public abstract class UnitTestCase extends GamePlayerTestCase
 {
   protected void testDefault(Unit unit)
   {
-    onSell(unit);
-    onDead(unit);
-    triplet(unit);
-    onAttackAttacked(unit);
+    onSell(unit.newThis());
+    onDead(unit.newThis());
+    triplet(unit.newThis());
+    onAttackAttacked(unit.newThis());
   };
   
   void onSell(Unit unit)
@@ -34,20 +34,22 @@ public abstract class UnitTestCase extends GamePlayerTestCase
   void onDead(Unit unit)
   {
     setUp();
-    
+
     player.addToTable(unit, 0);
     Unit unit2 = (Unit) unit.newBase();
     player2.addToTable(unit2, 0);
-    
+
     if (unit.isRebirth)
     {
-      unit.onDead(game, null, player, player2, unit2);
-      assertFalse(unit.isRebirth);
+      unit.onAttack(game, null, player, player2, unit2);
     }
-    
+
+    assertFalse(unit.isRebirth);
+    unit.onDead(game, null, player, player2, unit2);
+
     tearDown();
   }
-  
+
   void triplet(Unit unit)
   {
     setUp();
@@ -85,9 +87,12 @@ public abstract class UnitTestCase extends GamePlayerTestCase
     
     int unitBeginHP = unit.getHealth();
     int unit2BeginHP = unit2.getHealth();
-    
+
     boolean unitBeginBubbled = unit.isBubbled;
+    boolean unitBeginIsRebirth = unit.isRebirth;
     boolean unit2BeginBubbled = unit2.isBubbled;
+    boolean unit2BeginIsRebirth = unit2.isRebirth;
+
     
     unit.onAttack(game, null, player, player2, unit2);
     
@@ -104,6 +109,19 @@ public abstract class UnitTestCase extends GamePlayerTestCase
       assertFalse(unit2.isBubbled);
       unit2.onAttacked(game, null, player, player2, unit);
     }
+
+    if(unitBeginIsRebirth)
+    {
+      unit.onAttacked(game, null, player, player2, unit2);
+      assertFalse(unit.isRebirth);
+    }
+
+    if(unit2BeginIsRebirth)
+    {
+      unit2.onAttacked(game, null, player, player2, unit);
+      assertFalse(unit2.isRebirth);
+    }
+
     
     assertEquals(unitBeginHP - unit2.getAttack(), unit.getHealth());
     assertEquals(unit2BeginHP - unit.getAttack(), unit2.getHealth());

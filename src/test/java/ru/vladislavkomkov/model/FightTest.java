@@ -511,4 +511,46 @@ public class FightTest extends GamePlayerTestCase
     
     game.close();
   }
+  
+  @Test
+  void testFightAttackOrder()
+  {
+    player.addToTable(new Cat());
+    player.addToTable(new Cat());
+    player.addToTable(new Cat());
+    player.addToTable(new Cat());
+    player.addToTable(new Cat());
+    player.addToTable(new Cat());
+    
+    Unit taunt = new Cat();
+    taunt.setIsTaunt(true);
+    taunt.setAttack(1);
+    taunt.setHealth(99999);
+    
+    player.addToTable(taunt);
+    
+    player2.addToTable(new Cat());
+    player2.addToTable(new Cat());
+    player2.addToTable(new Cat());
+    player2.addToTable(new Cat());
+    player2.addToTable(new Cat());
+    player2.addToTable(new Cat());
+    
+    Unit taunt2 = new Cat();
+    taunt2.setIsTaunt(true);
+    taunt2.setAttack(1);
+    taunt2.setHealth(99999);
+    
+    player2.addToTable(taunt2);
+    
+    Fight fight = new Fight(game, player, player2);
+
+    for (int i = 7; i > 1; i--) {
+      assertEquals(i, fight.getFightTable(player).size());
+      assertEquals(i, fight.getFightTable(player2).size());
+
+      fight.doTurn();
+      fight.doTurn();
+    }
+  }
 }

@@ -31,7 +31,7 @@ public class Manasaber extends Unit
           {
             for (int i = 0; i < 2; i++)
             {
-              fight.addToFightTable(player, new Cubling(), unit);
+              fight.addToFightTable(player, new Cubling(), unit, true);
             }
           }
           else
@@ -39,7 +39,7 @@ public class Manasaber extends Unit
             int index = player.getIndex(unit);
             for (int i = 0; i < 2; i++)
             {
-              player.addToTable(new Cubling(), index + 1);
+              player.addToTable(new Cubling(), index + 1, true);
             }
           }
         });

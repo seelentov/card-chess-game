@@ -367,7 +367,8 @@ public abstract class Unit extends Entity
       if (isRebirth())
       {
         this.actualHealth = 1;
-        
+        this.isRebirth = false;
+
         if (fight != null)
         {
           fight.addToFightTable(player, this, indexOfThis);

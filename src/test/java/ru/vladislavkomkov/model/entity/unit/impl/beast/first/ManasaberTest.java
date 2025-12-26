@@ -24,9 +24,9 @@ public class ManasaberTest extends UnitTestCase
     player.addToTable(unit, -1);
     unit.onDead(game, null,player, player2, new Cat());
     
-    assertEquals(3, player.getUnitsCount());
+    assertEquals(2, player.getUnitsCount());
+    assertEquals(new Cubling().getName(), player.cloneTable().get(0).getName());
     assertEquals(new Cubling().getName(), player.cloneTable().get(1).getName());
-    assertEquals(new Cubling().getName(), player.cloneTable().get(2).getName());
   }
   
   @Test
@@ -36,15 +36,15 @@ public class ManasaberTest extends UnitTestCase
     player.addToTable(unit, -1);
     unit.onDead(game, null,player, player2, new Cat());
     
-    assertEquals(3, player.getUnitsCount());
+    assertEquals(2, player.getUnitsCount());
+    assertEquals(new Cubling().getName(), player.cloneTable().get(0).getName());
     assertEquals(new Cubling().getName(), player.cloneTable().get(1).getName());
-    assertEquals(new Cubling().getName(), player.cloneTable().get(2).getName());
+    
+    assertEquals(new Cubling().getAttack() * 2, player.cloneTable().get(0).getAttack());
+    assertEquals(new Cubling().getHealth() * 2, player.cloneTable().get(0).getHealth());
     
     assertEquals(new Cubling().getAttack() * 2, player.cloneTable().get(1).getAttack());
     assertEquals(new Cubling().getHealth() * 2, player.cloneTable().get(1).getHealth());
-    
-    assertEquals(new Cubling().getAttack() * 2, player.cloneTable().get(2).getAttack());
-    assertEquals(new Cubling().getHealth() * 2, player.cloneTable().get(2).getHealth());
   }
   
   @Test
@@ -63,8 +63,7 @@ public class ManasaberTest extends UnitTestCase
     unit.onDead(game, null,player, player2, new Cat());
     
     assertEquals(new Cat().getName(), player.cloneTable().get(0).getName());
-    assertEquals(new Manasaber().getName(), player.cloneTable().get(1).getName());
-    assertEquals(new Cubling().getName(), player.cloneTable().get(2).getName());
+    assertEquals(new Cubling().getName(), player.cloneTable().get(1).getName());
     
     for (int i = 3; i < 7; i++)
     {
@@ -88,7 +87,7 @@ public class ManasaberTest extends UnitTestCase
     unit.onDead(game, null,player, player2, new Cat());
     
     assertEquals(new Cat().getName(), player.cloneTable().get(0).getName());
-    assertEquals(new Manasaber().getName(), player.cloneTable().get(1).getName());
+    assertEquals(new Cubling().getName(), player.cloneTable().get(1).getName());
     
     for (int i = 2; i < 7; i++)
     {

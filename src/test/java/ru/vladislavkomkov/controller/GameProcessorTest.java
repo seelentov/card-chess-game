@@ -471,21 +471,21 @@ public class GameProcessorTest
     ev = consumer.processFight();
     assertTrue(ev.isPresent());
     
-    evExpected = makeEvent(player2, FightEvent.Type.ON_ATTACKED, null,
-            List.of(cat2Expected),
-            List.of(catExpected));
-    
-    assertEqualsEvents(ev.get(), evExpected);
-    
-    ev = consumer.processFight();
-    assertTrue(ev.isPresent());
-    
     evExpected = makeEvent(player2, FightEvent.Type.ON_DEAD, List.of(cat2Expected),
             List.of(cat2Expected),
             List.of());
     
     assertEqualsEvents(ev.get(), evExpected);
-    
+
+    ev = consumer.processFight();
+    assertTrue(ev.isPresent());
+
+    evExpected = makeEvent(player2, FightEvent.Type.ON_ATTACKED, null,
+            List.of(cat2Expected),
+            List.of(catExpected));
+
+    assertEqualsEvents(ev.get(), evExpected);
+
     ev = consumer.processFight();
     assertTrue(ev.isPresent());
     

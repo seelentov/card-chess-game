@@ -21,14 +21,18 @@ public class Fight
   
   List<Unit> player1Units;
   List<Unit> player2Units;
-  
+
+  Unit player1LastAttacker = null;
+  Unit player2LastAttacker = null;
+
   int player1Turn = 0;
   int player2Turn = 0;
   int turn = 0;
   
   List<FightEvent> history = new ArrayList<>();
   
-  public Fight(Game game, Player player1, Player player2){
+  public Fight(Game game, Player player1, Player player2)
+  {
     this(game, player1, player2, true);
   }
   
@@ -98,7 +102,6 @@ public class Fight
     {
       return;
     }
-    
     
     if ((index) >= table.size())
     {
@@ -216,7 +219,7 @@ public class Fight
     {
       executeAttack(isPlayer1Turn, attackerOpt.get(), attackedOpt.get());
     }
-    
+
     incTurn(isPlayer1Turn);
     turn++;
     
@@ -274,7 +277,7 @@ public class Fight
     attacker.onAttack(game, this, turnPlayer1, turnPlayer2, attacked);
     attacked.onAttacked(game, this, turnPlayer2, turnPlayer1, attacker);
   }
-  
+
   int calcAttack(List<Unit> units)
   {
     return units.stream()
