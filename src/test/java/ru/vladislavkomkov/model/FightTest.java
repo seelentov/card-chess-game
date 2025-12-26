@@ -515,42 +515,77 @@ public class FightTest extends GamePlayerTestCase
   @Test
   void testFightAttackOrder()
   {
-    player.addToTable(new Cat());
-    player.addToTable(new Cat());
-    player.addToTable(new Cat());
-    player.addToTable(new Cat());
-    player.addToTable(new Cat());
-    player.addToTable(new Cat());
+    for (int i = 1; i < 7; i++) {
+      Unit unit = new Cat();
+      unit.setAttack(i);
+      unit.setHealth(i);
+      player.addToTable(unit);
+    }
     
     Unit taunt = new Cat();
     taunt.setIsTaunt(true);
-    taunt.setAttack(1);
+    taunt.setAttack(10);
     taunt.setHealth(99999);
-    
     player.addToTable(taunt);
     
-    player2.addToTable(new Cat());
-    player2.addToTable(new Cat());
-    player2.addToTable(new Cat());
-    player2.addToTable(new Cat());
-    player2.addToTable(new Cat());
-    player2.addToTable(new Cat());
+    for (int i = 1; i < 7; i++) {
+      Unit unit = new Cat();
+      unit.setAttack(i);
+      unit.setHealth(i);
+      player2.addToTable(unit);
+    }
     
     Unit taunt2 = new Cat();
     taunt2.setIsTaunt(true);
-    taunt2.setAttack(1);
+    taunt2.setAttack(10);
     taunt2.setHealth(99999);
-    
     player2.addToTable(taunt2);
     
     Fight fight = new Fight(game, player, player2);
 
-    for (int i = 7; i > 1; i--) {
-      assertEquals(i, fight.getFightTable(player).size());
-      assertEquals(i, fight.getFightTable(player2).size());
+    for (int i = 1; i < 7; i++) {
+      assertEquals(i, fight.getFightTable(player).get(0).getAttack());
+      assertEquals(i, fight.getFightTable(player2).get(0).getHealth());
 
       fight.doTurn();
       fight.doTurn();
     }
+  }
+  
+  @Test
+  void testFightAttackOrder()
+  {
+    Unit unit = new Cat();
+    unit.setAttack(1);
+    unit.setHealth(1);
+    player.addToTable(unit);
+    
+    unit = new IckyImp();
+    unit.setAttack(1);
+    unit.setHealth(1);
+    unit.setIsTaunt(true);
+    player.addToTable(unit);
+    
+    unit = new Cat();
+    unit.setAttack(1);
+    unit.setHealth(1);
+    player2.addToTable(unit);
+    
+    unit = new Cat();
+    unit.setAttack(1);
+    unit.setHealth(1);
+    player2.addToTable(unit);
+    
+    unit = new Cat();
+    unit.setAttack(2);
+    unit.setHealth(2);
+    unit.setIsTaunt(true);
+    player2.addToTable(unit);
+    
+    Fight fight = new Fight(game, player, player2);
+    
+    fight.doTurn();
+    
+    assertEquals(new IckyImp().getName(), fight.getFightTable(player).get(0).getName());
   }
 }

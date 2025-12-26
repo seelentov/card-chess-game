@@ -21,10 +21,10 @@ public class Fight
   
   List<Unit> player1Units;
   List<Unit> player2Units;
-
+  
   Unit player1LastAttacker = null;
   Unit player2LastAttacker = null;
-
+  
   int player1Turn = 0;
   int player2Turn = 0;
   int turn = 0;
@@ -219,7 +219,7 @@ public class Fight
     {
       executeAttack(isPlayer1Turn, attackerOpt.get(), attackedOpt.get());
     }
-
+    
     incTurn(isPlayer1Turn);
     turn++;
     
@@ -274,10 +274,63 @@ public class Fight
     Player turnPlayer1 = isPlayer1Turn ? player1 : player2;
     Player turnPlayer2 = isPlayer1Turn ? player2 : player1;
     
+    int attakedAttackerIndex = (isPlayer1Turn ? player2Turn : player1Turn) % getFightTable(turnPlayer2).size();
+    Unit attackedAttacker = getFightTable(turnPlayer2).get(attakedAttackerIndex);
+    
     attacker.onAttack(game, this, turnPlayer1, turnPlayer2, attacked);
     attacked.onAttacked(game, this, turnPlayer2, turnPlayer1, attacker);
+    
+    int attackerIndex = getFightTable(turnPlayer1).indexOf(attacker);
+    
+    if (attackerIndex != -1)
+    {
+      if (isPlayer1Turn)
+      {
+        player1Turn = attackerIndex;
+      }
+      else
+      {
+        player2Turn = attackerIndex;
+      }
+    }
+    else
+    {
+      if (isPlayer1Turn)
+      {
+        player1Turn -= 1;
+      }
+      else
+      {
+        player2Turn -= 1;
+      }
+    }
+    
+    int attackedAttackerIndex = getFightTable(turnPlayer2).indexOf(attackedAttacker);
+    
+    if (attackedAttackerIndex != -1)
+    {
+      if (!isPlayer1Turn)
+      {
+        player1Turn = attackedAttackerIndex;
+      }
+      else
+      {
+        player2Turn = attackedAttackerIndex;
+      }
+    }
+    else
+    {
+      if (!isPlayer1Turn)
+      {
+        player1Turn -= 1;
+      }
+      else
+      {
+        player2Turn -= 1;
+      }
+    }
   }
-
+  
   int calcAttack(List<Unit> units)
   {
     return units.stream()
