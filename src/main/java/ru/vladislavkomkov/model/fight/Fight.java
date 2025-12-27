@@ -13,20 +13,15 @@ import ru.vladislavkomkov.util.RandUtils;
 
 public class Fight
 {
+  
   public static final int TURN_LIMIT = 10000;
   
   final Game game;
-  final Player player1;
-  final Player player2;
   
-  List<Unit> player1Units;
-  List<Unit> player2Units;
+  // Замена отдельных полей на два экземпляра FightPlayer
+  final FightPlayer fightPlayer1;
+  final FightPlayer fightPlayer2;
   
-  Unit player1LastAttacker = null;
-  Unit player2LastAttacker = null;
-  
-  int player1Turn = 0;
-  int player2Turn = 0;
   int turn = 0;
   
   List<FightEvent> history = new ArrayList<>();
@@ -39,8 +34,8 @@ public class Fight
   public Fight(Game game, Player player1, Player player2, boolean isSetup)
   {
     this.game = game;
-    this.player1 = player1;
-    this.player2 = player2;
+    this.fightPlayer1 = new FightPlayer(player1, new ArrayList<>());
+    this.fightPlayer2 = new FightPlayer(player2, new ArrayList<>());
     
     if (isSetup)
     {
@@ -50,8 +45,8 @@ public class Fight
   
   public void addToHistory(FightEvent.Type event, Player player, List<Object> data)
   {
-    List<Unit> playerUnits = player1 == player ? player1Units : player2Units;
-    List<Unit> enemyUnits = player1 == player ? player2Units : player1Units;
+    List<Unit> playerUnits = fightPlayer1.player == player ? fightPlayer1.units : fightPlayer2.units;
+    List<Unit> enemyUnits = fightPlayer1.player == player ? fightPlayer2.units : fightPlayer1.units;
     
     history.add(new FightEvent(
         event,
@@ -117,13 +112,13 @@ public class Fight
   
   public List<Unit> getFightTable(Player player)
   {
-    if (player == player1)
+    if (player == fightPlayer1.player)
     {
-      return player1Units;
+      return fightPlayer1.units;
     }
-    else if (player == player2)
+    else if (player == fightPlayer2.player)
     {
-      return player2Units;
+      return fightPlayer2.units;
     }
     else
     {
@@ -136,10 +131,10 @@ public class Fight
     if (turn >= TURN_LIMIT)
     {
       afterFight();
-      return Optional.of(new FightInfo(player1, player2, FightInfo.Result.DRAW, 0, history));
+      return Optional.of(new FightInfo(fightPlayer1.player, fightPlayer2.player, FightInfo.Result.DRAW, 0, history));
     }
     
-    if (player1Units.isEmpty() || player2Units.isEmpty())
+    if (fightPlayer1.units.isEmpty() || fightPlayer2.units.isEmpty())
     {
       return handleFightEnd();
     }
@@ -150,27 +145,27 @@ public class Fight
   
   public void setup()
   {
-    this.player1Units = new ArrayList<>();
-    this.player2Units = new ArrayList<>();
+    fightPlayer1.units.clear();
+    fightPlayer2.units.clear();
     
-    for (Unit item : player1.cloneTable())
+    for (Unit item : fightPlayer1.player.cloneTable())
     {
       if (item != null)
       {
-        this.player1Units.add(item);
+        fightPlayer1.units.add(item);
       }
     }
     
-    for (Unit item : player2.cloneTable())
+    for (Unit item : fightPlayer2.player.cloneTable())
     {
       if (item != null)
       {
-        this.player2Units.add(item);
+        fightPlayer2.units.add(item);
       }
     }
     
-    int player1Attack = calcAttack(this.player1Units);
-    int player2Attack = calcAttack(this.player2Units);
+    int player1Attack = calcAttack(fightPlayer1.units);
+    int player2Attack = calcAttack(fightPlayer2.units);
     
     if (player1Attack > player2Attack)
     {
@@ -185,21 +180,21 @@ public class Fight
       turn = RandUtils.getRand(1);
     }
     
-    addToHistory(FightEvent.Type.START, player1, null);
+    addToHistory(FightEvent.Type.START, fightPlayer1.player, null);
   }
   
   Optional<FightInfo> handleFightEnd()
   {
-    if (player1Units.isEmpty() && player2Units.isEmpty())
+    if (fightPlayer1.units.isEmpty() && fightPlayer2.units.isEmpty())
     {
       afterFight();
-      return Optional.of(new FightInfo(player1, player2, FightInfo.Result.DRAW, 0, history));
+      return Optional.of(new FightInfo(fightPlayer1.player, fightPlayer2.player, FightInfo.Result.DRAW, 0, history));
     }
     
-    boolean isPlayer1Win = player2Units.isEmpty();
-    Player winner = isPlayer1Win ? player1 : player2;
-    Player loser = isPlayer1Win ? player2 : player1;
-    List<Unit> winnerUnits = isPlayer1Win ? player1Units : player2Units;
+    boolean isPlayer1Win = fightPlayer2.units.isEmpty();
+    Player winner = isPlayer1Win ? fightPlayer1.player : fightPlayer2.player;
+    Player loser = isPlayer1Win ? fightPlayer2.player : fightPlayer1.player;
+    List<Unit> winnerUnits = isPlayer1Win ? fightPlayer1.units : fightPlayer2.units;
     
     int damage = calcPlayerDamage(winner, winnerUnits);
     loser.applyDamage(damage);
@@ -207,13 +202,13 @@ public class Fight
     afterFight();
     
     FightInfo.Result result = isPlayer1Win ? FightInfo.Result.PLAYER1_WIN : FightInfo.Result.PLAYER2_WIN;
-    return Optional.of(new FightInfo(player1, player2, result, damage, history));
+    return Optional.of(new FightInfo(fightPlayer1.player, fightPlayer2.player, result, damage, history));
   }
   
   Optional<FightInfo> processTurn(boolean isPlayer1Turn)
   {
     Optional<Unit> attackerOpt = findAttacker(isPlayer1Turn);
-    Optional<Unit> attackedOpt = getRandAttackedUnit(isPlayer1Turn ? player2Units : player1Units);
+    Optional<Unit> attackedOpt = getRandAttackedUnit(isPlayer1Turn ? fightPlayer2.units : fightPlayer1.units);
     
     if (attackerOpt.isPresent() && attackedOpt.isPresent())
     {
@@ -228,23 +223,39 @@ public class Fight
   
   Optional<Unit> findAttacker(boolean isPlayer1Turn)
   {
-    List<Unit> units = isPlayer1Turn ? player1Units : player2Units;
-    int currentTurn = isPlayer1Turn ? player1Turn : player2Turn;
+    FightPlayer currentFightPlayer = isPlayer1Turn ? fightPlayer1 : fightPlayer2;
+    int currentTurn = isPlayer1Turn ? fightPlayer1.turn : fightPlayer2.turn;
     
-    if (currentTurn >= units.size())
+    if (currentTurn >= currentFightPlayer.units.size())
     {
       currentTurn = 0;
+      if (isPlayer1Turn)
+      {
+        fightPlayer1.turn = 0;
+      }
+      else
+      {
+        fightPlayer2.turn = 0;
+      }
     }
     
     int startTurn = currentTurn;
     
     while (true)
     {
-      if (currentTurn >= units.size())
+      if (currentTurn >= currentFightPlayer.units.size())
       {
         currentTurn = 0;
+        if (isPlayer1Turn)
+        {
+          fightPlayer1.turn = 0;
+        }
+        else
+        {
+          fightPlayer2.turn = 0;
+        }
       }
-      Unit attacker = units.get(currentTurn);
+      Unit attacker = currentFightPlayer.units.get(currentTurn);
       
       if (checkAttacker(attacker))
       {
@@ -254,11 +265,11 @@ public class Fight
       incTurn(isPlayer1Turn);
       turn += 2;
       
-      int newTurn = isPlayer1Turn ? player1Turn : player2Turn;
-      int normalizedNewTurn = newTurn % units.size();
-      int normalizedStartTurn = startTurn % units.size();
+      int newTurn = isPlayer1Turn ? fightPlayer1.turn : fightPlayer2.turn;
+      int normalizedNewTurn = newTurn % currentFightPlayer.units.size();
+      int normalizedStartTurn = startTurn % currentFightPlayer.units.size();
       
-      currentTurn = isPlayer1Turn ? player1Turn : player2Turn;
+      currentTurn = isPlayer1Turn ? fightPlayer1.turn : fightPlayer2.turn;
       
       if (normalizedNewTurn == normalizedStartTurn)
       {
@@ -271,11 +282,11 @@ public class Fight
   
   void executeAttack(boolean isPlayer1Turn, Unit attacker, Unit attacked)
   {
-    Player turnPlayer1 = isPlayer1Turn ? player1 : player2;
-    Player turnPlayer2 = isPlayer1Turn ? player2 : player1;
+    Player turnPlayer1 = isPlayer1Turn ? fightPlayer1.player : fightPlayer2.player;
+    Player turnPlayer2 = isPlayer1Turn ? fightPlayer2.player : fightPlayer1.player;
     
-    int attakedAttackerIndex = (isPlayer1Turn ? player2Turn : player1Turn) % getFightTable(turnPlayer2).size();
-    Unit attackedAttacker = getFightTable(turnPlayer2).get(attakedAttackerIndex);
+    int attackedAttackerIndex = (isPlayer1Turn ? fightPlayer2.turn : fightPlayer1.turn) % getFightTable(turnPlayer2).size();
+    Unit attackedAttacker = getFightTable(turnPlayer2).get(attackedAttackerIndex);
     
     attacker.onAttack(game, this, turnPlayer1, turnPlayer2, attacked);
     attacked.onAttacked(game, this, turnPlayer2, turnPlayer1, attacker);
@@ -286,47 +297,36 @@ public class Fight
     {
       if (isPlayer1Turn)
       {
-        player1Turn = attackerIndex;
+        fightPlayer1.turn = attackerIndex;
       }
       else
       {
-        player2Turn = attackerIndex;
+        fightPlayer2.turn = attackerIndex;
       }
     }
     else
     {
       if (isPlayer1Turn)
       {
-        player1Turn -= 1;
+        fightPlayer1.turn -= 1;
       }
       else
       {
-        player2Turn -= 1;
+        fightPlayer2.turn -= 1;
       }
     }
     
-    int attackedAttackerIndex = getFightTable(turnPlayer2).indexOf(attackedAttacker);
+    int attackedAttackerIndexAfter = getFightTable(turnPlayer2).indexOf(attackedAttacker);
     
-    if (attackedAttackerIndex != -1)
+    if (attackedAttackerIndexAfter != -1)
     {
       if (!isPlayer1Turn)
       {
-        player1Turn = attackedAttackerIndex;
+        fightPlayer1.turn = attackedAttackerIndexAfter;
       }
       else
       {
-        player2Turn = attackedAttackerIndex;
-      }
-    }
-    else
-    {
-      if (!isPlayer1Turn)
-      {
-        player1Turn -= 1;
-      }
-      else
-      {
-        player2Turn -= 1;
+        fightPlayer2.turn = attackedAttackerIndexAfter;
       }
     }
   }
@@ -376,16 +376,16 @@ public class Fight
   
   void incTurn(boolean isPlayer1Turn)
   {
-    List<Unit> unitsForTurn = isPlayer1Turn ? player1Units : player2Units;
-    if (!unitsForTurn.isEmpty())
+    FightPlayer fightPlayer = isPlayer1Turn ? fightPlayer1 : fightPlayer2;
+    if (!fightPlayer.units.isEmpty())
     {
       if (isPlayer1Turn)
       {
-        player1Turn = (player1Turn + 1) % unitsForTurn.size();
+        fightPlayer1.turn = (fightPlayer1.turn + 1) % fightPlayer1.units.size();
       }
       else
       {
-        player2Turn = (player2Turn + 1) % unitsForTurn.size();
+        fightPlayer2.turn = (fightPlayer2.turn + 1) % fightPlayer2.units.size();
       }
     }
   }
@@ -401,7 +401,7 @@ public class Fight
   
   void afterFight()
   {
-    
+    // Пустой метод, как и было
   }
   
   public int getTurn()
@@ -411,21 +411,49 @@ public class Fight
   
   public Player getPlayer1()
   {
-    return player1;
+    return fightPlayer1.player;
   }
   
   public Player getPlayer2()
   {
-    return player2;
+    return fightPlayer2.player;
   }
   
   public List<Unit> getPlayer1Units()
   {
-    return player1Units;
+    return fightPlayer1.units;
   }
   
   public List<Unit> getPlayer2Units()
   {
-    return player2Units;
+    return fightPlayer2.units;
+  }
+  
+  public static class FightPlayer
+  {
+    final Player player;
+    final List<Unit> units;
+    int turn;
+    
+    public FightPlayer(Player player, List<Unit> units)
+    {
+      this.player = player;
+      this.units = units;
+    }
+    
+    public Player getPlayer()
+    {
+      return player;
+    }
+    
+    public List<Unit> getUnits()
+    {
+      return units;
+    }
+    
+    public int getTurn()
+    {
+      return turn;
+    }
   }
 }

@@ -511,7 +511,26 @@ public class FightTest extends GamePlayerTestCase
     
     game.close();
   }
-  
+
+  /*
+    Cat(1/1)
+    Cat(2/2)
+    Cat(3/3)
+    Cat(4/4)
+    Cat(5/5)
+    Cat(6/6)
+    Cat(10/99999)(taunt)
+
+    Cat(1/1)
+    Cat(2/2)
+    Cat(3/3)
+    Cat(4/4)
+    Cat(5/5)
+    Cat(6/6)
+    Cat(10/99999)(taunt)
+
+    Должны разбиться все в таунт друг друга по очереди: 1,2,3..6
+  */
   @Test
   void testFightAttackOrder()
   {
@@ -551,41 +570,117 @@ public class FightTest extends GamePlayerTestCase
       fight.doTurn();
     }
   }
-  
+
+
+    /*
+    Cat(1/1)
+    Icky Imp(2/2)(taunt)
+    Cat(30/30)
+
+    Cat(2/2)
+    Cat(2/2)(taunt)
+    Cat(3/3)
+
+    Cat 1.1 разбивается об таунт. Cat 2.1 разивает таунт и 1 бьется призванными импами. Таунт 2 ломается и бьет 2.3
+  */
+
   @Test
-  void testFightAttackOrder()
+  void testFightAttackOrderWithOnDead()
   {
-    Unit unit = new Cat();
-    unit.setAttack(1);
-    unit.setHealth(1);
-    player.addToTable(unit);
-    
-    unit = new IckyImp();
-    unit.setAttack(1);
-    unit.setHealth(1);
-    unit.setIsTaunt(true);
-    player.addToTable(unit);
-    
-    unit = new Cat();
-    unit.setAttack(1);
-    unit.setHealth(1);
-    player2.addToTable(unit);
-    
-    unit = new Cat();
-    unit.setAttack(1);
-    unit.setHealth(1);
-    player2.addToTable(unit);
-    
-    unit = new Cat();
-    unit.setAttack(2);
-    unit.setHealth(2);
-    unit.setIsTaunt(true);
-    player2.addToTable(unit);
+    Unit unit11 = new Cat();
+    unit11.setAttack(1);
+    unit11.setHealth(1);
+    player.addToTable(unit11);
+
+    Unit unit12 = new IckyImp();
+    unit12.setAttack(2);
+    unit12.setHealth(2);
+    unit12.setIsTaunt(true);
+    player.addToTable(unit12);
+
+    Unit unit13 = new Cat();
+    unit13.setAttack(30);
+    unit13.setHealth(30);
+    player.addToTable(unit13);
+
+    Unit unit21 = new Cat();
+    unit21.setAttack(2);
+    unit21.setHealth(2);
+    player2.addToTable(unit21);
+
+    Unit unit22 = new Cat();
+    unit22.setAttack(2);
+    unit22.setHealth(2);
+    unit22.setIsTaunt(true);
+    player2.addToTable(unit22);
+
+    Unit unit23 = new Cat();
+    unit23.setAttack(3);
+    unit23.setHealth(3);
+    unit23.setIsTaunt(true);
+    player2.addToTable(unit23);
     
     Fight fight = new Fight(game, player, player2);
     
     fight.doTurn();
-    
+
     assertEquals(new IckyImp().getName(), fight.getFightTable(player).get(0).getName());
+    assertEquals(2, fight.getFightTable(player).get(0).getAttack());
+    assertEquals(2, fight.getFightTable(player).get(0).getHealth());
+    assertTrue(fight.getFightTable(player).get(0).isTaunt());
+
+    assertEquals(new Cat().getName(), fight.getFightTable(player).get(1).getName());
+    assertEquals(30, fight.getFightTable(player).get(1).getAttack());
+    assertEquals(30, fight.getFightTable(player).get(1).getHealth());
+
+    assertEquals(new Cat().getName(), fight.getFightTable(player2).get(0).getName());
+    assertEquals(2, fight.getFightTable(player2).get(0).getAttack());
+    assertEquals(2, fight.getFightTable(player2).get(0).getHealth());
+
+    assertEquals(new Cat().getName(), fight.getFightTable(player2).get(1).getName());
+    assertEquals(2, fight.getFightTable(player2).get(1).getAttack());
+    assertEquals(1, fight.getFightTable(player2).get(1).getHealth());
+    assertTrue(fight.getFightTable(player2).get(1).isTaunt());
+
+    assertEquals(new Cat().getName(), fight.getFightTable(player2).get(2).getName());
+    assertEquals(3, fight.getFightTable(player2).get(2).getAttack());
+    assertEquals(3, fight.getFightTable(player2).get(2).getHealth());
+
+    fight.doTurn();
+
+    assertEquals(new Imp().getName(), fight.getFightTable(player).get(0).getName());
+    assertEquals(1, fight.getFightTable(player).get(0).getAttack());
+    assertEquals(1, fight.getFightTable(player).get(0).getHealth());
+
+    assertEquals(new Imp().getName(), fight.getFightTable(player).get(1).getName());
+    assertEquals(1, fight.getFightTable(player).get(1).getAttack());
+    assertEquals(1, fight.getFightTable(player).get(1).getHealth());
+
+    assertEquals(new Cat().getName(), fight.getFightTable(player).get(2).getName());
+    assertEquals(30, fight.getFightTable(player).get(2).getAttack());
+    assertEquals(30, fight.getFightTable(player).get(2).getHealth());
+
+    assertEquals(new Cat().getName(), fight.getFightTable(player2).get(0).getName());
+    assertEquals(2, fight.getFightTable(player2).get(0).getAttack());
+    assertEquals(1, fight.getFightTable(player2).get(0).getHealth());
+    assertTrue(fight.getFightTable(player2).get(1).isTaunt());
+
+    assertEquals(new Cat().getName(), fight.getFightTable(player2).get(1).getName());
+    assertEquals(3, fight.getFightTable(player2).get(1).getAttack());
+    assertEquals(3, fight.getFightTable(player2).get(1).getHealth());
+
+    fight.doTurn();
+
+    assertEquals(new Imp().getName(), fight.getFightTable(player).get(0).getName());
+    assertEquals(1, fight.getFightTable(player).get(0).getAttack());
+    assertEquals(1, fight.getFightTable(player).get(0).getHealth());
+
+    assertEquals(new Cat().getName(), fight.getFightTable(player).get(1).getName());
+    assertEquals(30, fight.getFightTable(player).get(1).getAttack());
+    assertEquals(30, fight.getFightTable(player).get(1).getHealth());
+
+    assertEquals(new Cat().getName(), fight.getFightTable(player2).get(0).getName());
+    assertEquals(3, fight.getFightTable(player2).get(0).getAttack());
+    assertEquals(3, fight.getFightTable(player2).get(0).getHealth());
   }
 }

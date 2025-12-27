@@ -234,6 +234,7 @@ public class Game implements AutoCloseable
             player.incMaxMoney();
           }
           player.statistic.counters.incrementIncLevelDecreaser();
+          player.sendLvlIncPrice();
         }
         player.resetMoney();
         player.resetTavern(true);

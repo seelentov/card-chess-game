@@ -8,6 +8,8 @@ import ru.vladislavkomkov.model.entity.unit.UnitType;
 import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.player.Player;
 
+import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
+
 public class HummingBird extends Unit
 {
   public static final int ATTACK_BOOST = 1;
@@ -27,6 +29,10 @@ public class HummingBird extends Unit
     isTavern = true;
     
     unitType = List.of(UnitType.BEAST);
+    
+    listener.onStartTurnListeners.put(
+        KEY_CORE,
+        ((game, fight, player) -> fight.getFightTable(player).forEach(unit -> unit.incAttack(ATTACK_BOOST))));
   }
   
   @Override
@@ -41,7 +47,6 @@ public class HummingBird extends Unit
   @Override
   public void onStartFight(Game game, Fight fight, Player player, Player player2)
   {
-    fight.getFightTable(player).forEach(unit -> unit.incAttack(!isGold() ? ATTACK_BOOST : ATTACK_BOOST * 2));
     super.onStartFight(game, fight, player, player2);
   }
   

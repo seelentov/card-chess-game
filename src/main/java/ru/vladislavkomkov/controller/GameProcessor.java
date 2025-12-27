@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ru.vladislavkomkov.model.Game;
+import ru.vladislavkomkov.model.player.Player;
 
 public class GameProcessor implements AutoCloseable
 {
@@ -124,7 +125,7 @@ public class GameProcessor implements AutoCloseable
     int preFightTimer = this.preFightTimer == Integer.MAX_VALUE ? (game.getTurn() * 5000) + 30000 : this.preFightTimer;
     
     game.sendPreFightTimer(preFightTimer);
-    
+    game.getPlayers().values().forEach(Player::sendFullStat);
     while (preFightTimer > 0) {
       Thread.sleep(1000);
       preFightTimer = Math.max(0, preFightTimer - 1000);
