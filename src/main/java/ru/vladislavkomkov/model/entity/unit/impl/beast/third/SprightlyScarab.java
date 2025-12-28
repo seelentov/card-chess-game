@@ -1,8 +1,6 @@
 package ru.vladislavkomkov.model.entity.unit.impl.beast.third;
 
 import ru.vladislavkomkov.model.Game;
-import ru.vladislavkomkov.model.action.OnPlayedAction;
-import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.Choice;
 import ru.vladislavkomkov.model.entity.Entity;
 import ru.vladislavkomkov.model.entity.PlayPair;
@@ -38,7 +36,7 @@ public class SprightlyScarab extends Choicer
     
     isTavern = true;
     
-    level = 1;
+    level = 3;
     
     playType = List.of(
         new PlayPair(PlayType.TABLE),
@@ -91,7 +89,7 @@ public class SprightlyScarab extends Choicer
   
   private static Unit findUnit(Fight fight, Player player, List<Integer> input)
   {
-    boolean isTavernIndex = input.get(2) == 1;
+    boolean isTavernIndex = input.get(3) == 1;
     
     List<Unit> units = isTavernIndex ? player.getTavern().getUnits() : fight != null ? fight.getFightTable(player) : player.getTable();
     int index = SprightlyScarab.calcIndex(input, units);
@@ -113,9 +111,9 @@ public class SprightlyScarab extends Choicer
   private static int calcIndex(List<Integer> input, List<Unit> units)
   {
     int index;
-    if (input.size() > 3)
+    if (input.size() > 2)
     {
-      index = input.get(3);
+      index = input.get(2);
     }
     else
     {

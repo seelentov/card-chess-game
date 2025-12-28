@@ -29,7 +29,6 @@ import ru.vladislavkomkov.util.UUIDUtils;
 
 public class Game implements AutoCloseable
 {
-  
   public static final int PLAYERS_COUNT = 8;
   public static final int FIGHTS_COUNT = 4;
   

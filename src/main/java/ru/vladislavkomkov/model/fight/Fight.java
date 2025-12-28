@@ -108,6 +108,12 @@ public class Fight
     unit.onAppear(game, this, player);
   }
   
+  public void removeFromFightTable(Player player, Unit unit)
+  {
+    getFightTable(player).removeIf(unit1 -> unit1 == unit);
+    unit.onDisappear(game, this, player);
+  }
+  
   public List<Unit> getFightTable(Player player)
   {
     if (player == fightPlayer1.player)

@@ -2,6 +2,7 @@ package ru.vladislavkomkov.model.entity.unit;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -403,12 +404,29 @@ public abstract class Unit extends Entity
       
       if (isRebirth())
       {
-        this.actualHealth = 1;
-        this.isRebirth = false;
+        Unit reCreated;
+        if (fight != null)
+        {
+          Optional<Unit> reCreatedOpt = player.getTableUnit(this.ID);
+          
+          if (reCreatedOpt.isEmpty())
+          {
+            throw new RuntimeException("Can`t find unit for rebirth");
+          }
+          
+          reCreated = reCreatedOpt.get();
+        }
+        else
+        {
+          reCreated = this;
+        }
+        
+        reCreated.actualHealth = 1;
+        reCreated.isRebirth = false;
         
         if (fight != null)
         {
-          fight.addToFightTable(player, this, indexOfThis);
+          fight.addToFightTable(player, reCreated, indexOfThis);
         }
         else
         {
@@ -426,9 +444,15 @@ public abstract class Unit extends Entity
     
     listener.processOnDeadListeners(game, fight, player, player2, this, attacker);
     
-    List<Unit> table = fight != null ? fight.getFightTable(player) : player.getTable();
-    table.removeIf(unit -> unit == this);
-    
+    if (fight != null)
+    {
+      fight.removeFromFightTable(player, this);
+    }
+    else
+    {
+      player.removeFromTable(this);
+    }
+
     if (fight != null)
     {
       fight.addToHistory(FightEvent.Type.ON_DEAD, player, List.of(this, attacker));

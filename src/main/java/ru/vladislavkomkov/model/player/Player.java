@@ -1,10 +1,6 @@
 package ru.vladislavkomkov.model.player;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -13,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import javafx.util.Pair;
 
 import ru.vladislavkomkov.controller.sender.Sender;
+import ru.vladislavkomkov.enviroment.Config;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.Listener;
 import ru.vladislavkomkov.model.card.Card;
@@ -32,7 +29,7 @@ public class Player
   
   public static final int MAX_LEVEL = 6;
   public static final int MAX_MONEY = 10;
-  public static final int START_MONEY = 3;
+  public static final int START_MONEY = Config.getInstance().isDebug() ? 100000 : 3;
   
   public static final int TABLE_LIMIT = 7;
   public static final int HAND_LIMIT = 10;
@@ -776,10 +773,15 @@ public class Player
   {
     return new ArrayList<>(hand);
   }
-  
+
   public List<Unit> getTable()
   {
     return table;
+  }
+
+  public Optional<Unit> getTableUnit(String ID)
+  {
+    return table.stream().filter(unit -> unit.getID().equals(ID)).findFirst();
   }
   
   public List<Card> getHand()

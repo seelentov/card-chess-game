@@ -12,7 +12,17 @@ public class Buff implements Cloneable
   
   final Consumer<Unit> upgrade;
   final Consumer<Unit> rollback;
-  
+
+  public Buff(String description)
+  {
+    this(description, false);
+  }
+
+  public Buff(String description, boolean rollback)
+  {
+    this(unit -> {}, rollback ? unit -> {} : null, description);
+  }
+
   public Buff(Consumer<Unit> upgrade, Consumer<Unit> rollback)
   {
     this(upgrade, rollback, "");

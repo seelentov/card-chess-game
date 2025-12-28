@@ -45,8 +45,9 @@ public class DeepBlues extends SpellCraft
           int attackBonus = getAttackBoost(multi);
           int hpBonus = getHealthBoost(multi);
           
-          if(input.size() < 2){
-              return;
+          if (input.size() < 2)
+          {
+            return;
           }
           
           boolean isTavernIndex = input.get(1) == 1;
@@ -54,7 +55,9 @@ public class DeepBlues extends SpellCraft
           Unit unit;
           if (!isTavernIndex)
           {
-            unit = player.getTable().get(input.get(0));
+            unit = fight != null
+                ? fight.getFightTable(player).get(input.get(0))
+                : player.getTable().get(input.get(0));
           }
           else
           {

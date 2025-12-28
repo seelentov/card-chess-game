@@ -77,7 +77,7 @@ public class SprightlyScarabTest extends ChoicerTestCase
     player.addToTable(new Cat());
     player.addToTable(new Cat());
     
-    player.playCard(0, List.of(1, 1, 0, 1));
+    player.playCard(0, List.of(1, 1, 1, 0));
     
     assertEquals(new Cat().getAttack() + SprightlyScarab.SprightlySupport.ATTACK_BOOST, player.getTable().get(2).getAttack());
     assertEquals(AttacksCount.DOUBLE, player.getTable().get(2).getAttacksCount());
@@ -104,7 +104,7 @@ public class SprightlyScarabTest extends ChoicerTestCase
     player.addToTable(new Cat());
     player.addToTable(new Cat());
     
-    player.playCard(0, List.of(1, 1, 2, 2));
+    player.playCard(0, List.of(1, 1, 2, 0));
     
     assertEquals(new Cat().getAttack() + SprightlyScarab.SprightlySupport.ATTACK_BOOST, player.getTable().get(3).getAttack());
     assertEquals(AttacksCount.DOUBLE, player.getTable().get(3).getAttacksCount());

@@ -13,11 +13,11 @@ import org.junit.jupiter.api.Test;
 
 import ru.vladislavkomkov.GamePlayerTestCase;
 import ru.vladislavkomkov.model.entity.unit.AttacksCount;
+import ru.vladislavkomkov.model.entity.unit.Buff;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.impl.beast.first.Alleycat;
 import ru.vladislavkomkov.model.entity.unit.impl.demon.first.IckyImp;
 import ru.vladislavkomkov.model.entity.unit.impl.dragon.fourth.Greenskeeper;
-import ru.vladislavkomkov.model.entity.unit.impl.elemental.second.CracklingCyclone;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.demon.first.Imp;
 import ru.vladislavkomkov.model.entity.unit.impl.undead.first.RisenRider;
@@ -716,5 +716,69 @@ public class FightTest extends GamePlayerTestCase
     
     assertEquals(unit21.getHealth(), fight.getFightTable(player2).get(0).getHealth());
     assertEquals(unit22.getHealth() - (unit11.getAttack() * 2), fight.getFightTable(player2).get(1).getHealth());
+  }
+  
+  @Test
+  void testRebirth()
+  {
+    Unit unit11 = new Cat();
+    unit11.setIsRebirth(true);
+    unit11.setAttack(10);
+    unit11.setHealth(10);
+    player.addToTable(unit11);
+    
+    Unit unit12 = new Cat();
+    unit12.setAttack(12);
+    unit12.setHealth(100);
+    unit12.setIsTaunt(true);
+    player.addToTable(unit12);
+    
+    Unit unit21 = new Cat();
+    unit21.setAttack(11);
+    unit21.setHealth(100);
+    player2.addToTable(unit21);
+    
+    Fight fight = new Fight(game, player, player2);
+    
+    fight.doTurn();
+    
+    assertEquals(1, fight.getFightTable(player).get(0).getHealth());
+    assertFalse(fight.getFightTable(player).get(0).isRebirth());
+    assertEquals(unit12.getHealth(), fight.getFightTable(player).get(1).getHealth());
+    
+    fight.doTurn();
+    
+    assertEquals(1, fight.getFightTable(player).get(0).getHealth());
+    assertEquals(unit12.getHealth() - unit21.getAttack(), fight.getFightTable(player).get(1).getHealth());
+    
+    fight.doTurn();
+    
+    assertEquals(unit12.getHealth() - unit21.getAttack(), fight.getFightTable(player).get(0).getHealth());
+  }
+  
+  @Test
+  void testRebirthWithBuffs()
+  {
+    String buff1Description = "TEST";
+    String buff2Description = "TEST2";
+    
+    Unit unit11 = new Cat();
+    unit11.setIsRebirth(true);
+    unit11.addBuff(new Buff(buff1Description));
+    player.addToTable(unit11);
+    
+    Unit unit21 = new Cat();
+    unit21.setAttack(100);
+    unit21.setHealth(100);
+    
+    player2.addToTable(unit21);
+    
+    Fight fight = new Fight(game, player, player2);
+    fight.getFightTable(player).get(0).getBuffs().add(new Buff(buff2Description));
+
+    fight.doTurn();
+    
+    assertEquals(1, fight.getFightTable(player).get(0).getBuffs().size());
+    assertEquals(buff1Description, fight.getFightTable(player).get(0).getBuffs().get(0).getDescription());
   }
 }

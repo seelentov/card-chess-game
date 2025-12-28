@@ -7,7 +7,7 @@ import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.player.Player;
 
-public abstract class Choice extends GObject
+  public abstract class Choice extends GObject
 {
   public Choice(boolean isGold)
   {
