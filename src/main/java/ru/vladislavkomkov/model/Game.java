@@ -161,7 +161,7 @@ public class Game implements AutoCloseable
     }
     player.setSender(sender);
     player.sendMessage(Event.Type.CONNECTED);
-    players.values().forEach(Player::sendFullStat);
+    player.sendFullStat();
     if (getState() != State.LOBBY)
     {
       player.sendMessage(Event.Type.START);
@@ -234,11 +234,11 @@ public class Game implements AutoCloseable
             player.incMaxMoney();
           }
           player.getStatistic().counters.incrementIncLevelDecreaser();
-          player.sendLvlIncPrice();
         }
         player.resetMoney();
         player.resetTavern(true);
         processStartTurn(player);
+        player.sendLvlIncPrice();
       }
     }
     finally

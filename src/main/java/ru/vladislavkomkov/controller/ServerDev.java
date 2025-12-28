@@ -5,12 +5,15 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import ru.vladislavkomkov.enviroment.Config;
 import ru.vladislavkomkov.model.Game;
 
 public class ServerDev
 {
     public static void main(String[] args)
     {
+        Config.getInstance().setDebug(true);
+        
         Map<String, Game> games = new HashMap<>();
         
         int portHttp = 8080;

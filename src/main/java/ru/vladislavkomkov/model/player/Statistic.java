@@ -7,7 +7,7 @@ public class Statistic
   public final Played played = new Played();
   public final Counters counters = new Counters();
   public final Boosts boosts = new Boosts();
-
+  
   public Statistic()
   {
   }

@@ -93,6 +93,16 @@ public class Tavern
     return cards;
   }
   
+  public List<Unit> getUnits()
+  {
+    return cards.stream().filter(card -> card.getEntity() instanceof Spell).map(card -> (Unit) card.getEntity()).toList();
+  }
+  
+  public List<Spell> getSpells()
+  {
+    return cards.stream().filter(card -> card.getEntity() instanceof Spell).map(card -> (Spell) card.getEntity()).toList();
+  }
+  
   public boolean isFreeze()
   {
     return freeze;

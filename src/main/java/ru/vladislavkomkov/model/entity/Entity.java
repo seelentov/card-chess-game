@@ -20,7 +20,6 @@ import ru.vladislavkomkov.util.UUIDUtils;
 
 public abstract class Entity extends GObject
 {
-  public final static String F_IS_GOLD = "is_gold";
   public final static String F_IS_SPELL = "is_spell";
   
   public final static String F_LVL = "lvl";
@@ -29,12 +28,8 @@ public abstract class Entity extends GObject
   
   protected Listener listener = new Listener();
   
-  protected String ID = UUIDUtils.generateKey();
-  protected String name = this.getClass().getSimpleName();
-  protected String description = "";
   protected int level = 1;
   protected boolean isTavern = false;
-  protected boolean isGold;
   
   protected List<PlayPair> playType = List.of();
   
@@ -46,6 +41,9 @@ public abstract class Entity extends GObject
   public Entity(boolean isGold)
   {
     this.isGold = isGold;
+    
+    ID = UUIDUtils.generateKey();
+    name = this.getClass().getSimpleName();
   }
   
   @JsonProperty(F_PLAY_TYPE)
@@ -158,16 +156,7 @@ public abstract class Entity extends GObject
     return isGold ? newGold() : newBase();
   }
   
-  @JsonProperty(F_IS_GOLD)
-  public boolean isGold()
-  {
-    return isGold;
-  }
-  
-  public void setIsGold(boolean isGold)
-  {
-    this.isGold = isGold;
-  }
+
   
   public Listener getListener()
   {

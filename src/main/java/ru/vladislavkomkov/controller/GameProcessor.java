@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ru.vladislavkomkov.model.Game;
-import ru.vladislavkomkov.model.player.Player;
 
 public class GameProcessor implements AutoCloseable
 {
@@ -20,9 +19,9 @@ public class GameProcessor implements AutoCloseable
   final ExecutorService executor = Executors.newCachedThreadPool();
   
   final int preFightTimer;
-
-  volatile AtomicBoolean isStoped = new AtomicBoolean(false);
-
+  
+  volatile AtomicBoolean isStopped = new AtomicBoolean(false);
+  
   public GameProcessor(Map<String, Game> games)
   {
     this(games, Integer.MAX_VALUE);
@@ -51,7 +50,7 @@ public class GameProcessor implements AutoCloseable
     game.sendStartGame();
     
     executor.submit(() -> {
-      while (!isStoped.get())
+      while (!isStopped.get())
       {
         try
         {
@@ -91,7 +90,7 @@ public class GameProcessor implements AutoCloseable
     {
       return true;
     }
-
+    
     processFight(game);
     
     return false;
@@ -115,6 +114,11 @@ public class GameProcessor implements AutoCloseable
   
   boolean processPreFight(Game game) throws Exception
   {
+    if (game == null)
+    {
+      return false;
+    }
+    
     if (game.calcFights())
     {
       return true;
@@ -125,15 +129,16 @@ public class GameProcessor implements AutoCloseable
     int preFightTimer = this.preFightTimer == Integer.MAX_VALUE ? (game.getTurn() * 5000) + 30000 : this.preFightTimer;
     
     game.sendPreFightTimer(preFightTimer);
-    game.getPlayers().values().forEach(Player::sendFullStat);
-    while (preFightTimer > 0) {
+    
+    while (preFightTimer > 0 && !isStopped.get())
+    {
       Thread.sleep(1000);
       preFightTimer = Math.max(0, preFightTimer - 1000);
       game.sendPreFightTimer(preFightTimer);
     }
-
+    
     game.doTurnEnd();
-
+    
     return false;
   }
   
@@ -154,9 +159,11 @@ public class GameProcessor implements AutoCloseable
     game.doFight();
     game.incTurn();
   }
-
+  
   @Override
-  public void close() throws Exception {
-    isStoped.set(true);
+  public void close() throws Exception
+  {
+    isStopped.set(true);
+    executor.shutdown();
   }
 }

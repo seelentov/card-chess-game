@@ -15,7 +15,7 @@ public class PlayPair
   
   private final PlayType type;
   private final List<UnitType> unitTypes;
-  private final List<Card> choice;
+  private final List<Choice> choice;
   
   public PlayPair(PlayType type)
   {
@@ -61,7 +61,7 @@ public class PlayPair
   }
   
   @JsonProperty(F_CHOICE)
-  public List<Card> getChoice()
+  public List<Choice> getChoice()
   {
     return choice;
   }

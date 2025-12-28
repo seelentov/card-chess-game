@@ -11,9 +11,22 @@ public abstract class GObject implements Cloneable
   public final static String F_NAME = "name";
   public final static String F_DESCRIPTION = "description";
   
+  public final static String F_IS_GOLD = "is_gold";
+  
+  protected Boolean isGold = false;
+  
   protected String ID = UUIDUtils.generateKey();
   protected String name = this.getClass().getSimpleName();
   protected String description = "";
+  
+  public GObject()
+  {
+  }
+  
+  public GObject(boolean isGold)
+  {
+    this.isGold = isGold;
+  }
   
   @JsonProperty(F_NAME)
   public String getName()
@@ -46,6 +59,17 @@ public abstract class GObject implements Cloneable
   public String getDescription(Player player)
   {
     return description;
+  }
+  
+  @JsonProperty(F_IS_GOLD)
+  public Boolean isGold()
+  {
+    return isGold;
+  }
+  
+  public void setIsGold(boolean isGold)
+  {
+    this.isGold = isGold;
   }
   
   public abstract void buildFace(Player player);

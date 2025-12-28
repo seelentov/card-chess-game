@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javafx.util.Pair;
+
 import ru.vladislavkomkov.controller.sender.Sender;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.Listener;
@@ -28,8 +29,8 @@ import ru.vladislavkomkov.util.UnitUtils;
 
 public class Player
 {
-  public static final int MAX_LEVEL = 6;
   
+  public static final int MAX_LEVEL = 6;
   public static final int MAX_MONEY = 10;
   public static final int START_MONEY = 3;
   
@@ -44,11 +45,9 @@ public class Player
   public static final Map<Integer, Integer> INC_LEVEL_PRICE_MAP = Map.of(
       1, 5,
       2, 7);
-  
   public static final int INC_LEVEL_PRICE_MAX = 10;
   
   final String uuid;
-  
   final Tavern tavern;
   final Listener listener = new Listener();
   final Statistic statistic = new Statistic();
@@ -100,7 +99,6 @@ public class Player
   public void sendFullStat()
   {
     sendArmorHealth();
-    
     sendMaxMoney();
     sendMoney();
     sendFreeze();
@@ -108,8 +106,6 @@ public class Player
     sendHand();
     sendTavern();
     sendTable();
-    sendHealth();
-    sendArmor();
     sendLvlIncPrice();
   }
   
@@ -213,9 +209,7 @@ public class Player
   {
     String key = UUIDUtils.generateKey();
     senderWaiters.put(key, consumer);
-    
-    sendMessage(Event.Type.WAIT_REQ,
-        new SenderWaiterDataReq(key, data));
+    sendMessage(Event.Type.WAIT_REQ, new SenderWaiterDataReq(key, data));
   }
   
   public void doSenderWaiter(String key, Integer param)
@@ -269,7 +263,6 @@ public class Player
     
     Unit unit = table.remove(fromIndex);
     table.add(toIndex, unit);
-    
     sendTable();
   }
   
@@ -298,7 +291,6 @@ public class Player
     
     unit.onAppear(game, null, this);
     sendTable();
-    
     return true;
   }
   
@@ -328,6 +320,7 @@ public class Player
     {
       table.get(index).onDisappear(game, null, this);
       table.remove(index);
+      sendTable();
     }
   }
   
@@ -354,7 +347,6 @@ public class Player
       card.getEntity().onHandled(game, null, this);
       hand.add(card);
     }
-    
     calcTriplets();
     sendHand();
   }
@@ -389,19 +381,22 @@ public class Player
   {
     if (indexCard < 0 || indexCard >= hand.size())
     {
-      throw new IndexOutOfBoundsException(
-          "Index " + indexCard + " not existed in hand with length " + hand.size());
+      throw new IndexOutOfBoundsException("Index " + indexCard + " not existed in hand with length " + hand.size());
     }
     
     Card cardTemp = hand.get(indexCard);
     hand.remove(indexCard);
     
-    if (!cardTemp.play(game, this, input))
+    boolean played = cardTemp.play(game, this, input);
+    if (!played)
     {
       hand.add(indexCard, cardTemp);
+      sendHand();
     }
-    
-    sendFullStat();
+    else
+    {
+      sendFullStat();
+    }
   }
   
   public void buyCard(int index)
@@ -417,7 +412,6 @@ public class Player
     if (isSpell)
     {
       int price = tavern.getCards().get(index).getEntity().getLevel();
-      
       if (money >= price && hand.size() < HAND_LIMIT)
       {
         decMoney(price);
@@ -436,7 +430,6 @@ public class Player
     if (success)
     {
       addToHand(tavern.buy(index));
-      
       sendTavern();
     }
   }
@@ -487,7 +480,6 @@ public class Player
   {
     tavern.reset(level, saveFreezed);
     listener.processOnResetTavernListeners(game, null, this);
-    
     sendTavern();
     sendFreeze();
   }
@@ -495,7 +487,6 @@ public class Player
   public void calcTriplets()
   {
     boolean foundTriplets;
-    
     do
     {
       foundTriplets = false;
@@ -600,12 +591,13 @@ public class Player
   public void setLevel(int level)
   {
     this.level = level;
+    sendLevel();
+    sendLvlIncPrice();
   }
   
   public void incLevel()
   {
     incLevel(false);
-    sendLvlIncPrice();
   }
   
   public void incLevel(boolean free)
@@ -621,6 +613,7 @@ public class Player
         decMoney(price);
         sendLevel();
         statistic.counters.resetIncLevelDecreaser();
+        sendLvlIncPrice();
       }
     }
   }
@@ -628,9 +621,7 @@ public class Player
   public int getIncLevelPrice()
   {
     int basePrice = INC_LEVEL_PRICE_MAP.getOrDefault(level, INC_LEVEL_PRICE_MAX);
-    
     int calcedPrice = basePrice - statistic.counters.getIncLevelDecreaser();
-    
     return Math.max(calcedPrice, 0);
   }
   
@@ -657,7 +648,7 @@ public class Player
   public void setArmor(int armor)
   {
     this.armor = Math.max(armor, 0);
-    sendHealth();
+    sendArmor();
   }
   
   public void addArmor(int amount)
@@ -669,7 +660,6 @@ public class Player
   public void applyDamage(int damage)
   {
     int piercingDamage = Math.max(damage - armor, 0);
-    
     armor = Math.max(armor - damage, 0);
     health -= piercingDamage;
     
@@ -691,6 +681,7 @@ public class Player
   public void setMoney(int money)
   {
     this.money = money;
+    sendMoney();
   }
   
   public int getMaxMoney()
@@ -706,6 +697,7 @@ public class Player
   public void setMaxMoney(int maxMoney)
   {
     this.maxMoney = maxMoney;
+    sendMaxMoney();
   }
   
   public void incMaxMoney()
@@ -758,12 +750,13 @@ public class Player
   public void removeTempBuffs()
   {
     doForAll(Unit::removeTempBuffs);
-    
     hand.stream()
         .map(Card::getEntity)
         .filter(entity -> entity instanceof Unit)
         .map(entity -> (Unit) entity)
         .forEach(Unit::removeTempBuffs);
+    sendHand();
+    sendTable();
   }
   
   public boolean isAlive()
@@ -808,12 +801,12 @@ public class Player
   {
     return buyPrice;
   }
-
+  
   public Listener getListener()
   {
     return listener;
   }
-
+  
   public Statistic getStatistic()
   {
     return statistic;
