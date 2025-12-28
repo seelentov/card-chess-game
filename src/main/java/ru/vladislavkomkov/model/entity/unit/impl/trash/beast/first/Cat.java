@@ -10,6 +10,7 @@ public class Cat extends TrashUnit
   public Cat()
   {
     super();
+
     unitType = List.of(UnitType.BEAST);
   }
 }

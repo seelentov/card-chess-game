@@ -14,15 +14,18 @@ import ru.vladislavkomkov.model.entity.spell.impl.TripleReward;
 import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.fight.FightEvent;
 import ru.vladislavkomkov.model.player.Player;
+import ru.vladislavkomkov.util.ListenerUtils;
 
 public abstract class Unit extends Entity
 {
   public final static String F_ATTACK = "attack";
+  public final static String F_ATTACKS_COUNT = "attacks_count";
   
   public final static String F_HEALTH = "health";
   public final static String F_MAX_HEALTH = "max_health";
   
   public final static String F_IS_BUBBLED = "is_bubbled";
+  public final static String F_IS_DOUBLE_ATTACK = "is_double_attack";
   public final static String F_IS_TAUNT = "is_taunt";
   public final static String F_IS_REBIRTH = "is_rebirth";
   public final static String F_IS_MAGNET = "is_magnet";
@@ -35,6 +38,7 @@ public abstract class Unit extends Entity
   protected List<UnitType> unitType = new ArrayList<>();
   
   protected int attack = 0;
+  protected AttacksCount attacksCount = AttacksCount.DEFAULT;
   protected int maxHealth = 1;
   protected int actualHealth = 1;
   
@@ -53,6 +57,17 @@ public abstract class Unit extends Entity
     super();
     
     playType = List.of(new PlayPair(PlayType.TABLE));
+  }
+  
+  @JsonProperty(F_ATTACKS_COUNT)
+  public AttacksCount getAttacksCount()
+  {
+    return attacksCount;
+  }
+  
+  public void setAttacksCount(AttacksCount attacksCount)
+  {
+    this.attacksCount = attacksCount;
   }
   
   @JsonProperty(F_ATTACK)
@@ -265,10 +280,13 @@ public abstract class Unit extends Entity
   
   public void onSell(Game game, Fight fight, Player player)
   {
-    player.listener.removeListener((Unit) this);
+    player.getListener().removeListener((Unit) this);
     player.addMoney(1);
     player.removeFromTable((Unit) this);
-    processListeners(player.listener.onSellListeners, (action) -> action.process(game, null, player, this), player);
+    
+    processListeners(
+        ListenerUtils.getPlayerListener(fight, player).onSellListeners,
+        (action) -> action.process(game, fight, player, this), player);
     
     listener.processOnSellListeners(game, fight, player, this);
     if (fight != null)
@@ -279,6 +297,10 @@ public abstract class Unit extends Entity
   
   public void onStartTurn(Game game, Fight fight, Player player)
   {
+    processListeners(
+        ListenerUtils.getPlayerListener(fight, player).onStartTurnListeners,
+        (action) -> action.process(game, fight, player), player);
+    
     listener.processOnStartTurnListeners(game, fight, player);
     if (fight != null)
     {
@@ -288,6 +310,10 @@ public abstract class Unit extends Entity
   
   public void onEndTurn(Game game, Fight fight, Player player)
   {
+    processListeners(
+        ListenerUtils.getPlayerListener(fight, player).onEndTurnListeners,
+        (action) -> action.process(game, fight, player), player);
+    
     listener.processOnEndTurnListeners(game, fight, player);
     if (fight != null)
     {
@@ -297,6 +323,10 @@ public abstract class Unit extends Entity
   
   public void onStartFight(Game game, Fight fight, Player player, Player player2)
   {
+    processListeners(
+        ListenerUtils.getPlayerListener(fight, player).onStartFightListeners,
+        (action) -> action.process(game, fight, player, player2), player);
+    
     listener.processOnStartFightListeners(game, fight, player, player2);
     if (fight != null)
     {
@@ -306,6 +336,10 @@ public abstract class Unit extends Entity
   
   public void onEndFight(Game game, Fight fight, Player player, Player player2)
   {
+    processListeners(
+        ListenerUtils.getPlayerListener(fight, player).onEndFightListeners,
+        (action) -> action.process(game, fight, player, player2), player);
+    
     listener.processOnEndFightListeners(game, fight, player, player2);
     if (fight != null)
     {
@@ -315,10 +349,11 @@ public abstract class Unit extends Entity
   
   public void onAttacked(Game game, Fight fight, Player player, Player player2, Unit attacker)
   {
-    processListeners(player.listener.onAttackedListeners, (action) -> action.process(game, null, player, player2, this, attacker), player);
+    processListeners(
+        ListenerUtils.getPlayerListener(fight, player).onAttackedListeners,
+        (action) -> action.process(game, fight, player, player2, this, attacker), player);
     
     processDamage(attacker);
-    
     processOnDead(game, fight, player, player2, attacker);
     
     listener.processOnAttackedListeners(game, fight, player, player2, this, attacker);
@@ -330,13 +365,15 @@ public abstract class Unit extends Entity
   
   public void onAttack(Game game, Fight fight, Player player, Player player2, Unit attacked)
   {
-    processListeners(player.listener.onAttackListeners, (action) -> action.process(game, null, player, player2, this, attacked), player);
-    
-    processDamage(attacked);
-    
-    processOnDead(game, fight, player, player2, attacked);
+    processListeners(
+        ListenerUtils.getPlayerListener(fight, player).onAttackListeners,
+        (action) -> action.process(game, fight, player, player2, this, attacked), player);
     
     listener.processOnAttackListeners(game, fight, player, player2, this, attacked);
+    
+    processDamage(attacked);
+    processOnDead(game, fight, player, player2, attacked);
+    
     if (fight != null)
     {
       fight.addToHistory(FightEvent.Type.ON_ATTACK, player, List.of(this, attacked));
@@ -368,7 +405,7 @@ public abstract class Unit extends Entity
       {
         this.actualHealth = 1;
         this.isRebirth = false;
-
+        
         if (fight != null)
         {
           fight.addToFightTable(player, this, indexOfThis);
@@ -383,7 +420,9 @@ public abstract class Unit extends Entity
   
   public void onDead(Game game, Fight fight, Player player, Player player2, Unit attacker)
   {
-    processListeners(player.listener.onDeadListeners, (action) -> action.process(game, null, player, player2, this, attacker), player);
+    processListeners(
+        ListenerUtils.getPlayerListener(fight, player).onDeadListeners,
+        (action) -> action.process(game, fight, player, player2, this, attacker), player);
     
     listener.processOnDeadListeners(game, fight, player, player2, this, attacker);
     
@@ -398,7 +437,9 @@ public abstract class Unit extends Entity
   
   public void onAppear(Game game, Fight fight, Player player)
   {
-    processListeners(player.listener.onAppearListeners, (action) -> action.process(game, null, player, this), player);
+    processListeners(
+        ListenerUtils.getPlayerListener(fight, player).onAppearListeners,
+        (action) -> action.process(game, fight, player, this), player);
     
     listener.processOnAppearListeners(game, fight, player, this);
     
@@ -410,7 +451,9 @@ public abstract class Unit extends Entity
   
   public void onDisappear(Game game, Fight fight, Player player)
   {
-    processListeners(player.listener.onDisappearListeners, (action) -> action.process(game, null, player, this), player);
+    processListeners(
+        ListenerUtils.getPlayerListener(fight, player).onDisappearListeners,
+        (action) -> action.process(game, fight, player, this), player);
     
     listener.processOnDisappearListeners(game, fight, player, this);
     
@@ -488,7 +531,7 @@ public abstract class Unit extends Entity
   
   public boolean isType(UnitType unitType)
   {
-    return this.unitType.contains(unitType);
+    return this.unitType.contains(UnitType.ALL) || this.unitType.contains(unitType);
   }
   
   public boolean isType(List<UnitType> unitType)

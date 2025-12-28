@@ -9,6 +9,11 @@ import ru.vladislavkomkov.model.player.Player;
 
 public abstract class Magnetized extends Unit
 {
+  public Magnetized()
+  {
+    super();
+  }
+  
   @Override
   public void onPlayed(Game game, Fight fight, Player player, List<Integer> input, boolean auto)
   {
@@ -18,7 +23,8 @@ public abstract class Magnetized extends Unit
       return;
     }
     
-    if(input.isEmpty()){
+    if (input.isEmpty())
+    {
       return;
     }
     

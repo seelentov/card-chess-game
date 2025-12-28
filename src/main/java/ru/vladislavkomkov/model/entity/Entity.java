@@ -9,20 +9,17 @@ import java.util.function.Supplier;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import ru.vladislavkomkov.consts.Listeners;
+import ru.vladislavkomkov.model.GObject;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.Listener;
 import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.fight.FightEvent;
 import ru.vladislavkomkov.model.player.Player;
+import ru.vladislavkomkov.util.ListenerUtils;
 import ru.vladislavkomkov.util.UUIDUtils;
 
-public abstract class Entity implements Cloneable
+public abstract class Entity extends GObject
 {
-  public final static String F_ID = "id";
-  
-  public final static String F_NAME = "name";
-  public final static String F_DESCRIPTION = "description";
-  
   public final static String F_IS_GOLD = "is_gold";
   public final static String F_IS_SPELL = "is_spell";
   
@@ -57,8 +54,6 @@ public abstract class Entity implements Cloneable
     return playType;
   }
   
-  public abstract void buildFace(Player player);
-  
   @JsonProperty(F_LVL)
   public int getLevel()
   {
@@ -73,8 +68,8 @@ public abstract class Entity implements Cloneable
   public void onHandled(Game game, Fight fight, Player player)
   {
     processListeners(
-        player.listener.onHandledListeners,
-        (action) -> action.process(game, null, player, this),
+        ListenerUtils.getPlayerListener(fight, player).onHandledListeners,
+        (action) -> action.process(game, fight, player, this),
         player);
     
     listener.processOnHandledListeners(game, fight, player, this);
@@ -97,7 +92,6 @@ public abstract class Entity implements Cloneable
   public void onPlayed(Game game, Fight fight, Player player, int index, int index2)
   {
     onPlayed(game, fight, player, List.of(index, 0, index2, 0));
-    ;
   }
   
   public void onPlayed(Game game, Fight fight, Player player, int index, boolean isTavernIndex)
@@ -113,7 +107,7 @@ public abstract class Entity implements Cloneable
   public void onPlayed(Game game, Fight fight, Player player, List<Integer> input, boolean auto)
   {
     processListeners(
-        player.listener.onPlayedListeners,
+        ListenerUtils.getPlayerListener(fight, player).onPlayedListeners,
         (action) -> action.process(game, fight, player, this, input, auto),
         player);
     
@@ -130,37 +124,9 @@ public abstract class Entity implements Cloneable
       actionMove.accept(action);
       if (key.startsWith(Listeners.KEY_ONCE_PREFIX))
       {
-        player.listener.removeListener(key);
+        player.getListener().removeListener(key);
       }
     });
-  }
-  
-  @JsonProperty(F_NAME)
-  public String getName()
-  {
-    return name;
-  }
-  
-  @JsonProperty(F_ID)
-  public String getID()
-  {
-    return ID;
-  }
-  
-  @JsonProperty(F_DESCRIPTION)
-  public String getDescription()
-  {
-    return getDescription(null);
-  }
-  
-  public void setDescription(String description)
-  {
-    this.description = description;
-  }
-  
-  public String getDescription(Player player)
-  {
-    return description;
   }
   
   public Entity newBase()
@@ -211,21 +177,9 @@ public abstract class Entity implements Cloneable
   @Override
   public Entity clone()
   {
-    try
-    {
       Entity clonedEntity = (Entity) super.clone();
       clonedEntity.listener = this.listener.clone();
       return clonedEntity;
-    }
-    catch (CloneNotSupportedException e)
-    {
-      throw new AssertionError("Clone not supported", e);
-    }
-  }
-  
-  protected String generateKey()
-  {
-    return UUIDUtils.generateKey(getID() + "_");
   }
   
   @JsonProperty(F_IS_SPELL)

@@ -41,7 +41,7 @@ public class Game implements AutoCloseable
   final Map<String, Player> players;
   private final ReadWriteLock playersLock = new ReentrantReadWriteLock();
   private final boolean acceptingNewPlayers;
-
+  
   State state = State.LOBBY;
   int turn = 1;
   
@@ -49,23 +49,22 @@ public class Game implements AutoCloseable
   {
     this(new HashMap<>(), UUIDUtils.generateKey(), true);
   }
-
+  
   public Game(Map<String, Player> players)
   {
     this(players, UUIDUtils.generateKey(), true);
   }
-
+  
   public Game(String uuid)
   {
     this(new HashMap<>(), uuid, true);
   }
-
-  public Game(Map<String, Player> players,String uuid)
+  
+  public Game(Map<String, Player> players, String uuid)
   {
     this(players, uuid, true);
   }
-
-
+  
   private Game(Map<String, Player> players, String uuid, boolean acceptingNewPlayers)
   {
     this.players = players;
@@ -163,7 +162,8 @@ public class Game implements AutoCloseable
     player.setSender(sender);
     player.sendMessage(Event.Type.CONNECTED);
     players.values().forEach(Player::sendFullStat);
-    if(getState() != State.LOBBY){
+    if (getState() != State.LOBBY)
+    {
       player.sendMessage(Event.Type.START);
     }
   }
@@ -181,7 +181,7 @@ public class Game implements AutoCloseable
       {
         throw new IllegalStateException("Users count not % 2");
       }
-
+      
       processor.start(getUUID());
     }
     finally
@@ -233,7 +233,7 @@ public class Game implements AutoCloseable
           {
             player.incMaxMoney();
           }
-          player.statistic.counters.incrementIncLevelDecreaser();
+          player.getStatistic().counters.incrementIncLevelDecreaser();
           player.sendLvlIncPrice();
         }
         player.resetMoney();
@@ -320,72 +320,87 @@ public class Game implements AutoCloseable
   {
     this.fights = fights;
   }
-
-  public boolean calcFights() {
+  
+  public boolean calcFights()
+  {
     playersLock.readLock().lock();
-    try {
+    try
+    {
       Queue<Player> alive = newPlayerQueue(true);
       Queue<Player> dead = newPlayerQueue(false);
-
-      if (alive.size() < 2) {
+      
+      if (alive.size() < 2)
+      {
         Player player = alive.peek();
-        if (player != null) {
+        if (player != null)
+        {
           player.sendMessage(Event.Type.WIN);
           state = State.END;
         }
         return true;
       }
-
+      
       fights.clear();
-
+      
       List<Player> playersList = new ArrayList<>(alive);
       Map<String, Map<String, Integer>> fightCounts = new HashMap<>();
-
-      for (Player player : playersList) {
+      
+      for (Player player : playersList)
+      {
         fightCounts.put(player.getUUID(), new HashMap<>());
       }
-
-      for (FightInfo fightInfo : fightHistory) {
+      
+      for (FightInfo fightInfo : fightHistory)
+      {
         String p1 = fightInfo.player1.getUUID();
         String p2 = fightInfo.player2.getUUID();
         fightCounts.get(p1).merge(p2, 1, Integer::sum);
         fightCounts.get(p2).merge(p1, 1, Integer::sum);
       }
-
+      
       List<Player> availablePlayers = new ArrayList<>(playersList);
       Collections.shuffle(availablePlayers);
-
+      
       // Если нечётное число живых — добавляем одного мёртвого (если есть)
-      if (availablePlayers.size() % 2 != 0 && !dead.isEmpty()) {
+      if (availablePlayers.size() % 2 != 0 && !dead.isEmpty())
+      {
         Player dummyOpponent = dead.poll(); // берём любого мёртвого
         availablePlayers.add(dummyOpponent);
       }
-
-      while (availablePlayers.size() >= 2) {
+      
+      while (availablePlayers.size() >= 2)
+      {
         Player player1 = availablePlayers.remove(0);
         Player player2 = findOpponent(player1, availablePlayers, fightCounts, playersList);
-
-        if (player2 != null) {
+        
+        if (player2 != null)
+        {
           availablePlayers.remove(player2);
           fights.add(new Fight(this, player1, player2, false));
-        } else if (!availablePlayers.isEmpty()) {
+        }
+        else if (!availablePlayers.isEmpty())
+        {
           player2 = availablePlayers.remove(0);
           fights.add(new Fight(this, player1, player2, false));
         }
       }
-
+      
       long aliveCount = players.values().stream().filter(Player::isAlive).count();
-      if (aliveCount <= 1) {
+      if (aliveCount <= 1)
+      {
         Player winner = players.values().stream().filter(Player::isAlive).findFirst().orElse(null);
-        if (winner != null) {
+        if (winner != null)
+        {
           winner.sendMessage(Event.Type.WIN);
         }
         state = State.END;
         return true;
       }
-
+      
       return false;
-    } finally {
+    }
+    finally
+    {
       playersLock.readLock().unlock();
     }
   }
@@ -462,7 +477,7 @@ public class Game implements AutoCloseable
   public void processStartTurn(Player player)
   {
     ListenerUtils.processGlobalActionListeners(
-        player.listener.onStartTurnListeners, this, null, player);
+        player.getListener().onStartTurnListeners, this, null, player);
     player.doForAll(unit -> unit.onStartTurn(this, null, player));
     player.removeTempBuffs();
     player.calcTriplets();
@@ -471,7 +486,7 @@ public class Game implements AutoCloseable
   public void processEndTurn(Player player)
   {
     ListenerUtils.processGlobalActionListeners(
-        player.listener.onEndTurnListeners, this, null, player);
+        player.getListener().onEndTurnListeners, this, null, player);
     player.clearSpellCraft();
     player.doForAll(unit -> unit.onEndTurn(this, null, player));
   }
@@ -479,14 +494,14 @@ public class Game implements AutoCloseable
   public void processStartFight(Fight fight, Player player, Player player2)
   {
     ListenerUtils.processFightActionListeners(
-        player.listener.onStartFightListeners, this, fight, player, player2);
+        ListenerUtils.getPlayerListener(fight, player).onStartFightListeners, this, fight, player, player2);
     fight.getFightTable(player).forEach(unit -> unit.onStartFight(this, fight, player, player2));
   }
   
   public void processEndFight(Fight fight, Player player, Player player2)
   {
     ListenerUtils.processFightActionListeners(
-        player.listener.onEndFightListeners, this, fight, player, player2);
+        ListenerUtils.getPlayerListener(fight, player).onEndFightListeners, this, fight, player, player2);
     fight.getFightTable(player).forEach(unit -> unit.onEndFight(this, fight, player, player2));
   }
   

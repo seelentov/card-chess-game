@@ -13,6 +13,8 @@ public class Manasaber extends Unit
 {
   public Manasaber()
   {
+    super();
+    
     description = "Deathrattle: Summon two 0/1 Cublings with Taunt";
     level = 1;
     isTavern = true;

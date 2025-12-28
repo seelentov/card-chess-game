@@ -13,6 +13,8 @@ public class Alleycat extends Unit
 {
   public Alleycat()
   {
+    super();
+    
     description = "Summon a 1/1 Cat";
     level = 1;
     isTavern = true;

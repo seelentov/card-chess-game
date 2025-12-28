@@ -16,6 +16,7 @@ public class AccordoTron extends Magnetized
   public AccordoTron()
   {
     super();
+
     description = "At the start of your turn, gain " + GOLD + " Gold";
     level = 4;
     isTavern = true;

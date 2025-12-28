@@ -10,6 +10,7 @@ public class Imp extends TrashUnit
   public Imp()
   {
     super();
+
     unitType = List.of(UnitType.DEMON);
   }
 }

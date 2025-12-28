@@ -13,6 +13,8 @@ public class IckyImp extends Unit
 {
   public IckyImp()
   {
+    super();
+    
     description = "Deathrattle: Summon two 1/1 Imps";
     
     unitType = List.of(UnitType.DEMON);

@@ -7,5 +7,5 @@ public enum PlayType
   FRENDLY,
   TAVERN,
   TAVERN_FRENDLY,
-  PLAY_PLAY,
+  CHOICE,
 }

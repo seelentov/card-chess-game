@@ -13,6 +13,8 @@ public class Greenskeeper extends Unit
 {
   public Greenskeeper()
   {
+    super();
+    
     description = "Rally: Trigger your right-most Battlecry";
     
     unitType = List.of(UnitType.DRAGON);

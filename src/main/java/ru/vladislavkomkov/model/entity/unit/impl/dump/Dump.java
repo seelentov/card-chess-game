@@ -6,6 +6,8 @@ public abstract class Dump extends Unit
 {
   public Dump(int lvl)
   {
+    super();
+
     level = lvl;
     isTavern = true;
     

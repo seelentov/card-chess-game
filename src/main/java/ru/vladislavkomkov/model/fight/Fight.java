@@ -13,12 +13,10 @@ import ru.vladislavkomkov.util.RandUtils;
 
 public class Fight
 {
-  
   public static final int TURN_LIMIT = 10000;
   
   final Game game;
   
-  // Замена отдельных полей на два экземпляра FightPlayer
   final FightPlayer fightPlayer1;
   final FightPlayer fightPlayer2;
   
@@ -288,8 +286,18 @@ public class Fight
     int attackedAttackerIndex = (isPlayer1Turn ? fightPlayer2.turn : fightPlayer1.turn) % getFightTable(turnPlayer2).size();
     Unit attackedAttacker = getFightTable(turnPlayer2).get(attackedAttackerIndex);
     
-    attacker.onAttack(game, this, turnPlayer1, turnPlayer2, attacked);
-    attacked.onAttacked(game, this, turnPlayer2, turnPlayer1, attacker);
+    int attacks = attacker.getAttacksCount().toInt();
+    
+    for (int i = 0; i < attacks; i++)
+    {
+      attacker.onAttack(game, this, turnPlayer1, turnPlayer2, attacked);
+      attacked.onAttacked(game, this, turnPlayer2, turnPlayer1, attacker);
+      
+      if (attacker.isDead())
+      {
+        break;
+      }
+    }
     
     int attackerIndex = getFightTable(turnPlayer1).indexOf(attacker);
     
@@ -409,6 +417,21 @@ public class Fight
     return turn;
   }
   
+  public FightPlayer getFightPlayer(Player player)
+  {
+    if (fightPlayer1.getPlayer() == player)
+    {
+      return fightPlayer1;
+    }
+    
+    if (fightPlayer2.getPlayer() == player)
+    {
+      return fightPlayer2;
+    }
+    
+    throw new RuntimeException("Player not found");
+  }
+  
   public Player getPlayer1()
   {
     return fightPlayer1.player;
@@ -427,33 +450,5 @@ public class Fight
   public List<Unit> getPlayer2Units()
   {
     return fightPlayer2.units;
-  }
-  
-  public static class FightPlayer
-  {
-    final Player player;
-    final List<Unit> units;
-    int turn;
-    
-    public FightPlayer(Player player, List<Unit> units)
-    {
-      this.player = player;
-      this.units = units;
-    }
-    
-    public Player getPlayer()
-    {
-      return player;
-    }
-    
-    public List<Unit> getUnits()
-    {
-      return units;
-    }
-    
-    public int getTurn()
-    {
-      return turn;
-    }
   }
 }

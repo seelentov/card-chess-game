@@ -73,13 +73,13 @@ public class DeepBlues extends SpellCraft
                   },
                   getDescription(player)));
                   
-          player.statistic.played.onlyBluesPlayed++;
+          player.getStatistic().played.onlyBluesPlayed++;
         });
   }
   
   int calcMulti(Player player)
   {
-    int casted = player.statistic.played.onlyBluesPlayed;
+    int casted = player.getStatistic().played.onlyBluesPlayed;
     return casted + 1;
   }
   

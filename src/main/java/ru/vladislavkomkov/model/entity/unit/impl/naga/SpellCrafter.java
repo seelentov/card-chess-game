@@ -17,6 +17,7 @@ public abstract class SpellCrafter extends Unit
   public SpellCrafter(SpellCraft spellcraft)
   {
     super();
+
     description = "Spellcraft: " + spellcraft.getDescription();
     this.spellcraft = spellcraft;
     

@@ -50,8 +50,8 @@ public class Player
   final String uuid;
   
   final Tavern tavern;
-  public Listener listener = new Listener();
-  public Statistic statistic = new Statistic();
+  final Listener listener = new Listener();
+  final Statistic statistic = new Statistic();
   
   final List<Unit> table = new ArrayList<>(TABLE_LIMIT);
   final List<Card> hand = new ArrayList<>();
@@ -807,5 +807,15 @@ public class Player
   public int getBuyPrice()
   {
     return buyPrice;
+  }
+
+  public Listener getListener()
+  {
+    return listener;
+  }
+
+  public Statistic getStatistic()
+  {
+    return statistic;
   }
 }

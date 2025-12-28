@@ -8,6 +8,7 @@ public enum UnitType
   UNDEAD("Undead"),
   DEMON("Demon"),
   MECH("Mech"),
+  ELEMENTAL("Elemental"),
   ALL("All");
   
   final String type;
