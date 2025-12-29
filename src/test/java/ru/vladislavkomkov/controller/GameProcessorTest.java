@@ -6,22 +6,15 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Queue;
-import java.util.function.Consumer;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javassist.bytecode.analysis.Type;
 import ru.vladislavkomkov.controller.sender.MockConsumer;
 import ru.vladislavkomkov.controller.sender.MockSender;
 import ru.vladislavkomkov.model.Game;
@@ -40,7 +33,6 @@ import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.fight.FightEvent;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.model.player.Tavern;
-import ru.vladislavkomkov.util.ObjectUtils;
 
 public class GameProcessorTest
 {
@@ -376,7 +368,7 @@ public class GameProcessorTest
     player1.setLevel(1);
     player1.getTable().clear();
     Cat unit = new Cat();
-    unit.setAttack(10);
+    unit.setBaseAttack(10);
     unit.setHealth(10);
     player1.getTable().add(unit);
     
@@ -417,12 +409,12 @@ public class GameProcessorTest
     assertTrue(ev.isPresent());
     
     Cat catExpected = new Cat();
-    catExpected.setAttack(10);
+    catExpected.setBaseAttack(10);
     catExpected.setHealth(10);
     catExpected.setMaxHealth(10);
     
     Cat cat2Expected = new Cat();
-    cat2Expected.setAttack(1);
+    cat2Expected.setBaseAttack(1);
     cat2Expected.setHealth(1);
     cat2Expected.setMaxHealth(1);
     
@@ -454,12 +446,12 @@ public class GameProcessorTest
     assertTrue(ev.isPresent());
     
     catExpected = new Cat();
-    catExpected.setAttack(10);
+    catExpected.setBaseAttack(10);
     catExpected.setHealth(9);
     catExpected.setMaxHealth(10);
     
     cat2Expected = new Cat();
-    cat2Expected.setAttack(1);
+    cat2Expected.setBaseAttack(1);
     cat2Expected.setHealth(-9);
     cat2Expected.setMaxHealth(1);
     evExpected = makeEvent(player1, FightEvent.Type.ON_ATTACK, null,

@@ -76,10 +76,10 @@ public class UnitUtilsTest
     unit.addBuff(new Buff(
         unit1 -> {
           unit1.incHealth(boost);
-          unit1.incAttack(boost);
+          unit1.incBaseAttack(boost);
         },
         unit1 -> {
-          unit1.decAttack(boost);
+          unit1.decBaseAttack(boost);
           unit1.decHealth(boost);
         }, description));
     

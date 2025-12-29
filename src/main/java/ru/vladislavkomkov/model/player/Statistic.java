@@ -69,7 +69,14 @@ public class Statistic
     
     private void incByUnitType(Map<UnitType, Integer> map, UnitType type, int i)
     {
-      map.merge(type, i, Integer::sum);
+      if (type == UnitType.ALL)
+      {
+        map.forEach((key, value) -> map.merge(key, i, Integer::sum));
+      }
+      else
+      {
+        map.merge(type, i, Integer::sum);
+      }
     }
     
     public int getAttackByUnitType(UnitType type)

@@ -231,7 +231,7 @@ public class PlayerTest extends GamePlayerTestCase
     
     player.doForAll(unit -> {
       unit.incHealth(2);
-      unit.incAttack(2);
+      unit.incBaseAttack(2);
     });
     
     List<Unit> units = player.cloneTable();

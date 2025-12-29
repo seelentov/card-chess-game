@@ -67,10 +67,10 @@ public class HummingBird extends Unit
   {
     unit.addBuff(new Buff(
         unit1 -> {
-          unit1.incAttack(attackBoost);
+          unit1.incBaseAttack(attackBoost);
         },
         unit1 -> {
-          unit1.decAttack(attackBoost);
+          unit1.decBaseAttack(attackBoost);
         },
         getDescription()));
   }

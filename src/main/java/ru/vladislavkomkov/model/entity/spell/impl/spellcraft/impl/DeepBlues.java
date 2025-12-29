@@ -71,11 +71,11 @@ public class DeepBlues extends SpellCraft
           unit.addBuff(
               new Buff(
                   unit1 -> {
-                    unit1.incAttack(attackBonus);
+                    unit1.incBaseAttack(attackBonus);
                     unit1.incHealth(hpBonus);
                   },
                   unit1 -> {
-                    unit1.decAttack(attackBonus);
+                    unit1.decBaseAttack(attackBonus);
                     unit1.decHealth(hpBonus);
                   },
                   getDescription()));

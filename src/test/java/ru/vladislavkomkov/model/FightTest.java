@@ -31,11 +31,11 @@ public class FightTest extends GamePlayerTestCase
   void testFightDraw()
   {
     Unit unit = new Cat();
-    unit.incAttack(2);
+    unit.incBaseAttack(2);
     unit.incHealth(6);
     
     Unit unit2 = new Cat();
-    unit2.incAttack(2);
+    unit2.incBaseAttack(2);
     unit2.incHealth(6);
     
     player.addToTable(unit, 0);
@@ -61,11 +61,11 @@ public class FightTest extends GamePlayerTestCase
   void testFightWin()
   {
     Unit unit = new Cat();
-    unit.incAttack(2);
+    unit.incBaseAttack(2);
     unit.incHealth(6);
     
     Unit unit2 = new Cat();
-    unit2.incAttack(2);
+    unit2.incBaseAttack(2);
     unit2.incHealth(5);
     
     player.addToTable(unit, 0);
@@ -236,7 +236,7 @@ public class FightTest extends GamePlayerTestCase
     }
     
     Unit enUnit = new Cat();
-    enUnit.incAttack(99);
+    enUnit.incBaseAttack(99);
     player.addToTable(enUnit, -1);
     
     Fight fight = new Fight(game, player, player2);
@@ -275,7 +275,7 @@ public class FightTest extends GamePlayerTestCase
     }
     
     Unit enUnit = new Cat();
-    enUnit.incAttack(99);
+    enUnit.incBaseAttack(99);
     player.addToTable(enUnit, -1);
     
     Fight fight = new Fight(game, player, player2);
@@ -308,11 +308,11 @@ public class FightTest extends GamePlayerTestCase
     for (int i = 0; i < 6; i++)
     {
       Unit u = new Cat();
-      u.setAttack(0);
+      u.setBaseAttack(0);
       player.addToTable(u, -1);
     }
     Unit unit = new Cat();
-    unit.setAttack(0);
+    unit.setBaseAttack(0);
     unit.setHealth(tauntHealth);
     unit.setIsTaunt(true);
     player.addToTable(unit, -1);
@@ -402,14 +402,14 @@ public class FightTest extends GamePlayerTestCase
     for (int i = 0; i < 7; i++)
     {
       Unit unit = new Cat();
-      unit.setAttack(0);
+      unit.setBaseAttack(0);
       player.addToTable(unit);
     }
     
     for (int i = 0; i < 7; i++)
     {
       Unit unit = new Cat();
-      unit.setAttack(0);
+      unit.setBaseAttack(0);
       player2.addToTable(unit);
     }
     
@@ -539,28 +539,28 @@ public class FightTest extends GamePlayerTestCase
     for (int i = 1; i < 7; i++)
     {
       Unit unit = new Cat();
-      unit.setAttack(i);
+      unit.setBaseAttack(i);
       unit.setHealth(i);
       player.addToTable(unit);
     }
     
     Unit taunt = new Cat();
     taunt.setIsTaunt(true);
-    taunt.setAttack(10);
+    taunt.setBaseAttack(10);
     taunt.setHealth(99999);
     player.addToTable(taunt);
     
     for (int i = 1; i < 7; i++)
     {
       Unit unit = new Cat();
-      unit.setAttack(i);
+      unit.setBaseAttack(i);
       unit.setHealth(i);
       player2.addToTable(unit);
     }
     
     Unit taunt2 = new Cat();
     taunt2.setIsTaunt(true);
-    taunt2.setAttack(10);
+    taunt2.setBaseAttack(10);
     taunt2.setHealth(99999);
     player2.addToTable(taunt2);
     
@@ -592,34 +592,34 @@ public class FightTest extends GamePlayerTestCase
   void testFightAttackOrderWithOnDead()
   {
     Unit unit11 = new Cat();
-    unit11.setAttack(1);
+    unit11.setBaseAttack(1);
     unit11.setHealth(1);
     player.addToTable(unit11);
     
     Unit unit12 = new IckyImp();
-    unit12.setAttack(2);
+    unit12.setBaseAttack(2);
     unit12.setHealth(2);
     unit12.setIsTaunt(true);
     player.addToTable(unit12);
     
     Unit unit13 = new Cat();
-    unit13.setAttack(30);
+    unit13.setBaseAttack(30);
     unit13.setHealth(30);
     player.addToTable(unit13);
     
     Unit unit21 = new Cat();
-    unit21.setAttack(2);
+    unit21.setBaseAttack(2);
     unit21.setHealth(2);
     player2.addToTable(unit21);
     
     Unit unit22 = new Cat();
-    unit22.setAttack(2);
+    unit22.setBaseAttack(2);
     unit22.setHealth(2);
     unit22.setIsTaunt(true);
     player2.addToTable(unit22);
     
     Unit unit23 = new Cat();
-    unit23.setAttack(3);
+    unit23.setBaseAttack(3);
     unit23.setHealth(3);
     unit23.setIsTaunt(true);
     player2.addToTable(unit23);
@@ -693,18 +693,18 @@ public class FightTest extends GamePlayerTestCase
   {
     Unit unit11 = new Cat();
     unit11.setAttacksCount(AttacksCount.DOUBLE);
-    unit11.setAttack(10);
+    unit11.setBaseAttack(10);
     unit11.setHealth(10);
     player.addToTable(unit11);
     
     Unit unit21 = new Cat();
-    unit21.setAttack(1);
+    unit21.setBaseAttack(1);
     unit21.setHealth(1);
     player2.addToTable(unit21);
     
     Unit unit22 = new Cat();
     unit22.setIsTaunt(true);
-    unit22.setAttack(1);
+    unit22.setBaseAttack(1);
     unit22.setHealth(21);
     player2.addToTable(unit22);
     
@@ -723,18 +723,18 @@ public class FightTest extends GamePlayerTestCase
   {
     Unit unit11 = new Cat();
     unit11.setIsRebirth(true);
-    unit11.setAttack(10);
+    unit11.setBaseAttack(10);
     unit11.setHealth(10);
     player.addToTable(unit11);
     
     Unit unit12 = new Cat();
-    unit12.setAttack(12);
+    unit12.setBaseAttack(12);
     unit12.setHealth(100);
     unit12.setIsTaunt(true);
     player.addToTable(unit12);
     
     Unit unit21 = new Cat();
-    unit21.setAttack(11);
+    unit21.setBaseAttack(11);
     unit21.setHealth(100);
     player2.addToTable(unit21);
     
@@ -768,7 +768,7 @@ public class FightTest extends GamePlayerTestCase
     player.addToTable(unit11);
     
     Unit unit21 = new Cat();
-    unit21.setAttack(100);
+    unit21.setBaseAttack(100);
     unit21.setHealth(100);
     
     player2.addToTable(unit21);

@@ -7,10 +7,8 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
-import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
-import ru.vladislavkomkov.model.event.data.SenderWaiterDataReq;
 
 public class EventTest
 {
@@ -54,7 +52,7 @@ public class EventTest
     Unit unit = new Cat();
     
     int updAttack = 10;
-    unit.setAttack(updAttack);
+    unit.setBaseAttack(updAttack);
     
     int updHealth = 10;
     unit.setHealth(updHealth);
@@ -86,7 +84,7 @@ public class EventTest
     Unit unit2 = new Cat();
     
     int updAttack = 10;
-    unit2.setAttack(updAttack);
+    unit2.setBaseAttack(updAttack);
     
     int updHealth = 10;
     unit2.setHealth(updHealth);

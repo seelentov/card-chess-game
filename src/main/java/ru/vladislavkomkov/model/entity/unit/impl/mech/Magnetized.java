@@ -75,8 +75,8 @@ public abstract class Magnetized extends Unit
           rightUnit.setIsAnswerOnDead(true);
         }
         
-        rightUnit.incAttack(this.newThis().getAttack());
-        rightUnit.incHealth(this.newThis().getHealth());
+        rightUnit.incBaseAttack(this.newThis().getBaseAttack());
+        rightUnit.incHealth(this.newThis().getBaseHealth());
         
         rightUnit.getListener().push(getListener(), true);
         

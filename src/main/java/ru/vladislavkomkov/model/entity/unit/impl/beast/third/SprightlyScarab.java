@@ -139,7 +139,7 @@ public class SprightlyScarab extends Choicer
       Unit unit = SprightlyScarab.findUnit(fight, player, input);
       unit.addBuff(new Buff(
           u -> {
-            u.incAttack(ATTACK_BOOST * (this.isGold ? 2 : 1));
+            u.incBaseAttack(ATTACK_BOOST * (this.isGold ? 2 : 1));
             u.incHealth(HEALTH_BOOST * (this.isGold ? 2 : 1));
             u.setIsRebirth(true);
           },
@@ -173,7 +173,7 @@ public class SprightlyScarab extends Choicer
       Unit unit = SprightlyScarab.findUnit(fight, player, input);
       unit.addBuff(new Buff(
           u -> {
-            u.incAttack(ATTACK_BOOST * (this.isGold ? 2 : 1));
+            u.incBaseAttack(ATTACK_BOOST * (this.isGold ? 2 : 1));
             u.setAttacksCount(AttacksCount.DOUBLE);
           },
           null,

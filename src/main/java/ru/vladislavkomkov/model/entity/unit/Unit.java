@@ -77,6 +77,11 @@ public abstract class Unit extends Entity
     this.attacksCount = attacksCount;
   }
   
+  public int getBaseAttack()
+  {
+    return attack;
+  }
+  
   @JsonProperty(F_ATTACK)
   public int getAttack()
   {
@@ -85,19 +90,24 @@ public abstract class Unit extends Entity
         + playerLink.getStatistic().getBoosts().getAttackUnit();
   }
   
-  public void setAttack(int i)
+  public void setBaseAttack(int i)
   {
     attack = i;
   }
   
-  public void incAttack(int i)
+  public void incBaseAttack(int i)
   {
     attack += i;
   }
   
-  public void decAttack(int i)
+  public void decBaseAttack(int i)
   {
     attack -= i;
+  }
+  
+  public int getBaseHealth()
+  {
+    return maxHealth;
   }
   
   @JsonProperty(F_HEALTH)
@@ -530,8 +540,8 @@ public abstract class Unit extends Entity
   public Unit buildGold(Unit unit, Unit unit2, Unit unit3)
   {
     Unit entity = this.newBase();
-    entity.setAttack(entity.getAttack() * 2);
-    entity.setHealth(entity.getHealth() * 2);
+    entity.setBaseAttack(entity.getBaseAttack() * 2);
+    entity.setHealth(entity.getBaseHealth() * 2);
     
     List<Unit> units = List.of(unit, unit2, unit3);
     units.stream()
@@ -553,7 +563,7 @@ public abstract class Unit extends Entity
     Unit u = (Unit) super.newGold();
     
     u.setHealth(u.getHealth() * 2);
-    u.setAttack(u.getAttack() * 2);
+    u.setBaseAttack(u.getAttack() * 2);
     
     return u;
   }
