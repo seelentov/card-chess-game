@@ -1,5 +1,7 @@
 package ru.vladislavkomkov.model.entity.unit;
 
+import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +28,6 @@ public abstract class Unit extends Entity
   public final static String F_MAX_HEALTH = "max_health";
   
   public final static String F_IS_BUBBLED = "is_bubbled";
-  public final static String F_IS_DOUBLE_ATTACK = "is_double_attack";
   public final static String F_IS_TAUNT = "is_taunt";
   public final static String F_IS_REBIRTH = "is_rebirth";
   public final static String F_IS_MAGNET = "is_magnet";
@@ -41,7 +42,7 @@ public abstract class Unit extends Entity
   protected int attack = 0;
   protected AttacksCount attacksCount = AttacksCount.DEFAULT;
   protected int maxHealth = 1;
-  protected int actualHealth = 1;
+  protected int actualHealth;
   
   protected boolean isBubbled = false;
   protected boolean isTaunt = false;
@@ -55,7 +56,12 @@ public abstract class Unit extends Entity
   
   public Unit()
   {
-    super();
+    this(DUMP_PLAYER);
+  }
+  
+  public Unit(Player playerLink)
+  {
+    super(playerLink);
     
     playType = List.of(new PlayPair(PlayType.TABLE));
   }
@@ -74,7 +80,9 @@ public abstract class Unit extends Entity
   @JsonProperty(F_ATTACK)
   public int getAttack()
   {
-    return attack;
+    return attack
+        + playerLink.getStatistic().getBoosts().getAttackByUnitType(unitType)
+        + playerLink.getStatistic().getBoosts().getAttackUnit();
   }
   
   public void setAttack(int i)
@@ -107,7 +115,9 @@ public abstract class Unit extends Entity
   @JsonProperty(F_MAX_HEALTH)
   public int getMaxHealth()
   {
-    return maxHealth;
+    return maxHealth
+        + playerLink.getStatistic().getBoosts().getHealthByUnitType(unitType)
+        + playerLink.getStatistic().getBoosts().getHealthUnit();
   }
   
   public void setMaxHealth(int maxHealth)
@@ -452,7 +462,7 @@ public abstract class Unit extends Entity
     {
       player.removeFromTable(this);
     }
-
+    
     if (fight != null)
     {
       fight.addToHistory(FightEvent.Type.ON_DEAD, player, List.of(this, attacker));
@@ -493,7 +503,7 @@ public abstract class Unit extends Entity
     super.onPlayed(game, fight, player, input, auto);
     if (this.isGold())
     {
-      player.addToHand(Card.of(new TripleReward(player.getLevel() + 1)), true);
+      player.addToHand(Card.of(new TripleReward(player, player.getLevel() + 1)), true);
     }
   }
   
@@ -591,10 +601,10 @@ public abstract class Unit extends Entity
   {
     return false;
   }
-
+  
   @Override
-  public void buildFace(Player player)
+  public String getDescription()
   {
-
+    return "";
   }
 }

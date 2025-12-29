@@ -1,6 +1,7 @@
 package ru.vladislavkomkov.model.entity.unit.impl.dragon.fourth;
 
 import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
+import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
 
 import java.util.List;
 
@@ -13,16 +14,18 @@ public class Greenskeeper extends Unit
 {
   public Greenskeeper()
   {
-    super();
-    
-    description = "Rally: Trigger your right-most Battlecry";
+    this(DUMP_PLAYER);
+  }
+  
+  public Greenskeeper(Player playerLink)
+  {
+    super(playerLink);
     
     unitType = List.of(UnitType.DRAGON);
     
     attack = 4;
     
     maxHealth = 5;
-    actualHealth = 5;
     
     isTavern = true;
     
@@ -30,47 +33,29 @@ public class Greenskeeper extends Unit
     
     listener.onAttackListeners.put(
         KEY_CORE,
-        (game, fight, player, player2, unit1, attacked) -> {
-          List<Unit> units = fight != null ? fight.getFightTable(player) : player.getTable();
+        (game, fight, player1, player2, unit1, attacked) -> {
+          List<Unit> units = fight != null ? fight.getFightTable(player1) : player1.getTable();
           for (int i = units.size() - 1; i >= 0; i--)
           {
             Unit unit = units.get(i);
             if (unit.isAnswerOnPlayed())
             {
-              unit.onPlayed(game, fight, player, RandUtils.getRand(units.size()), true);
-              break;
-            }
-          }
-        });
-  }
-  
-  @Override
-  public Unit buildGold(Unit unit, Unit unit2, Unit unit3)
-  {
-    Unit gold = super.buildGold(unit, unit2, unit3);
-    gold.setDescription("Rally: Trigger your right-most Battlecry twice");
-    gold.getListener().onAttackListeners.put(
-        KEY_CORE,
-        (game, fight, player, player2, unit1, attacked) -> {
-          List<Unit> units = fight != null ? fight.getFightTable(player) : player.cloneTable();
-          for (int i = units.size() - 1; i >= 0; i--)
-          {
-            Unit u = units.get(i);
-            if (u.isAnswerOnPlayed())
-            {
-              u.onPlayed(game, fight, player, RandUtils.getRand(units.size()), RandUtils.getRand(units.size()));
-              u.onPlayed(game, fight, player, RandUtils.getRand(units.size()), RandUtils.getRand(units.size()));
+              unit.onPlayed(game, fight, player1, RandUtils.getRand(units.size()), true);
+              if (isGold)
+              {
+                unit.onPlayed(game, fight, player1, RandUtils.getRand(units.size()), true);
+              }
               break;
             }
           }
         });
     
-    return gold;
+    actualHealth = getMaxHealth();
   }
   
   @Override
-  public void buildFace(Player player)
+  public String getDescription()
   {
-    
+    return "Rally: Trigger your right-most Battlecry" + (isGold ? " twice" : "");
   }
 }

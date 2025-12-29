@@ -26,8 +26,8 @@ import ru.vladislavkomkov.model.entity.unit.impl.undead.first.RisenRider;
 
 public class Units
 {
-  public static List<Unit> units = new ArrayList<>();
-  public static List<Unit> tavernUnits = new ArrayList<>();
+  public static List<Class<? extends Unit>> units = new ArrayList<>();
+  public static List<Class<? extends Unit>> tavernUnits = new ArrayList<>();
   
   static
   {
@@ -52,53 +52,60 @@ public class Units
   {
     // BEASTS
     // 1
-    units.add(new Alleycat());
-    units.add(new Cat());
-    units.add(new Manasaber());
-    units.add(new Cubling());
+    units.add(Alleycat.class);
+    units.add(Cat.class);
+    units.add(Manasaber.class);
+    units.add(Cubling.class);
     
     // 2
-    units.add(new HummingBird());
+    units.add(HummingBird.class);
     
     // 3
-    units.add(new SprightlyScarab());
+    units.add(SprightlyScarab.class);
     
     // UNDEAD
     // 1
-    units.add(new RisenRider());
+    units.add(RisenRider.class);
     
     // DEMONS
     // 1
-    units.add(new IckyImp());
-    units.add(new Imp());
+    units.add(IckyImp.class);
+    units.add(Imp.class);
     
     // DRAGONS
     // 4
-    units.add(new Greenskeeper());
+    units.add(Greenskeeper.class);
     
     // MECH
     // 4
-    units.add(new AccordoTron());
+    units.add(AccordoTron.class);
     
     // NAGA
     // 4
-    units.add(new DeepBlueCrooner());
+    units.add(DeepBlueCrooner.class);
     
     // DUMPS
-    units.add(new DumpFirst());
-    units.add(new DumpSecond());
-    units.add(new DumpThird());
-    units.add(new DumpFourth());
-    units.add(new DumpFifth());
-    units.add(new DumpSixth());
+    units.add(DumpFirst.class);
+    units.add(DumpSecond.class);
+    units.add(DumpThird.class);
+    units.add(DumpFourth.class);
+    units.add(DumpFifth.class);
+    units.add(DumpSixth.class);
   }
   
   static void setupTavernUnits()
   {
     units.forEach(unit -> {
-      if (unit.isTavern())
+      try
       {
-        tavernUnits.add(unit);
+        if (unit.getDeclaredConstructor().newInstance().isTavern())
+        {
+          tavernUnits.add(unit);
+        }
+      }
+      catch (Exception e)
+      {
+        throw new RuntimeException(e);
       }
     });
   }

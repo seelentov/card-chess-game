@@ -1,5 +1,7 @@
 package ru.vladislavkomkov.model.entity.unit.impl.naga.fourth;
 
+import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
+
 import ru.vladislavkomkov.model.entity.spell.impl.spellcraft.impl.DeepBlues;
 import ru.vladislavkomkov.model.entity.unit.impl.naga.SpellCrafter;
 import ru.vladislavkomkov.model.player.Player;
@@ -8,7 +10,12 @@ public class DeepBlueCrooner extends SpellCrafter
 {
   public DeepBlueCrooner()
   {
-    super(new DeepBlues());
+    this(DUMP_PLAYER);
+  }
+  
+  public DeepBlueCrooner(Player playerLink)
+  {
+    super(playerLink, new DeepBlues(playerLink));
     
     level = 4;
     isTavern = true;
@@ -16,12 +23,7 @@ public class DeepBlueCrooner extends SpellCrafter
     attack = 2;
     
     maxHealth = 3;
-    actualHealth = 3;
-  }
-  
-  @Override
-  public void buildFace(Player player)
-  {
-    super.buildFace(player);
+    
+    actualHealth = getMaxHealth();
   }
 }

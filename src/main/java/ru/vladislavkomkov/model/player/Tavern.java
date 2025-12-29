@@ -1,10 +1,14 @@
 package ru.vladislavkomkov.model.player;
 
+import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import ru.vladislavkomkov.consts.Spells;
+import ru.vladislavkomkov.consts.Units;
 import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.Entity;
 import ru.vladislavkomkov.model.entity.spell.Spell;
@@ -59,22 +63,28 @@ public class Tavern
     }
   }
   
+  final List<Class<? extends Spell>> spellsPool = new ArrayList<>();
+  final List<Class<? extends Unit>> unitsPool = new ArrayList<>();
+  List<Slot> cards = new ArrayList<>();
+  boolean freeze = false;
+  private Player player;
+  
   public Tavern()
   {
-    this(SpellUtils.getTavern(), UnitUtils.getTavern());
+    this(DUMP_PLAYER);
   }
   
-  public Tavern(List<Spell> spellsPool, List<Unit> unitsPool)
+  public Tavern(Player player)
+  {
+    this(Units.tavernUnits, Spells.tavernSpells, player);
+  }
+  
+  public Tavern(List<Class<? extends Unit>> unitsPool, List<Class<? extends Spell>> spellsPool, Player player)
   {
     this.spellsPool.addAll(spellsPool);
     this.unitsPool.addAll(unitsPool);
+    this.player = player;
   }
-  
-  final List<Spell> spellsPool = new ArrayList<>();
-  final List<Unit> unitsPool = new ArrayList<>();
-  
-  List<Slot> cards = new ArrayList<>();
-  boolean freeze = false;
   
   public static int getCountByLevel(int level)
   {
@@ -183,24 +193,38 @@ public class Tavern
   Card generateUnitCard(int level)
   {
     int targetLevel = RandUtils.getRandLvl(level);
-    List<Unit> units = getAvailableUnitsWithFallback(targetLevel, level);
+    List<Class<? extends Unit>> units = getAvailableUnitsWithFallback(targetLevel, level);
     
-    Unit unit = units.get(RandUtils.getRand(units.size() - 1));
-    return new Card(unit);
+    Class<? extends Unit> unit = units.get(RandUtils.getRand(units.size() - 1));
+    try
+    {
+      return new Card(unit.getDeclaredConstructor(Player.class).newInstance(player));
+    }
+    catch (Exception e)
+    {
+      throw new RuntimeException(e);
+    }
   }
   
   void addRandomSpell(int level)
   {
     int targetLevel = RandUtils.getRandLvl(level);
-    List<Spell> spells = getAvailableSpellsWithFallback(targetLevel, level);
+    List<Class<? extends Spell>> spells = getAvailableSpellsWithFallback(targetLevel, level);
     
-    Spell spell = spells.get(RandUtils.getRand(spells.size() - 1));
-    add(new Card(spell));
+    Class<? extends Spell> spell = spells.get(RandUtils.getRand(spells.size() - 1));
+    try
+    {
+      add(new Card(spell.getDeclaredConstructor(Player.class).newInstance(player)));
+    }
+    catch (Exception e)
+    {
+      throw new RuntimeException(e);
+    }
   }
   
-  List<Unit> getAvailableUnitsWithFallback(int targetLevel, int maxLevel)
+  List<Class<? extends Unit>> getAvailableUnitsWithFallback(int targetLevel, int maxLevel)
   {
-    List<Unit> units = UnitUtils.getByTavern(targetLevel, unitsPool);
+    List<Class<? extends Unit>> units = UnitUtils.getByTavern(targetLevel, unitsPool);
     
     while (units.isEmpty())
     {
@@ -211,9 +235,9 @@ public class Tavern
     return units;
   }
   
-  List<Spell> getAvailableSpellsWithFallback(int targetLevel, int maxLevel)
+  List<Class<? extends Spell>> getAvailableSpellsWithFallback(int targetLevel, int maxLevel)
   {
-    List<Spell> spells = SpellUtils.getByTavern(targetLevel, spellsPool);
+    List<Class<? extends Spell>> spells = SpellUtils.getByTavern(targetLevel, spellsPool);
     
     while (spells.isEmpty())
     {
@@ -236,12 +260,12 @@ public class Tavern
     }
   }
   
-  public List<Unit> getUnitsPool()
+  public List<Class<? extends Unit>> getUnitsPool()
   {
     return unitsPool;
   }
   
-  public List<Spell> getSpellsPool()
+  public List<Class<? extends Spell>> getSpellsPool()
   {
     return spellsPool;
   }

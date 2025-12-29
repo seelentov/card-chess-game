@@ -1,10 +1,10 @@
 package ru.vladislavkomkov.model.entity.unit.impl.mech.fourth;
 
 import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
+import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
 
 import java.util.List;
 
-import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.UnitType;
 import ru.vladislavkomkov.model.entity.unit.impl.mech.Magnetized;
 import ru.vladislavkomkov.model.player.Player;
@@ -15,16 +15,19 @@ public class AccordoTron extends Magnetized
   
   public AccordoTron()
   {
-    super();
-
-    description = "At the start of your turn, gain " + GOLD + " Gold";
+    this(DUMP_PLAYER);
+  }
+  
+  public AccordoTron(Player playerLink)
+  {
+    super(playerLink);
+    
     level = 4;
     isTavern = true;
     
     attack = 5;
     
     maxHealth = 5;
-    actualHealth = 5;
     
     unitType = List.of(UnitType.MECH);
     
@@ -32,24 +35,14 @@ public class AccordoTron extends Magnetized
     
     listener.onStartTurnListeners.put(
         KEY_CORE,
-        (game, fight, player) -> player.addMoney(GOLD));
+        (game, fight, player1) -> player1.addMoney(GOLD));
+    
+    actualHealth = getMaxHealth();
   }
   
   @Override
-  public Unit buildGold(Unit unit, Unit unit2, Unit unit3)
+  public String getDescription()
   {
-    Unit gold = super.buildGold(unit, unit2, unit3);
-    gold.setDescription("At the start of your turn, gain 2 Gold");
-    gold.getListener().onStartTurnListeners.put(
-        KEY_CORE,
-        (game, fight, player) -> player.addMoney(GOLD * 2));
-    
-    return gold;
-  }
-  
-  @Override
-  public void buildFace(Player player)
-  {
-    
+    return "At the start of your turn, gain " + (GOLD * (isGold ? 2 : 1)) + " Gold";
   }
 }

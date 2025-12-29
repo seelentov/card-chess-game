@@ -1,6 +1,7 @@
 package ru.vladislavkomkov.model.entity.spell.impl.second;
 
 import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
+import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
 
 import ru.vladislavkomkov.model.entity.spell.Spell;
 import ru.vladislavkomkov.model.player.Player;
@@ -9,14 +10,18 @@ public class StrikeOil extends Spell
 {
   public StrikeOil()
   {
-    this(false);
+    this(DUMP_PLAYER, false);
   }
   
-  public StrikeOil(boolean isGold)
+  public StrikeOil(Player playerLink)
   {
-    super(isGold);
+    this(playerLink, false);
+  }
+  
+  public StrikeOil(Player playerLink, boolean isGold)
+  {
+    super(playerLink, isGold);
     isTavern = true;
-    description = "Increase your maximum Gold by 1";
   }
   
   @Override
@@ -30,8 +35,8 @@ public class StrikeOil extends Spell
   }
   
   @Override
-  public void buildFace(Player player)
+  public String getDescription()
   {
-    
+    return "Increase your maximum Gold by 1";
   }
 }

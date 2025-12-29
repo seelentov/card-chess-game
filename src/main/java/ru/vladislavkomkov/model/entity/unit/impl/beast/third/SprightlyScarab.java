@@ -1,5 +1,11 @@
 package ru.vladislavkomkov.model.entity.unit.impl.beast.third;
 
+import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
+import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
+
+import java.util.List;
+import java.util.Optional;
+
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.entity.Choice;
 import ru.vladislavkomkov.model.entity.Entity;
@@ -14,18 +20,16 @@ import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.RandUtils;
 
-import java.util.List;
-import java.util.Optional;
-
-import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
-
 public class SprightlyScarab extends Choicer
 {
   public SprightlyScarab()
   {
-    super();
-    
-    description = "Choose One - Give a Beast +1/+1 and Reborn; or +4 Attack and Windfury.";
+    this(DUMP_PLAYER);
+  }
+  
+  public SprightlyScarab(Player playerLink)
+  {
+    super(playerLink);
     
     attack = 3;
     
@@ -41,50 +45,37 @@ public class SprightlyScarab extends Choicer
     playType = List.of(
         new PlayPair(PlayType.TABLE),
         new PlayPair(PlayType.CHOICE, List.of(
-            new SprightlySprucing(isGold()),
-            new SprightlySupport(isGold()))),
+            new SprightlySprucing(playerLink, isGold()),
+            new SprightlySupport(playerLink, isGold()))),
         new PlayPair(PlayType.TAVERN_FRENDLY, List.of(UnitType.BEAST)));
     
     isAnswerOnPlayed = false;
     listener.onPlayedListeners.put(
         KEY_CORE,
-        (game, fight, player, entity, input, auto) -> {
+        (game, fight, player1, entity, input, auto) -> {
           Choice choice;
           if (input.size() > 1)
           {
-            choice = input.get(1) == 0 ? new SprightlySprucing(false) : new SprightlySupport(entity.isGold());
+            choice = input.get(1) == 0 ? new SprightlySprucing(player1, entity.isGold()) : new SprightlySupport(player1, entity.isGold());
           }
           else
           {
-            choice = RandUtils.getRand(1) == 0 ? new SprightlySprucing(false) : new SprightlySupport(entity.isGold());
+            choice = RandUtils.getRand(1) == 0 ? new SprightlySprucing(player1, entity.isGold()) : new SprightlySupport(player1, entity.isGold());
           }
           
-          choice.process(game, fight, player, entity, input, auto);
+          choice.process(game, fight, player1, entity, input, auto);
         });
+    
+    actualHealth = getMaxHealth();
   }
   
   @Override
-  public Unit buildGold(Unit unit, Unit unit2, Unit unit3)
+  public String getDescription()
   {
-    Unit gold = super.buildGold(unit, unit2, unit3);
-    gold.setDescription("Choose One - Give a Beast +2/+2 and Reborn; or +8 Attack and Windfury.");
-    gold.getListener().onPlayedListeners.put(
-        KEY_CORE,
-        (game, fight, player, entity, input, auto) -> {
-          Choice choice;
-          if (input.size() > 1)
-          {
-            choice = input.get(1) == 0 ? new SprightlySprucing(true) : new SprightlySupport(true);
-          }
-          else
-          {
-            choice = RandUtils.getRand(1) == 0 ? new SprightlySprucing(true) : new SprightlySupport(true);
-          }
-          
-          choice.process(game, fight, player, entity, input, auto);
-        });
-    
-    return gold;
+    return "Choose One: "
+        + new SprightlySprucing(playerLink, isGold).getDescription()
+        + "; or "
+        + new SprightlySupport(playerLink, isGold).getDescription();
   }
   
   private static Unit findUnit(Fight fight, Player player, List<Integer> input)
@@ -138,11 +129,9 @@ public class SprightlyScarab extends Choicer
     public static int ATTACK_BOOST = 1;
     public static int HEALTH_BOOST = 1;
     
-    public SprightlySprucing(boolean isGold)
+    public SprightlySprucing(Player player, boolean isGold)
     {
-      super(isGold);
-      
-      description = "Give a Beast " + (this.isGold ? "+2/+2" : "+1/+1" + " and Reborn.");
+      super(player, isGold);
     }
     
     public void process(Game game, Fight fight, Player player, Entity entity, List<Integer> input, boolean auto)
@@ -159,9 +148,12 @@ public class SprightlyScarab extends Choicer
     }
     
     @Override
-    public void buildFace(Player player)
+    public String getDescription()
     {
-      description = "Give a Beast " + (this.isGold ? "+2/+2" : "+1/+1") + " and Reborn.";
+      int attackBoost = ATTACK_BOOST * (isGold ? 2 : 1);
+      int healthBoost = HEALTH_BOOST * (isGold ? 2 : 1);
+      
+      return "Give a Beast +" + attackBoost + "/+" + healthBoost + " and Reborn.";
     }
   }
   
@@ -169,12 +161,11 @@ public class SprightlyScarab extends Choicer
   {
     public static int ATTACK_BOOST = 4;
     
-    public SprightlySupport(boolean isGold)
+    public SprightlySupport(Player player, boolean isGold)
     {
-      super(isGold);
+      super(player, isGold);
       
       this.isGold = isGold;
-      description = "Give a Beast " + (this.isGold ? "+8" : "+4") + " Attack and Windfury.";
     }
     
     public void process(Game game, Fight fight, Player player, Entity entity, List<Integer> input, boolean auto)
@@ -190,9 +181,9 @@ public class SprightlyScarab extends Choicer
     }
     
     @Override
-    public void buildFace(Player player)
+    public String getDescription()
     {
-      description = "Give a Beast " + (this.isGold ? "+8" : "+4") + " Attack and Windfury.";
+      return "Give a Beast +" + ATTACK_BOOST * (this.isGold ? 2 : 1) + " Attack and Windfury.";
     }
   }
 }

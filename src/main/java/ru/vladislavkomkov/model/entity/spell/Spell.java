@@ -1,5 +1,7 @@
 package ru.vladislavkomkov.model.entity.spell;
 
+import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
+
 import java.util.List;
 
 import ru.vladislavkomkov.model.entity.Entity;
@@ -9,12 +11,17 @@ public abstract class Spell extends Entity
 {
   public Spell()
   {
-    this(false);
+    this(DUMP_PLAYER);
   }
   
-  public Spell(boolean isGold)
+  public Spell(Player playerLink)
   {
-    super(isGold);
+    this(playerLink, false);
+  }
+  
+  public Spell(Player playerLink, boolean isGold)
+  {
+    super(playerLink, isGold);
     build();
     
     playType = List.of();
@@ -35,8 +42,8 @@ public abstract class Spell extends Entity
   }
   
   @Override
-  public void buildFace(Player player)
+  public String getDescription()
   {
-    
+    return "";
   }
 }

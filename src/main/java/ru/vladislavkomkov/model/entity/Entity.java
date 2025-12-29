@@ -33,17 +33,20 @@ public abstract class Entity extends GObject
   
   protected List<PlayPair> playType = List.of();
   
-  public Entity()
+  protected Player playerLink;
+  
+  public Entity(Player playerLink)
   {
-    this(false);
+    this(playerLink, false);
   }
   
-  public Entity(boolean isGold)
+  public Entity(Player playerLink, boolean isGold)
   {
     this.isGold = isGold;
     
     ID = UUIDUtils.generateKey();
     name = this.getClass().getSimpleName();
+    this.playerLink = playerLink;
   }
   
   @JsonProperty(F_PLAY_TYPE)
@@ -156,8 +159,6 @@ public abstract class Entity extends GObject
     return isGold ? newGold() : newBase();
   }
   
-
-  
   public Listener getListener()
   {
     return listener;
@@ -166,9 +167,11 @@ public abstract class Entity extends GObject
   @Override
   public Entity clone()
   {
-      Entity clonedEntity = (Entity) super.clone();
-      clonedEntity.listener = this.listener.clone();
-      return clonedEntity;
+    Entity clonedEntity = (Entity) super.clone();
+    
+    clonedEntity.playerLink = playerLink;
+    clonedEntity.listener = this.listener.clone();
+    return clonedEntity;
   }
   
   @JsonProperty(F_IS_SPELL)

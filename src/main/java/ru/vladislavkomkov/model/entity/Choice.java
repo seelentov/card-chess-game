@@ -9,7 +9,7 @@ import ru.vladislavkomkov.model.player.Player;
 
   public abstract class Choice extends GObject
 {
-  public Choice(boolean isGold)
+  public Choice(Player player, boolean isGold)
   {
     super(isGold);
   }

@@ -1,6 +1,7 @@
 package ru.vladislavkomkov.model.entity.unit.impl.demon.first;
 
 import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
+import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
 
 import java.util.List;
 
@@ -13,16 +14,18 @@ public class IckyImp extends Unit
 {
   public IckyImp()
   {
-    super();
-    
-    description = "Deathrattle: Summon two 1/1 Imps";
+    this(DUMP_PLAYER);
+  }
+  
+  public IckyImp(Player playerLink)
+  {
+    super(playerLink);
     
     unitType = List.of(UnitType.DEMON);
     
     attack = 1;
     
     maxHealth = 1;
-    actualHealth = 1;
     
     isTavern = true;
     
@@ -30,56 +33,31 @@ public class IckyImp extends Unit
     
     listener.onDeadListeners.put(
         KEY_CORE,
-        (game, fight, player, player2, unit, attacker) -> {
+        (game, fight, player1, player2, unit, attacker) -> {
           if (fight != null)
           {
             for (int i = 0; i < 2; i++)
             {
-              fight.addToFightTable(player, new Imp(), unit, true);
+              fight.addToFightTable(player1, isGold ? new Imp(player1).buildGold() : new Imp(player1), unit, true);
             }
           }
           else
           {
-            int index = player.getIndex(unit);
+            int index = player1.getIndex(unit);
             for (int i = 0; i < 2; i++)
             {
-              player.addToTable(new Imp(), index + 1, true);
-            }
-          }
-        });
-  }
-  
-  @Override
-  public Unit buildGold(Unit unit, Unit unit2, Unit unit3)
-  {
-    Unit gold = super.buildGold(unit, unit2, unit3);
-    gold.setDescription("Deathrattle: Summon two 2/2 Imps");
-    gold.getListener().onDeadListeners.put(
-        KEY_CORE,
-        (game, fight, player, player2, unit1, attacker) -> {
-          if (fight != null)
-          {
-            for (int i = 0; i < 2; i++)
-            {
-              fight.addToFightTable(player, new Imp().newGold(), unit1);
-            }
-          }
-          else
-          {
-            int index = player.getIndex(unit1);
-            for (int i = 0; i < 2; i++)
-            {
-              player.addToTable(new Imp().newGold(), index + 1);
+              player1.addToTable(isGold ? new Imp(player1).buildGold() : new Imp(player1), index + 1, true);
             }
           }
         });
     
-    return gold;
+    actualHealth = getMaxHealth();
   }
   
   @Override
-  public void buildFace(Player player)
+  public String getDescription()
   {
-    
+    Unit unit = isGold ? new Imp(playerLink).buildGold() : new Imp(playerLink);
+    return "Deathrattle: Summon two " + unit.getAttack() + "/" + unit.getHealth() + " Imps";
   }
 }

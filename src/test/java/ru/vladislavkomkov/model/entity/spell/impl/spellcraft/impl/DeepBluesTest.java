@@ -33,15 +33,12 @@ public class DeepBluesTest extends SpellCraftTestCase
   
   void testIncBoostAfterUseIter(boolean isGold)
   {
+    Player player = new Player(game);
+    
     int unitIndex = 0;
     
-    Unit unit = new Unit()
+    Unit unit = new Unit(player)
     {
-      @Override
-      public void buildFace(Player player)
-      {
-        
-      }
     };
     
     player.addToTable(unit, unitIndex);
@@ -51,7 +48,7 @@ public class DeepBluesTest extends SpellCraftTestCase
     
     for (int i = 1; i <= 100; i++)
     {
-      Spell blues = new DeepBlues();
+      Spell blues = new DeepBlues(player);
       blues.setIsGold(isGold);
       
       player.addToHand(Card.of(blues));
@@ -59,7 +56,7 @@ public class DeepBluesTest extends SpellCraftTestCase
       int tempAttack = unit.getAttack();
       int tempHealth = unit.getHealth();
       
-      String description = player.cloneHand().get(0).getEntity().getDescription(player);
+      String description = player.cloneHand().get(0).getEntity().getDescription();
       assertTrue(description.contains("+" + (attack * i) + "/+" + (health * i)));
       
       player.playCard(0, unitIndex);
@@ -73,7 +70,7 @@ public class DeepBluesTest extends SpellCraftTestCase
   {
     int unitIndex = 0;
     
-    Unit unit = new Unit()
+    Unit unit = new Unit(player)
     {
     };
     

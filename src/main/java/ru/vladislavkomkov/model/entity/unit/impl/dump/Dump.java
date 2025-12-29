@@ -1,12 +1,13 @@
 package ru.vladislavkomkov.model.entity.unit.impl.dump;
 
 import ru.vladislavkomkov.model.entity.unit.Unit;
+import ru.vladislavkomkov.model.player.Player;
 
 public abstract class Dump extends Unit
 {
-  public Dump(int lvl)
+  public Dump(Player playerLink, int lvl)
   {
-    super();
+    super(playerLink);
 
     level = lvl;
     isTavern = true;
@@ -14,7 +15,13 @@ public abstract class Dump extends Unit
     attack = lvl;
     
     maxHealth = lvl;
-    actualHealth = lvl;
+    
+    actualHealth = getMaxHealth();
   }
   
+  @Override
+  public String getDescription()
+  {
+    return "";
+  }
 }

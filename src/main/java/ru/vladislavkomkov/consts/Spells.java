@@ -5,11 +5,12 @@ import java.util.List;
 
 import ru.vladislavkomkov.model.entity.spell.Spell;
 import ru.vladislavkomkov.model.entity.spell.impl.first.TavernCoin;
+import ru.vladislavkomkov.model.entity.spell.impl.second.StrikeOil;
 
 public class Spells
 {
-  public static List<Spell> spells = new ArrayList<>();
-  public static List<Spell> tavernSpells = new ArrayList<>();
+  public static List<Class<? extends Spell>> spells = new ArrayList<>();
+  public static List<Class<? extends Spell>> tavernSpells = new ArrayList<>();
   
   static
   {
@@ -19,15 +20,23 @@ public class Spells
   
   static void setup()
   {
-    spells.add(new TavernCoin());
+    spells.add(TavernCoin.class);
+    spells.add(StrikeOil.class);
   }
   
   static void setupTavern()
   {
     spells.forEach(unit -> {
-      if (unit.isTavern())
+      try
       {
-        tavernSpells.add(unit);
+        if (unit.getDeclaredConstructor().newInstance().isTavern())
+        {
+          tavernSpells.add(unit);
+        }
+      }
+      catch (Exception e)
+      {
+        throw new RuntimeException(e);
       }
     });
   }

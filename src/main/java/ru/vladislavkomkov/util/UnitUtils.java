@@ -3,34 +3,57 @@ package ru.vladislavkomkov.util;
 import java.util.List;
 
 import ru.vladislavkomkov.consts.Units;
-import ru.vladislavkomkov.model.entity.spell.Spell;
 import ru.vladislavkomkov.model.entity.unit.Unit;
+import ru.vladislavkomkov.model.player.Player;
 
 public class UnitUtils
 {
-  public static List<Unit> getAll()
+  public static List<Unit> getAll(Player player)
   {
-    return Units.units.stream().map(Unit::clone).toList();
+    return get(Units.units, player);
   };
   
-  public static List<Unit> getTavern()
+  public static List<Unit> getTavern(Player player)
   {
-    return Units.tavernUnits.stream().map(Unit::clone).toList();
+    return get(Units.tavernUnits, player);
   };
   
-  public static List<Unit> getByTavern(int lvl)
+  private static List<Unit> get(List<Class<? extends Unit>> list, Player player)
   {
-    return getByTavern(lvl, true);
+    return (List<Unit>) list.stream().map(unit -> {
+      try
+      {
+        return unit.getDeclaredConstructor(Player.class).newInstance(player);
+      }
+      catch (Exception e)
+      {
+        throw new RuntimeException(e);
+      }
+    }).toList();
+  }
+  
+  public static List<Class<? extends Unit>> getByTavern(int lvl, Player player)
+  {
+    return getByTavern(lvl, true, player);
   };
   
-  public static List<Unit> getByTavern(int lvl, boolean isTavern)
+  public static List<Class<? extends Unit>> getByTavern(int lvl, boolean isTavern, Player player)
   {
-    List<Unit> units = isTavern ? getTavern() : getAll();
+    List<Class<? extends Unit>> units = isTavern ? Units.tavernUnits : Units.units;
     return getByTavern(lvl, units);
   }
   
-  public static List<Unit> getByTavern(int lvl, List<Unit> pool)
+  public static List<Class<? extends Unit>> getByTavern(int lvl, List<Class<? extends Unit>> pool)
   {
-    return pool.stream().filter(unit -> unit.getLevel() == lvl).map(Unit::clone).toList();
+    return pool.stream().filter(unit -> {
+      try
+      {
+        return unit.getDeclaredConstructor().newInstance().getLevel() == lvl;
+      }
+      catch (Exception e)
+      {
+        throw new RuntimeException(e);
+      }
+    }).toList();
   };
 }

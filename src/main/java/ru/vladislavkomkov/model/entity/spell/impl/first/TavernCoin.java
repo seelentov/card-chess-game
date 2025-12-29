@@ -1,6 +1,7 @@
 package ru.vladislavkomkov.model.entity.spell.impl.first;
 
 import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
+import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
 
 import ru.vladislavkomkov.model.entity.spell.Spell;
 import ru.vladislavkomkov.model.player.Player;
@@ -9,14 +10,18 @@ public class TavernCoin extends Spell
 {
   public TavernCoin()
   {
-    this(false);
+    this(DUMP_PLAYER, false);
   }
   
-  public TavernCoin(boolean isGold)
+  public TavernCoin(Player playerLink)
   {
-    super(isGold);
+    this(playerLink, false);
+  }
+  
+  public TavernCoin(Player playerLink, boolean isGold)
+  {
+    super(playerLink, isGold);
     isTavern = true;
-    description = "Gain 1 Gold";
   }
   
   @Override
@@ -30,8 +35,8 @@ public class TavernCoin extends Spell
   }
   
   @Override
-  public void buildFace(Player player)
+  public String getDescription()
   {
-    
+    return "Gain 1 Gold";
   }
 }

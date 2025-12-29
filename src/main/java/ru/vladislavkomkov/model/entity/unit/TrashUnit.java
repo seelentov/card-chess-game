@@ -4,17 +4,12 @@ import ru.vladislavkomkov.model.player.Player;
 
 public abstract class TrashUnit extends Unit
 {
-  public TrashUnit()
+  public TrashUnit(Player playerLink)
   {
+    super(playerLink);
+    
     level = 1;
     attack = 1;
     maxHealth = 1;
-    actualHealth = 1;
-  }
-  
-  @Override
-  public void buildFace(Player player)
-  {
-    
   }
 }

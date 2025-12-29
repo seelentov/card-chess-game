@@ -13,6 +13,7 @@ import ru.vladislavkomkov.model.entity.unit.impl.beast.first.Alleycat;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
 import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.player.Player;
+import ru.vladislavkomkov.util.UUIDUtils;
 
 public class GreenskeeperTest extends UnitTestCase
 {
@@ -34,26 +35,12 @@ public class GreenskeeperTest extends UnitTestCase
     for (int i = 1; i < Player.TABLE_LIMIT; i++)
     {
       int finalI = i;
-      player.addToTable(new Unit()
-      {
-        @Override
-        public boolean isAnswerOnPlayed()
-        {
-          return true;
-        }
-        
-        @Override
-        public void buildFace(Player player)
-        {
-          
-        }
-        
-        @Override
-        public void onPlayed(Game game, Fight fight, Player player, List<Integer> input, boolean auto)
-        {
-          player.addMoney(finalI * moneyStep);
-        }
-      });
+      Unit unit = new Unit(player) {};
+      unit.getListener().onPlayedListeners.put(
+              UUIDUtils.generateKey(),
+              ((game1, fight, player1, entity, input, auto)
+                      -> player1.addMoney(finalI * moneyStep)));
+      player.addToTable(unit);
     }
     
     gk.onAttack(game, null, player, player2, new Cat());

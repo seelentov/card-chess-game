@@ -1,11 +1,13 @@
 package ru.vladislavkomkov.model.entity.unit.impl.beast.first;
 
 import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
+import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
 
 import java.util.List;
 
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.UnitType;
+import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cubling;
 import ru.vladislavkomkov.model.player.Player;
 
@@ -13,71 +15,49 @@ public class Manasaber extends Unit
 {
   public Manasaber()
   {
-    super();
+    this(DUMP_PLAYER);
+  }
+  
+  public Manasaber(Player playerLink)
+  {
+    super(playerLink);
     
-    description = "Deathrattle: Summon two 0/1 Cublings with Taunt";
     level = 1;
     isTavern = true;
     
     attack = 4;
     
     maxHealth = 1;
-    actualHealth = 1;
     
     unitType = List.of(UnitType.BEAST);
     
     listener.onDeadListeners.put(
         KEY_CORE,
-        (game, fight, player, player2, unit, attacker) -> {
+        (game, fight, player1, player2, unit, attacker) -> {
           if (fight != null)
           {
             for (int i = 0; i < 2; i++)
             {
-              fight.addToFightTable(player, new Cubling(), unit, true);
+              fight.addToFightTable(player1, isGold ? new Cubling(player1).newGold() : new Cubling(player1), unit, true);
             }
           }
           else
           {
-            int index = player.getIndex(unit);
+            int index = player1.getIndex(unit);
             for (int i = 0; i < 2; i++)
             {
-              player.addToTable(new Cubling(), index + 1, true);
-            }
-          }
-        });
-  }
-  
-  @Override
-  public Unit buildGold(Unit unit, Unit unit2, Unit unit3)
-  {
-    Unit gold = super.buildGold(unit, unit2, unit3);
-    gold.setDescription("Deathrattle: Summon two 0/2 Cublings with Taunt");
-    gold.getListener().onDeadListeners.put(
-        KEY_CORE,
-        (game, fight, player, player2, unit1, attacker) -> {
-          if (fight != null)
-          {
-            for (int i = 0; i < 2; i++)
-            {
-              fight.addToFightTable(player, new Cubling().newGold(), unit1, true);
-            }
-          }
-          else
-          {
-            int index = player.getIndex(unit1);
-            for (int i = 0; i < 2; i++)
-            {
-              player.addToTable(new Cubling().newGold(), index + 1, true);
+              player1.addToTable(isGold ? new Cubling(player1).newGold() : new Cubling(player1), index + 1, true);
             }
           }
         });
     
-    return gold;
+    actualHealth = getMaxHealth();
   }
   
   @Override
-  public void buildFace(Player player)
+  public String getDescription()
   {
-    
+    Unit sub = isGold ? new Cubling(playerLink).buildGold() : new Cat(playerLink);
+    return "Summon a " + sub.getAttack() + "/" + sub.getHealth() + " Cat";
   }
 }

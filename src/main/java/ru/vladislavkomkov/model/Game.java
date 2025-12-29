@@ -91,7 +91,7 @@ public class Game implements AutoCloseable
     {
       if (!acceptingNewPlayers)
       {
-        throw new IllegalStateException("Cannot add player: game already started");
+        throw new IllegalStateException("Cannot add playerLink: game already started");
       }
       String key = UUIDUtils.generateKey();
       addPlayerInternal(key, new Player(key, this));
@@ -110,7 +110,7 @@ public class Game implements AutoCloseable
     {
       if (!acceptingNewPlayers)
       {
-        throw new IllegalStateException("Cannot add player: game already started");
+        throw new IllegalStateException("Cannot add playerLink: game already started");
       }
       addPlayerInternal(UUID, player);
     }
@@ -232,7 +232,7 @@ public class Game implements AutoCloseable
           {
             player.incMaxMoney();
           }
-          player.getStatistic().counters.incrementIncLevelDecreaser();
+          player.getStatistic().getCounters().incrementIncLevelDecreaser();
         }
         player.resetMoney();
         player.resetTavern(true);

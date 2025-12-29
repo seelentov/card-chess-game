@@ -10,13 +10,14 @@ import org.junit.jupiter.api.Test;
 import ru.vladislavkomkov.model.entity.unit.Buff;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
+import ru.vladislavkomkov.model.player.Player;
 
 public class UnitUtilsTest
 {
   @Test
   void testGetUnits()
   {
-    var units = UnitUtils.getAll();
+    var units = UnitUtils.getAll(new Player());
     
     assertNotNull(units);
     assertFalse(units.isEmpty());
@@ -25,7 +26,7 @@ public class UnitUtilsTest
   @Test
   void testGetTavernUnits()
   {
-    var units = UnitUtils.getTavern();
+    var units = UnitUtils.getTavern(new Player());
     
     assertNotNull(units);
     units.forEach(unit -> assertTrue(unit.isTavern()));
@@ -38,10 +39,20 @@ public class UnitUtilsTest
     {
       int fLevel = level;
       
-      var units = UnitUtils.getByTavern(fLevel);
+      var units = UnitUtils.getByTavern(fLevel, new Player());
       
       assertNotNull(units);
-      units.forEach(unit -> assertEquals(fLevel, unit.getLevel()));
+      
+      units.forEach(unit -> {
+        try
+        {
+          assertEquals(fLevel, unit.getDeclaredConstructor().newInstance().getLevel());
+        }
+        catch (Exception e)
+        {
+          throw new RuntimeException(e);
+        }
+      });
     }
   }
   

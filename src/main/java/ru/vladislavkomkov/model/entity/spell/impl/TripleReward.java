@@ -1,6 +1,7 @@
 package ru.vladislavkomkov.model.entity.spell.impl;
 
 import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
+import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -20,14 +21,18 @@ public class TripleReward extends Spell
   
   public TripleReward()
   {
-    this(0);
+    this(DUMP_PLAYER);
   }
   
-  public TripleReward(int lvl)
+  public TripleReward(Player playerLink)
   {
-    super(true);
+    this(playerLink, 0);
+  }
+  
+  public TripleReward(Player playerLink, int lvl)
+  {
+    super(playerLink, true);
     unitLvl = lvl;
-    description = "Discover a minion from Tier " + (lvl);
   }
   
   @Override
@@ -36,7 +41,7 @@ public class TripleReward extends Spell
     listener.onPlayedListeners.put(
         KEY_CORE,
         (game, fight, player, entity, input, auto) -> {
-          List<Unit> allUnits = UnitUtils.getByTavern(player.getLevel(), player.getTavern().getUnitsPool());
+          List<Class<? extends Unit>> allUnits = UnitUtils.getByTavern(player.getLevel(), player.getTavern().getUnitsPool());
           
           if (allUnits.isEmpty())
           {
@@ -46,7 +51,7 @@ public class TripleReward extends Spell
           while (allUnits.size() < 3)
           {
             allUnits = new ArrayList<>(allUnits);
-            allUnits.add(allUnits.get(0).newBase());
+            allUnits.add(allUnits.get(0));
           }
           
           Set<Integer> setInts = new HashSet<>();
@@ -57,25 +62,48 @@ public class TripleReward extends Spell
           
           List<Integer> ints = setInts.stream().toList();
           
-          List<Card> units = List.of(
-              Card.of(allUnits.get(ints.get(0))),
-              Card.of(allUnits.get(ints.get(1))),
-              Card.of(allUnits.get(ints.get(2))));
+          List<Class<? extends Unit>> unitClasses = List.of(
+              allUnits.get(ints.get(0)),
+              allUnits.get(ints.get(1)),
+              allUnits.get(ints.get(2)));
           
+          List<Card> units = unitClasses.stream()
+              .map(unitClass -> {
+                try
+                {
+                  return unitClass
+                      .getDeclaredConstructor(Player.class)
+                      .newInstance(player);
+                }
+                catch (Exception e)
+                {
+                  throw new RuntimeException(e);
+                }
+              })
+              .map(unit -> (Card) Card.of(unit))
+              .toList();
+              
           player.putSenderWaiter((param) -> {
             if (param < 0 || param > 3)
             {
               param = RandUtils.getRand(1, 3);
             }
             
-            player.addToHand(Card.of(units.get(param).getEntity()));
+            try
+            {
+              player.addToHand(units.get(param));
+            }
+            catch (Exception e)
+            {
+              throw new RuntimeException(e);
+            }
           }, units);
         });
   }
   
   @Override
-  public void buildFace(Player player)
+  public String getDescription()
   {
-    
+    return "Discover a minion from Tier " + unitLvl;
   }
 }

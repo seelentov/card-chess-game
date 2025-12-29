@@ -1,7 +1,7 @@
 package ru.vladislavkomkov.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import ru.vladislavkomkov.model.player.Player;
+
 import ru.vladislavkomkov.util.UUIDUtils;
 
 public abstract class GObject implements Cloneable
@@ -17,7 +17,6 @@ public abstract class GObject implements Cloneable
   
   protected String ID = UUIDUtils.generateKey();
   protected String name = this.getClass().getSimpleName();
-  protected String description = "";
   
   public GObject()
   {
@@ -46,20 +45,7 @@ public abstract class GObject implements Cloneable
   }
   
   @JsonProperty(F_DESCRIPTION)
-  public String getDescription()
-  {
-    return getDescription(null);
-  }
-  
-  public void setDescription(String description)
-  {
-    this.description = description;
-  }
-  
-  public String getDescription(Player player)
-  {
-    return description;
-  }
+  public abstract String getDescription();
   
   @JsonProperty(F_IS_GOLD)
   public Boolean isGold()
@@ -71,8 +57,6 @@ public abstract class GObject implements Cloneable
   {
     this.isGold = isGold;
   }
-  
-  public abstract void buildFace(Player player);
   
   @Override
   public GObject clone()

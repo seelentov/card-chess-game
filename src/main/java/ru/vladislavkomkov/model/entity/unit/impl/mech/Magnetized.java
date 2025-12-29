@@ -9,9 +9,9 @@ import ru.vladislavkomkov.model.player.Player;
 
 public abstract class Magnetized extends Unit
 {
-  public Magnetized()
+  public Magnetized(Player playerLink)
   {
-    super();
+    super(playerLink);
   }
   
   @Override
@@ -63,6 +63,11 @@ public abstract class Magnetized extends Unit
         if (this.isAnswerOnPlayed)
         {
           rightUnit.setIsAnswerOnPlayed(true);
+        }
+        
+        if (this.getAttacksCount().toInt() > rightUnit.getAttacksCount().toInt())
+        {
+          rightUnit.setAttacksCount(this.getAttacksCount());
         }
         
         if (this.isAnswerOnDead)

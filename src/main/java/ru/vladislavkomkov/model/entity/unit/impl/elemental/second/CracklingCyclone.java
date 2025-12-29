@@ -1,26 +1,30 @@
 package ru.vladislavkomkov.model.entity.unit.impl.elemental.second;
 
+import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
+
+import java.util.List;
+
 import ru.vladislavkomkov.model.entity.unit.AttacksCount;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.UnitType;
-
-import java.util.List;
+import ru.vladislavkomkov.model.player.Player;
 
 public class CracklingCyclone extends Unit
 {
   public CracklingCyclone()
   {
-    super();
-
-    description = "Divine Shield\n" +
-        "Windfury";
+    this(DUMP_PLAYER);
+  }
+  
+  public CracklingCyclone(Player playerLink)
+  {
+    super(playerLink);
     
     unitType = List.of(UnitType.ELEMENTAL);
     
     attack = 3;
     
     maxHealth = 1;
-    actualHealth = 1;
     
     isTavern = true;
     
@@ -28,5 +32,14 @@ public class CracklingCyclone extends Unit
     
     isBubbled = true;
     attacksCount = AttacksCount.DOUBLE;
+    
+    actualHealth = getMaxHealth();
+  }
+  
+  @Override
+  public String getDescription()
+  {
+    return "Divine Shield\n" +
+        "Windfury";
   }
 }

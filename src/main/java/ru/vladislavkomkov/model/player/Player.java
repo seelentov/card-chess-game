@@ -1,13 +1,19 @@
 package ru.vladislavkomkov.model.player;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javafx.util.Pair;
-
+import ru.vladislavkomkov.consts.Spells;
+import ru.vladislavkomkov.consts.Units;
 import ru.vladislavkomkov.controller.sender.Sender;
 import ru.vladislavkomkov.enviroment.Config;
 import ru.vladislavkomkov.model.Game;
@@ -20,9 +26,7 @@ import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.event.Event;
 import ru.vladislavkomkov.model.event.data.SenderWaiterDataReq;
 import ru.vladislavkomkov.util.RandUtils;
-import ru.vladislavkomkov.util.SpellUtils;
 import ru.vladislavkomkov.util.UUIDUtils;
-import ru.vladislavkomkov.util.UnitUtils;
 
 public class Player
 {
@@ -78,19 +82,19 @@ public class Player
   
   public Player(String uuid, Game game)
   {
-    this(uuid, game, UnitUtils.getTavern(), SpellUtils.getTavern());
+    this(uuid, game, Units.tavernUnits, Spells.tavernSpells);
   }
   
-  public Player(Game game, List<Unit> unitsPool, List<Spell> spellsPool)
+  public Player(Game game, List<Class<? extends Unit>> unitsPool, List<Class<? extends Spell>> spellsPool)
   {
     this(UUIDUtils.generateKey(), game, unitsPool, spellsPool);
   }
   
-  public Player(String uuid, Game game, List<Unit> unitsPool, List<Spell> spellsPool)
+  public Player(String uuid, Game game, List<Class<? extends Unit>> unitsPool, List<Class<? extends Spell>> spellsPool)
   {
     this.uuid = uuid;
     this.game = game;
-    this.tavern = new Tavern(spellsPool, unitsPool);
+    this.tavern = new Tavern(unitsPool, spellsPool, this);
   }
   
   public void sendFullStat()
@@ -139,17 +143,17 @@ public class Player
   
   public void sendHand()
   {
-    sendMessage(Event.Type.HAND, getHand().stream().peek(card -> card.getEntity().buildFace(this)).toList());
+    sendMessage(Event.Type.HAND, getHand());
   }
   
   public void sendTavern()
   {
-    sendMessage(Event.Type.TAVERN, getTavern().getCards().stream().peek(slot -> slot.getEntity().buildFace(this)).toList());
+    sendMessage(Event.Type.TAVERN, getTavern().getCards());
   }
   
   public void sendTable()
   {
-    sendMessage(Event.Type.TABLE, getTable().stream().peek(entity -> entity.buildFace(this)).toList());
+    sendMessage(Event.Type.TABLE, getTable());
   }
   
   public void sendHealth()

@@ -14,11 +14,10 @@ public abstract class SpellCrafter extends Unit
 {
   protected SpellCraft spellcraft;
   
-  public SpellCrafter(SpellCraft spellcraft)
+  public SpellCrafter(Player playerLink, SpellCraft spellcraft)
   {
-    super();
+    super(playerLink);
 
-    description = "Spellcraft: " + spellcraft.getDescription();
     this.spellcraft = spellcraft;
     
     unitType = List.of(UnitType.NAGA);
@@ -55,8 +54,8 @@ public abstract class SpellCrafter extends Unit
   }
   
   @Override
-  public void buildFace(Player player)
+  public String getDescription()
   {
-    description = "Spellcraft: " + spellcraft.getDescription(player);
+    return "Spellcraft: " + spellcraft.getDescription();
   }
 }

@@ -1,5 +1,7 @@
 package ru.vladislavkomkov.model.entity.unit.impl.undead.first;
 
+import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
+
 import java.util.List;
 
 import ru.vladislavkomkov.model.entity.unit.Unit;
@@ -10,9 +12,12 @@ public class RisenRider extends Unit
 {
   public RisenRider()
   {
-    super();
-    
-    description = "Taunt Reborn";
+    this(DUMP_PLAYER);
+  }
+  
+  public RisenRider(Player playerLink)
+  {
+    super(playerLink);
     
     isTaunt = true;
     isRebirth = true;
@@ -22,16 +27,17 @@ public class RisenRider extends Unit
     attack = 2;
     
     maxHealth = 1;
-    actualHealth = 1;
     
     isTavern = true;
     
     level = 1;
+    
+    actualHealth = getMaxHealth();
   }
   
   @Override
-  public void buildFace(Player player)
+  public String getDescription()
   {
-    
+    return "Taunt Reborn";
   }
 }
