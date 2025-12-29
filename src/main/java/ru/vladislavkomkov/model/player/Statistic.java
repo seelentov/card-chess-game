@@ -1,5 +1,8 @@
 package ru.vladislavkomkov.model.player;
 
+import ru.vladislavkomkov.model.entity.unit.UnitType;
+
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Statistic
@@ -19,7 +22,17 @@ public class Statistic
   
   public static class Boosts
   {
-    public int incMaxMoney = 0;
+    public Map<UnitType, Integer> byUnitType = Map.of(
+        UnitType.BEAST, 0,
+        UnitType.NAGA, 0,
+        UnitType.DRAGON, 0,
+        UnitType.UNDEAD, 0,
+        UnitType.DEMON, 0,
+        UnitType.MECH, 0,
+        UnitType.ELEMENTAL, 0,
+        UnitType.ALL, 0);
+
+    public int tavern = 0;
   }
   
   public static class Counters

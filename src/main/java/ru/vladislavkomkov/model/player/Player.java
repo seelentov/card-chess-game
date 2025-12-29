@@ -683,7 +683,7 @@ public class Player
   
   public int getMaxMoney()
   {
-    return maxMoney + statistic.boosts.incMaxMoney;
+    return maxMoney;
   }
   
   public int getMaxMoneyBase()

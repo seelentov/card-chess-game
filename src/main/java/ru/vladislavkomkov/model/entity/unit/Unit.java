@@ -591,10 +591,10 @@ public abstract class Unit extends Entity
   {
     return false;
   }
-  
+
   @Override
   public void buildFace(Player player)
   {
-    
+
   }
 }

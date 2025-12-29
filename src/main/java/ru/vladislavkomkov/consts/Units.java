@@ -45,10 +45,7 @@ public class Units
   
   static void setupUnitsDebug()
   {
-    units.add(new Alleycat());
-    units.add(new RisenRider());
-    units.add(new SprightlyScarab());
-    units.add(new DeepBlueCrooner());
+    setupUnits();
   }
   
   static void setupUnits()
