@@ -16,6 +16,7 @@ import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.fight.FightEvent;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.ListenerUtils;
+import ru.vladislavkomkov.util.ReflectUtils;
 import ru.vladislavkomkov.util.UUIDUtils;
 
 public abstract class Entity extends GObject
@@ -132,18 +133,7 @@ public abstract class Entity extends GObject
   
   public Entity newBase()
   {
-    Supplier<? extends Entity> supplier = () -> {
-      try
-      {
-        return this.getClass().getDeclaredConstructor().newInstance();
-      }
-      catch (Exception e)
-      {
-        throw new RuntimeException(e);
-      }
-    };
-    
-    return supplier.get();
+    return ReflectUtils.getInstance(this.getClass(), playerLink);
   }
   
   public Entity newGold()

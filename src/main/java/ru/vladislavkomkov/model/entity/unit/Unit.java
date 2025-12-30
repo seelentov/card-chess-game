@@ -458,19 +458,27 @@ public abstract class Unit extends Entity
   
   public void onDead(Game game, Fight fight, Player player, Player player2, Unit attacker)
   {
+    onDead(game, fight, player, player2, attacker, true);
+  }
+  
+  public void onDead(Game game, Fight fight, Player player, Player player2, Unit attacker, boolean processDead)
+  {
     processListeners(
         ListenerUtils.getPlayerListener(fight, player).onDeadListeners,
         (action) -> action.process(game, fight, player, player2, this, attacker), player);
     
     listener.processOnDeadListeners(game, fight, player, player2, this, attacker);
     
-    if (fight != null)
+    if (processDead)
     {
-      fight.removeFromFightTable(player, this);
-    }
-    else
-    {
-      player.removeFromTable(this);
+      if (fight != null)
+      {
+        fight.removeFromFightTable(player, this);
+      }
+      else
+      {
+        player.removeFromTable(this);
+      }
     }
     
     if (fight != null)

@@ -4,40 +4,30 @@ import java.util.List;
 
 import ru.vladislavkomkov.consts.Units;
 import ru.vladislavkomkov.model.entity.unit.Unit;
-import ru.vladislavkomkov.model.player.Player;
 
 public class UnitUtils
 {
-  public static List<Unit> getAll(Player player)
+  public static List<Unit> getAll()
   {
-    return get(Units.units, player);
+    return get(Units.units);
   };
   
-  public static List<Unit> getTavern(Player player)
+  public static List<Unit> getTavern()
   {
-    return get(Units.tavernUnits, player);
+    return get(Units.tavernUnits);
   };
   
-  private static List<Unit> get(List<Class<? extends Unit>> list, Player player)
+  private static List<Unit> get(List<Class<? extends Unit>> list)
   {
-    return (List<Unit>) list.stream().map(unit -> {
-      try
-      {
-        return unit.getDeclaredConstructor(Player.class).newInstance(player);
-      }
-      catch (Exception e)
-      {
-        throw new RuntimeException(e);
-      }
-    }).toList();
+    return (List<Unit>) list.stream().map(ReflectUtils::getInstance).toList();
   }
   
-  public static List<Class<? extends Unit>> getByTavern(int lvl, Player player)
+  public static List<Class<? extends Unit>> getByTavern(int lvl)
   {
-    return getByTavern(lvl, true, player);
+    return getByTavern(lvl, true);
   };
   
-  public static List<Class<? extends Unit>> getByTavern(int lvl, boolean isTavern, Player player)
+  public static List<Class<? extends Unit>> getByTavern(int lvl, boolean isTavern)
   {
     List<Class<? extends Unit>> units = isTavern ? Units.tavernUnits : Units.units;
     return getByTavern(lvl, units);
@@ -45,15 +35,6 @@ public class UnitUtils
   
   public static List<Class<? extends Unit>> getByTavern(int lvl, List<Class<? extends Unit>> pool)
   {
-    return pool.stream().filter(unit -> {
-      try
-      {
-        return unit.getDeclaredConstructor().newInstance().getLevel() == lvl;
-      }
-      catch (Exception e)
-      {
-        throw new RuntimeException(e);
-      }
-    }).toList();
+    return pool.stream().filter(unit -> ReflectUtils.getInstance(unit).getLevel() == lvl).toList();
   };
 }

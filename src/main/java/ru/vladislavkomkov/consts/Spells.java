@@ -6,6 +6,7 @@ import java.util.List;
 import ru.vladislavkomkov.model.entity.spell.Spell;
 import ru.vladislavkomkov.model.entity.spell.impl.first.TavernCoin;
 import ru.vladislavkomkov.model.entity.spell.impl.second.StrikeOil;
+import ru.vladislavkomkov.util.ReflectUtils;
 
 public class Spells
 {
@@ -27,16 +28,9 @@ public class Spells
   static void setupTavern()
   {
     spells.forEach(unit -> {
-      try
+      if (ReflectUtils.getInstance(unit).isTavern())
       {
-        if (unit.getDeclaredConstructor().newInstance().isTavern())
-        {
-          tavernSpells.add(unit);
-        }
-      }
-      catch (Exception e)
-      {
-        throw new RuntimeException(e);
+        tavernSpells.add(unit);
       }
     });
   }

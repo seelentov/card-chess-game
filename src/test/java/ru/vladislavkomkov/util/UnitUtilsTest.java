@@ -17,7 +17,7 @@ public class UnitUtilsTest
   @Test
   void testGetUnits()
   {
-    var units = UnitUtils.getAll(new Player());
+    var units = UnitUtils.getAll();
     
     assertNotNull(units);
     assertFalse(units.isEmpty());
@@ -26,7 +26,7 @@ public class UnitUtilsTest
   @Test
   void testGetTavernUnits()
   {
-    var units = UnitUtils.getTavern(new Player());
+    var units = UnitUtils.getTavern();
     
     assertNotNull(units);
     units.forEach(unit -> assertTrue(unit.isTavern()));
@@ -39,20 +39,11 @@ public class UnitUtilsTest
     {
       int fLevel = level;
       
-      var units = UnitUtils.getByTavern(fLevel, new Player());
+      var units = UnitUtils.getByTavern(fLevel);
       
       assertNotNull(units);
       
-      units.forEach(unit -> {
-        try
-        {
-          assertEquals(fLevel, unit.getDeclaredConstructor().newInstance().getLevel());
-        }
-        catch (Exception e)
-        {
-          throw new RuntimeException(e);
-        }
-      });
+      units.forEach(unit -> assertEquals(fLevel, ReflectUtils.getInstance(unit).getLevel()));
     }
   }
   

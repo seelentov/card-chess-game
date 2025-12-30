@@ -14,6 +14,7 @@ import ru.vladislavkomkov.model.entity.Entity;
 import ru.vladislavkomkov.model.entity.spell.Spell;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.util.RandUtils;
+import ru.vladislavkomkov.util.ReflectUtils;
 import ru.vladislavkomkov.util.SpellUtils;
 import ru.vladislavkomkov.util.UnitUtils;
 
@@ -196,14 +197,8 @@ public class Tavern
     List<Class<? extends Unit>> units = getAvailableUnitsWithFallback(targetLevel, level);
     
     Class<? extends Unit> unit = units.get(RandUtils.getRand(units.size() - 1));
-    try
-    {
-      return new Card(unit.getDeclaredConstructor(Player.class).newInstance(player));
-    }
-    catch (Exception e)
-    {
-      throw new RuntimeException(e);
-    }
+    
+    return new Card(ReflectUtils.getInstance(unit, player));
   }
   
   void addRandomSpell(int level)
@@ -212,14 +207,8 @@ public class Tavern
     List<Class<? extends Spell>> spells = getAvailableSpellsWithFallback(targetLevel, level);
     
     Class<? extends Spell> spell = spells.get(RandUtils.getRand(spells.size() - 1));
-    try
-    {
-      add(new Card(spell.getDeclaredConstructor(Player.class).newInstance(player)));
-    }
-    catch (Exception e)
-    {
-      throw new RuntimeException(e);
-    }
+    
+    add(new Card(ReflectUtils.getInstance(spell, player)));
   }
   
   List<Class<? extends Unit>> getAvailableUnitsWithFallback(int targetLevel, int maxLevel)

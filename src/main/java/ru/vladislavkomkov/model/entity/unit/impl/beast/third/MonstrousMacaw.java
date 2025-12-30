@@ -1,4 +1,4 @@
-package ru.vladislavkomkov.model.entity.unit.impl.dragon.fourth;
+package ru.vladislavkomkov.model.entity.unit.impl.beast.third;
 
 import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
 import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
@@ -10,39 +10,38 @@ import ru.vladislavkomkov.model.entity.unit.UnitType;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.RandUtils;
 
-public class Greenskeeper extends Unit
+public class MonstrousMacaw extends Unit
 {
-  public Greenskeeper()
+  public MonstrousMacaw()
   {
     this(DUMP_PLAYER);
   }
   
-  public Greenskeeper(Player playerLink)
+  public MonstrousMacaw(Player player)
   {
-    super(playerLink);
-    
-    unitType = List.of(UnitType.DRAGON);
+    super(player);
     
     attack = 4;
     
-    maxHealth = 5;
+    maxHealth = 3;
+    
+    unitType = List.of(UnitType.BEAST);
     
     isTavern = true;
     
-    level = 4;
+    level = 3;
     
     listener.onAttackListeners.put(
         KEY_CORE,
         (game, fight, player1, player2, unit1, attacked) -> {
           List<Unit> units = fight != null ? fight.getFightTable(player1) : player1.getTable();
-          for (int i = units.size() - 1; i >= 0; i--)
+          for (Unit unit : units)
           {
-            Unit unit = units.get(i);
-            if (unit.isAnswerOnPlayed())
+            if (unit.isAnswerOnDead())
             {
-              for (int j = 0; j < (isGold() ? 2 : 1); j++)
+              for (int i = 0; i < (isGold() ? 2 : 1); i++)
               {
-                unit.onPlayed(game, fight, player1, RandUtils.getRand(units.size()), true);
+                unit.onDead(game, fight, player1, player2, null, false);
               }
               break;
             }
@@ -55,6 +54,7 @@ public class Greenskeeper extends Unit
   @Override
   public String getDescription()
   {
-    return "Rally: Trigger your right-most Battlecry" + (isGold ? " twice" : "");
+    return "Rally: Trigger your left-most Deathrattle" + (isGold() ? " twice" : "") + "\n" +
+        "(except this minion's).";
   }
 }

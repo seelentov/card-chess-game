@@ -1,4 +1,9 @@
-package ru.vladislavkomkov.model.entity.unit.impl.beast.second;
+package ru.vladislavkomkov.model.entity.unit.impl.none.third;
+
+import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
+import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
+
+import java.util.Optional;
 
 import ru.vladislavkomkov.model.entity.unit.Buff;
 import ru.vladislavkomkov.model.entity.unit.Unit;
@@ -6,41 +11,36 @@ import ru.vladislavkomkov.model.entity.unit.UnitType;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.UUIDUtils;
 
-import java.util.List;
-import java.util.Optional;
-
-import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
-import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
-
-public class HungrySnapjaw extends Unit
+public class BirdBuddy extends Unit
 {
+  public static int ATTACK_BOOST = 1;
   public static int HEALTH_BOOST = 1;
   
-  public HungrySnapjaw()
+  public BirdBuddy()
   {
     this(DUMP_PLAYER);
   }
   
-  public HungrySnapjaw(Player playerLink)
+  public BirdBuddy(Player player)
   {
-    super(playerLink);
+    super(player);
     
-    attack = 4;
-    
-    level = 2;
-    
-    maxHealth = 2;
-    
+    level = 3;
     isTavern = true;
     
-    unitType = List.of(UnitType.BEAST);
+    attack = 2;
+    
+    maxHealth = 4;
+    
+    actualHealth = getMaxHealth();
     
     String tempKey = UUIDUtils.generateKey();
     
     getListener().onAppearListeners.put(
         KEY_CORE,
         (g, f, p, e) -> {
-          if(f == null){
+          if (f == null)
+          {
             return;
           }
           f.getFightPlayer(p).getListener().onDeadListeners.put(
@@ -50,19 +50,7 @@ public class HungrySnapjaw extends Unit
                 {
                   if (fight != null)
                   {
-                    Optional<Unit> hj = fight.getFightUnit(player1, ID);
-                    if (hj.isPresent())
-                    {
-                      addBuff(hj.get());
-                      
-                      hj = player1.getTableUnit(ID);
-                      hj.ifPresent(this::addBuff);
-                    }
-                  }
-                  else
-                  {
-                    Optional<Unit> hj = player1.getTableUnit(ID);
-                    hj.ifPresent(this::addBuff);
+                    fight.getFightTable(player1).forEach(this::addBuff);
                   }
                 }
               });
@@ -77,21 +65,28 @@ public class HungrySnapjaw extends Unit
           }
           f.getFightPlayer(p).getListener().onDeadListeners.remove(tempKey);
         });
-    
-    actualHealth = getMaxHealth();
   }
   
   @Override
   public String getDescription()
   {
-    return "After a friendly Beast dies, gain +" + (HEALTH_BOOST * (isGold() ? 2 : 1)) + " Health permanently.";
+    int attack = ATTACK_BOOST * (isGold() ? 2 : 1);
+    int health = HEALTH_BOOST * (isGold() ? 2 : 1);
+    
+    return "Avenge (1): Give your Beasts +" + attack + "/+" + health + ".";
   }
   
   private void addBuff(Unit unit)
   {
     unit.addBuff(new Buff(
-        unit1 -> unit1.incHealth(HEALTH_BOOST * (isGold() ? 2 : 1)),
-        null,
+        unit1 -> {
+          unit1.incBaseAttack(ATTACK_BOOST * (isGold() ? 2 : 1));
+          unit1.incHealth(HEALTH_BOOST * (isGold() ? 2 : 1));
+        },
+        unit1 -> {
+          unit1.decBaseAttack(ATTACK_BOOST * (isGold() ? 2 : 1));
+          unit1.decHealth(HEALTH_BOOST * (isGold() ? 2 : 1));
+        },
         getDescription()));
   }
 }

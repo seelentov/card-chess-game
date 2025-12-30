@@ -23,6 +23,8 @@ import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cubling;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.demon.first.Imp;
 import ru.vladislavkomkov.model.entity.unit.impl.undead.first.RisenRider;
+import ru.vladislavkomkov.util.RandUtils;
+import ru.vladislavkomkov.util.ReflectUtils;
 
 public class Units
 {
@@ -96,16 +98,9 @@ public class Units
   static void setupTavernUnits()
   {
     units.forEach(unit -> {
-      try
+      if (ReflectUtils.getInstance(unit).isTavern())
       {
-        if (unit.getDeclaredConstructor().newInstance().isTavern())
-        {
-          tavernUnits.add(unit);
-        }
-      }
-      catch (Exception e)
-      {
-        throw new RuntimeException(e);
+        tavernUnits.add(unit);
       }
     });
   }

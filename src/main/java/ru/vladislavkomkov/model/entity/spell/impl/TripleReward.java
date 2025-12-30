@@ -13,6 +13,7 @@ import ru.vladislavkomkov.model.entity.spell.Spell;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.RandUtils;
+import ru.vladislavkomkov.util.ReflectUtils;
 import ru.vladislavkomkov.util.UnitUtils;
 
 public class TripleReward extends Spell
@@ -68,21 +69,10 @@ public class TripleReward extends Spell
               allUnits.get(ints.get(2)));
           
           List<Card> units = unitClasses.stream()
-              .map(unitClass -> {
-                try
-                {
-                  return unitClass
-                      .getDeclaredConstructor(Player.class)
-                      .newInstance(player);
-                }
-                catch (Exception e)
-                {
-                  throw new RuntimeException(e);
-                }
-              })
+              .map(unitClass -> ReflectUtils.getInstance(unitClass, playerLink))
               .map(unit -> (Card) Card.of(unit))
               .toList();
-              
+          
           player.putSenderWaiter((param) -> {
             if (param < 0 || param > 3)
             {

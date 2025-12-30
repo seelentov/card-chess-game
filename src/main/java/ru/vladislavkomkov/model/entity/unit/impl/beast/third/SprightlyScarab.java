@@ -33,7 +33,6 @@ public class SprightlyScarab extends Choicer
     
     attack = 3;
     
-    actualHealth = 3;
     maxHealth = 3;
     
     unitType = List.of(UnitType.BEAST);

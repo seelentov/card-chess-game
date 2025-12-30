@@ -7,14 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-import ru.vladislavkomkov.model.player.Player;
-
 public class SpellUtilsTest
 {
   @Test
   void testGetAll()
   {
-    var units = SpellUtils.getAll(new Player());
+    var units = SpellUtils.getAll();
     
     assertNotNull(units);
     assertFalse(units.isEmpty());
@@ -23,7 +21,7 @@ public class SpellUtilsTest
   @Test
   void testGetTavern()
   {
-    var units = SpellUtils.getTavern(new Player());
+    var units = SpellUtils.getTavern();
     
     assertNotNull(units);
     units.forEach(unit -> assertTrue(unit.isTavern()));
@@ -36,20 +34,11 @@ public class SpellUtilsTest
     {
       int fLevel = level;
       
-      var units = SpellUtils.getByTavern(fLevel, new Player());
+      var units = SpellUtils.getByTavern(fLevel);
       
       assertNotNull(units);
       
-      units.forEach(unit -> {
-        try
-        {
-          assertEquals(fLevel, unit.getDeclaredConstructor().newInstance().getLevel());
-        }
-        catch (Exception e)
-        {
-          throw new RuntimeException(e);
-        }
-      });
+      units.forEach(unit -> assertEquals(fLevel, ReflectUtils.getInstance(unit).getLevel()));
     }
   }
 }
