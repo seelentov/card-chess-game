@@ -113,7 +113,11 @@ public class Fight
     getFightTable(player).removeIf(unit1 -> unit1 == unit);
     unit.onDisappear(game, this, player);
   }
-  
+
+  public Optional<Unit> getFightUnit(Player player, String ID){
+    return getFightTable(player).stream().filter(unit -> unit.getID().equals(ID)).findFirst();
+  }
+
   public List<Unit> getFightTable(Player player)
   {
     if (player == fightPlayer1.player)
@@ -157,6 +161,7 @@ public class Fight
       if (item != null)
       {
         fightPlayer1.units.add(item);
+        item.onAppear(game, this, fightPlayer1.getPlayer());
       }
     }
     
@@ -165,6 +170,7 @@ public class Fight
       if (item != null)
       {
         fightPlayer2.units.add(item);
+        item.onAppear(game, this, fightPlayer2.getPlayer());
       }
     }
     

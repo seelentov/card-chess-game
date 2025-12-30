@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javafx.util.Pair;
 import ru.vladislavkomkov.consts.Spells;
 import ru.vladislavkomkov.consts.Units;
 import ru.vladislavkomkov.controller.sender.Sender;
@@ -27,6 +26,7 @@ import ru.vladislavkomkov.model.event.Event;
 import ru.vladislavkomkov.model.event.data.SenderWaiterDataReq;
 import ru.vladislavkomkov.util.RandUtils;
 import ru.vladislavkomkov.util.UUIDUtils;
+import ru.vladislavkomkov.util.models.Pair;
 
 public class Player
 {

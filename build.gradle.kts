@@ -35,7 +35,7 @@ tasks.test {
 }
 
 application {
-    mainClass.set("ru.vladislavkomkov.controller.Server")
+    mainClass.set("ru.vladislavkomkov.controller.ServerDev")
 }
 
 //tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {

@@ -57,7 +57,7 @@ public class Manasaber extends Unit
   @Override
   public String getDescription()
   {
-    Unit sub = isGold ? new Cubling(playerLink).buildGold() : new Cat(playerLink);
+    Unit sub = isGold ? new Cubling(playerLink).buildGold() : new Cubling(playerLink);
     return "Summon a " + sub.getAttack() + "/" + sub.getHealth() + " Cat";
   }
 }
