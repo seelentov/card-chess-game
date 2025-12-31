@@ -1,5 +1,5 @@
 package ru.vladislavkomkov.model.action;
 
-public interface OnDisappearAction extends PrepareAction
+public interface OnDisappearAction extends OnAppearDisappearAction
 {
 }

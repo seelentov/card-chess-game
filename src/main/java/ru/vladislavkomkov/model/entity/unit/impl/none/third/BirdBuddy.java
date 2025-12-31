@@ -3,8 +3,6 @@ package ru.vladislavkomkov.model.entity.unit.impl.none.third;
 import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
 import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
 
-import java.util.Optional;
-
 import ru.vladislavkomkov.model.entity.unit.Buff;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.UnitType;
@@ -38,7 +36,7 @@ public class BirdBuddy extends Unit
     
     getListener().onAppearListeners.put(
         KEY_CORE,
-        (g, f, p, e) -> {
+        (g, f, p, e, isSetup) -> {
           if (f == null)
           {
             return;

@@ -421,7 +421,8 @@ public class Fight
   
   void afterFight()
   {
-    // Пустой метод, как и было
+    fightPlayer1.units.forEach(unit -> unit.onDisappear(game, this, fightPlayer1.player));
+    fightPlayer2.units.forEach(unit -> unit.onDisappear(game, this, fightPlayer2.player));
   }
   
   public int getTurn()

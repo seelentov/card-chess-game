@@ -5,6 +5,6 @@ import ru.vladislavkomkov.model.entity.Entity;
 import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.player.Player;
 
-public interface OnAppearAction extends OnAppearDisappearAction
-{
+public interface OnAppearDisappearAction {
+    void process(Game game, Fight fight, Player player, Entity entity, boolean isSetup);
 }

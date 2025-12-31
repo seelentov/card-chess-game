@@ -52,6 +52,39 @@ public class BirdBuddyTest extends UnitTestCase
     }
     
     @Test
+    void testOnDeadGold()
+    {
+        player.addToTable(new Cat(player));
+        player.addToTable(new Cat(player));
+        player.addToTable(new Cat(player));
+        player.addToTable(new Cat(player));
+        player.addToTable(new Cat(player));
+        player.addToTable(new Cat(player));
+        
+        player.getTable().forEach(unit -> unit.setIsTaunt(true));
+        
+        player.addToTable(new BirdBuddy(player).buildGold());
+        
+        Unit unit21 = new Cat();
+        unit21.setBaseAttack(999);
+        unit21.setHealth(999);
+        player2.addToTable(unit21);
+        
+        Fight fight = new Fight(game, player, player2);
+        
+        for (int i = 1; i < player.getTable().size(); i++)
+        {
+            int finalI = (i * 2) - 1;
+            fight.getFightTable(player).stream().filter(unit -> unit instanceof Cat).forEach(unit -> {
+                assertEquals(finalI, unit.getAttack());
+                assertEquals(finalI, unit.getHealth());
+            });
+            
+            fight.doTurn();
+        }
+    }
+    
+    @Test
     void testOnDeadIfDead()
     {
         player.addToTable(new Cat(player));

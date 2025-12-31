@@ -8,6 +8,10 @@ import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.impl.beast.first.Alleycat;
 import ru.vladislavkomkov.model.entity.unit.impl.beast.first.Manasaber;
 import ru.vladislavkomkov.model.entity.unit.impl.beast.second.HummingBird;
+import ru.vladislavkomkov.model.entity.unit.impl.beast.second.HungrySnapjaw;
+import ru.vladislavkomkov.model.entity.unit.impl.beast.second.SewerRat;
+import ru.vladislavkomkov.model.entity.unit.impl.beast.third.MonstrousMacaw;
+import ru.vladislavkomkov.model.entity.unit.impl.beast.third.SlyRaptor;
 import ru.vladislavkomkov.model.entity.unit.impl.beast.third.SprightlyScarab;
 import ru.vladislavkomkov.model.entity.unit.impl.demon.first.IckyImp;
 import ru.vladislavkomkov.model.entity.unit.impl.dragon.fourth.Greenskeeper;
@@ -55,14 +59,16 @@ public class Units
     // BEASTS
     // 1
     units.add(Alleycat.class);
-    units.add(Cat.class);
     units.add(Manasaber.class);
-    units.add(Cubling.class);
     
     // 2
     units.add(HummingBird.class);
+    units.add(HungrySnapjaw.class);
+    units.add(SewerRat.class);
     
     // 3
+    units.add(MonstrousMacaw.class);
+    units.add(SlyRaptor.class);
     units.add(SprightlyScarab.class);
     
     // UNDEAD
@@ -72,7 +78,6 @@ public class Units
     // DEMONS
     // 1
     units.add(IckyImp.class);
-    units.add(Imp.class);
     
     // DRAGONS
     // 4

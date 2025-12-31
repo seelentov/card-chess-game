@@ -386,6 +386,8 @@ public abstract class Unit extends Entity
   
   public void onAttack(Game game, Fight fight, Player player, Player player2, Unit attacked)
   {
+    this.isDisguise = false;
+    
     processListeners(
         ListenerUtils.getPlayerListener(fight, player).onAttackListeners,
         (action) -> action.process(game, fight, player, player2, this, attacked), player);
@@ -491,7 +493,7 @@ public abstract class Unit extends Entity
   {
     processListeners(
         ListenerUtils.getPlayerListener(fight, player).onAppearListeners,
-        (action) -> action.process(game, fight, player, this), player);
+        (action) -> action.process(game, fight, player, this, ), player);
     
     listener.processOnAppearListeners(game, fight, player, this);
     
@@ -501,7 +503,7 @@ public abstract class Unit extends Entity
     }
   }
   
-  public void onDisappear(Game game, Fight fight, Player player)
+  public void onDisappear(Game game, Fight fight, Player player, )
   {
     processListeners(
         ListenerUtils.getPlayerListener(fight, player).onDisappearListeners,
