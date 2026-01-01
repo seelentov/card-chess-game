@@ -2,8 +2,7 @@ package ru.vladislavkomkov.model.entity.unit.impl.beast.second;
 
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.UnitType;
-import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
-import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cubling;
+import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.HalfShell;
 import ru.vladislavkomkov.model.player.Player;
 
 import java.util.List;
@@ -32,6 +31,8 @@ public class SewerRat extends Unit
     
     unitType = List.of(UnitType.BEAST);
     
+    isTaunt = true;
+    
     listener.onDeadListeners.put(
         KEY_CORE,
         (game, fight, player1, player2, unit, attacker) -> {
@@ -55,29 +56,4 @@ public class SewerRat extends Unit
     Unit sub = isGold ? new HalfShell(playerLink).buildGold() : new HalfShell(playerLink);
     return "Deathrattle: Summon a " + sub.getAttack() + "/" + sub.getHealth() + " Turtle with Taunt.";
   }
-  
-  public static class HalfShell extends Unit
-  {
-    public HalfShell()
-    {
-      this(DUMP_PLAYER);
-    }
-    
-    public HalfShell(Player playerLink)
-    {
-      super(playerLink);
-      
-      attack = 2;
-      maxHealth = 3;
-      
-      isTaunt = true;
-      
-      level = 1;
-      
-      unitType = List.of(UnitType.BEAST);
-      
-      actualHealth = getMaxHealth();
-    }
-  }
-  
 }

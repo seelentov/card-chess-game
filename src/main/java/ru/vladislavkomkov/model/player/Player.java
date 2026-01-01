@@ -290,7 +290,9 @@ public class Player
       table.add(index, unit);
     }
     
+    unit.onSummoned(game, null, this);
     unit.onAppear(game, null, this);
+    
     sendTable();
     return true;
   }
@@ -309,8 +311,8 @@ public class Player
   {
     if (game != null)
     {
-      unit.onDisappear(game, null, this);
       table.removeIf(unit1 -> unit1 == unit);
+      unit.onDisappear(game, null, this);
       sendTable();
     }
   }
@@ -319,8 +321,8 @@ public class Player
   {
     if (index >= 0 && index < table.size())
     {
-      table.get(index).onDisappear(game, null, this);
       table.remove(index);
+      table.get(index).onDisappear(game, null, this);
       sendTable();
     }
   }

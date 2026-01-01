@@ -7,7 +7,6 @@ import java.util.List;
 
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.UnitType;
-import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cubling;
 import ru.vladislavkomkov.model.player.Player;
 

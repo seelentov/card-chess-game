@@ -1,34 +1,39 @@
-package ru.vladislavkomkov.model.entity.unit.impl.none.third;
+package ru.vladislavkomkov.model.entity.unit.impl.beast.fourth;
 
 import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
 import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
 
+import java.util.List;
+
+import ru.vladislavkomkov.model.Listener;
 import ru.vladislavkomkov.model.entity.unit.Buff;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.UnitType;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.UUIDUtils;
 
-public class BirdBuddy extends Unit
+public class MamaBear extends Unit
 {
-  public static int ATTACK_BOOST = 1;
-  public static int HEALTH_BOOST = 1;
+  public static int ATTACK_BOOST = 6;
+  public static int HEALTH_BOOST = 6;
   
-  public BirdBuddy()
+  public MamaBear()
   {
     this(DUMP_PLAYER);
   }
   
-  public BirdBuddy(Player player)
+  public MamaBear(Player player)
   {
     super(player);
     
-    level = 3;
+    level = 4;
     isTavern = true;
     
-    attack = 2;
+    attack = 6;
     
-    maxHealth = 4;
+    maxHealth = 6;
+    
+    unitType = List.of(UnitType.BEAST);
     
     actualHealth = getMaxHealth();
     
@@ -37,19 +42,16 @@ public class BirdBuddy extends Unit
     getListener().onAppearListeners.put(
         KEY_CORE,
         (g, f, p, e) -> {
-          if (f == null)
-          {
-            return;
-          }
-          f.getFightPlayer(p).getListener().onDeadListeners.put(
+          Listener listener = f != null
+              ? f.getFightPlayer(p).getListener()
+              : p.getListener();
+          
+          listener.onSummonedListeners.put(
               tempKey,
-              (game, fight, player1, player2, unit, attacker) -> {
-                if (unit.isType(UnitType.BEAST) && !unit.getID().equals(getID()))
+              (game, fight, player1, unit) -> {
+                if (((Unit) unit).isType(UnitType.BEAST))
                 {
-                  if (fight != null)
-                  {
-                    fight.getFightTable(player1).forEach(this::addBuff);
-                  }
+                  addBuff((Unit) unit);
                 }
               });
         });
@@ -57,11 +59,11 @@ public class BirdBuddy extends Unit
     getListener().onDisappearListeners.put(
         KEY_CORE,
         (g, f, p, e) -> {
-          if (f == null)
-          {
-            return;
-          }
-          f.getFightPlayer(p).getListener().onDeadListeners.remove(tempKey);
+          Listener listener = f != null
+              ? f.getFightPlayer(p).getListener()
+              : p.getListener();
+          
+          listener.onSummonedListeners.remove(tempKey);
         });
   }
   
@@ -70,8 +72,7 @@ public class BirdBuddy extends Unit
   {
     int attack = ATTACK_BOOST * (isGold() ? 2 : 1);
     int health = HEALTH_BOOST * (isGold() ? 2 : 1);
-    
-    return "Avenge (1): Give your Beasts +" + attack + "/+" + health + ".";
+    return "Whenever you summon a Beast, give it +" + attack + "/+" + health + ".";
   }
   
   private void addBuff(Unit unit)
@@ -81,10 +82,7 @@ public class BirdBuddy extends Unit
           unit1.incBaseAttack(ATTACK_BOOST * (isGold() ? 2 : 1));
           unit1.incHealth(HEALTH_BOOST * (isGold() ? 2 : 1));
         },
-        unit1 -> {
-          unit1.decBaseAttack(ATTACK_BOOST * (isGold() ? 2 : 1));
-          unit1.decHealth(HEALTH_BOOST * (isGold() ? 2 : 1));
-        },
+        null,
         getDescription()));
   }
 }

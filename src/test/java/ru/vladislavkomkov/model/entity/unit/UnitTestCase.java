@@ -3,9 +3,14 @@ package ru.vladislavkomkov.model.entity.unit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Optional;
 
 import ru.vladislavkomkov.GamePlayerTestCase;
 import ru.vladislavkomkov.model.card.Card;
+import ru.vladislavkomkov.model.entity.spell.impl.TripleReward;
+import ru.vladislavkomkov.model.entity.unit.impl.naga.fourth.DeepBlueCrooner;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
 import ru.vladislavkomkov.model.fight.Fight;
 
@@ -61,21 +66,20 @@ public abstract class UnitTestCase extends GamePlayerTestCase
     player.incLevel();
     
     player.addToTable(unit);
-    assertEquals(0, player.cloneHand().size());
     assertEquals(1, player.getUnitsCount());
     
     player.addToHand(Card.of(unit.newBase()));
-    assertEquals(1, player.cloneHand().size());
     assertEquals(1, player.getUnitsCount());
     
     player.addToHand(Card.of(unit.newBase()));
-    assertEquals(1, player.cloneHand().size());
+    Optional<Card> gold = player.getHand().stream().filter(card -> card.getEntity().getName().equals(unit.getName()) && card.getEntity().isGold()).findFirst();
+    
+    assertTrue(gold.isPresent());
     assertEquals(0, player.getUnitsCount());
     
-    Unit gold = (Unit) player.cloneHand().get(0).getEntity();
-    assertEquals(unit.getName(), gold.getName());
-    assertEquals(unit.getAttack() * 2, gold.getAttack());
-    assertEquals(unit.getHealth() * 2, gold.getHealth());
+    assertEquals(unit.getName(), gold.get().getEntity().getName());
+    assertEquals(unit.getAttack() * 2, ((Unit)gold.get().getEntity()).getAttack());
+    assertEquals(unit.getHealth() * 2, ((Unit)gold.get().getEntity()).getHealth());
     
     tearDown();
   }
@@ -157,7 +161,7 @@ public abstract class UnitTestCase extends GamePlayerTestCase
     
     fight.doTurn();
     
-    assertEquals(startHealth - (unit1.getAttack() * attacksCount), fight.getFightTable(player2).get(0).getHealth());
+    assertEquals(startHealth - (fight.getFightTable(player).get(0).getAttack() * attacksCount), fight.getFightTable(player2).get(0).getHealth());
     
     tearDown();
   }

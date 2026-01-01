@@ -59,59 +59,47 @@ public class Fight
         data,
         player));
   }
-  
-  public void addToFightTable(Player player, Unit unit, Unit parent)
-  {
-    addToFightTable(player, unit, parent, false);
+  public void addToFightTable(Player player, Unit unit, Unit parent, boolean withoutOne) {
+    int index = -1;
+    List<Unit> table = getFightTable(player);
+    int parentIndex = table.indexOf(parent);
+    if (parentIndex != -1) {
+      index = parentIndex + 1;
+    }
+    addToFightTableInternal(player, unit, index, withoutOne);
   }
   
-  public void addToFightTable(Player player, Unit unit, Unit parent, boolean withoutOne)
-  {
+  public void addToFightTable(Player player, Unit unit, int index, boolean withoutOne) {
+    addToFightTableInternal(player, unit, index, withoutOne);
+  }
+  
+  private void addToFightTableInternal(Player player, Unit unit, int index, boolean withoutOne) {
     List<Unit> table = getFightTable(player);
     
-    if ((table.size() - (withoutOne ? 1 : 0)) == Player.TABLE_LIMIT)
-    {
+    if ((table.size() - (withoutOne ? 1 : 0)) == Player.TABLE_LIMIT) {
       return;
     }
     
-    int indexParent = table.indexOf(parent);
-    if ((indexParent + 1) > table.size())
-    {
+    if (index >= table.size() || index == -1) {
       table.add(unit);
-    }
-    else
-    {
-      table.add(indexParent + 1, unit);
-    }
-    
-    unit.onAppear(game, this, player);
-  }
-  
-  public void addToFightTable(Player player, Unit unit, int index)
-  {
-    List<Unit> table = getFightTable(player);
-    
-    if (table.size() == Player.TABLE_LIMIT)
-    {
-      return;
-    }
-    
-    if ((index) >= table.size())
-    {
-      table.add(unit);
-    }
-    else
-    {
+    } else {
       table.add(index, unit);
     }
     
     unit.onAppear(game, this, player);
+    unit.onSummoned(game, this, player);
   }
   
   public void removeFromFightTable(Player player, Unit unit)
   {
     getFightTable(player).removeIf(unit1 -> unit1 == unit);
     unit.onDisappear(game, this, player);
+  }
+  
+  public void removeFromFightTable(Player player, int index)
+  {
+    Unit unit = getFightTable(player).get(index);
+    removeFromFightTable(player, unit);
   }
 
   public Optional<Unit> getFightUnit(Player player, String ID){
@@ -156,6 +144,8 @@ public class Fight
     fightPlayer1.units.clear();
     fightPlayer2.units.clear();
     
+    addToHistory(FightEvent.Type.START, fightPlayer1.player, null);
+    
     for (Unit item : fightPlayer1.player.cloneTable())
     {
       if (item != null)
@@ -189,8 +179,6 @@ public class Fight
     {
       turn = RandUtils.getRand(1);
     }
-    
-    addToHistory(FightEvent.Type.START, fightPlayer1.player, null);
   }
   
   Optional<FightInfo> handleFightEnd()

@@ -418,7 +418,16 @@ public class GameProcessorTest
     cat2Expected.setHealth(1);
     cat2Expected.setMaxHealth(1);
     
-    FightEvent evExpected = makeEvent(player1, FightEvent.Type.ON_APPEAR, List.of(catExpected),
+    FightEvent  evExpected = makeEvent(player1, FightEvent.Type.START, null,
+            List.of(catExpected),
+            List.of(cat2Expected));
+    
+    assertEqualsEvents(ev.get(), evExpected);
+    
+     ev = consumer.processFight();
+    assertTrue(ev.isPresent());
+    
+    evExpected = makeEvent(player1, FightEvent.Type.ON_APPEAR, List.of(catExpected),
             List.of(catExpected),
             List.of(cat2Expected));
     
@@ -430,15 +439,6 @@ public class GameProcessorTest
     evExpected = makeEvent(player2, FightEvent.Type.ON_APPEAR, List.of(cat2Expected),
             List.of(cat2Expected),
             List.of(catExpected));
-    
-    assertEqualsEvents(ev.get(), evExpected);
-    
-    ev = consumer.processFight();
-    assertTrue(ev.isPresent());
-    
-    evExpected = makeEvent(player1, FightEvent.Type.START, null,
-            List.of(catExpected),
-            List.of(cat2Expected));
     
     assertEqualsEvents(ev.get(), evExpected);
     
@@ -504,7 +504,16 @@ public class GameProcessorTest
             List.of(catExpected));
 
     assertEqualsEvents(ev.get(), evExpected);
-
+    
+    ev = consumer.processFight();
+    assertTrue(ev.isPresent());
+    
+    evExpected = makeEvent(player1, FightEvent.Type.ON_DISAPPEAR, List.of(catExpected),
+            List.of(catExpected),
+            List.of());
+    
+    assertEqualsEvents(ev.get(), evExpected);
+    
     ev = consumer.processFight();
     assertTrue(ev.isPresent());
     

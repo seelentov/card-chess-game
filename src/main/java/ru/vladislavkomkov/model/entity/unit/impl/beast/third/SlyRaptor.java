@@ -3,7 +3,6 @@ package ru.vladislavkomkov.model.entity.unit.impl.beast.third;
 import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
 import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import ru.vladislavkomkov.model.entity.unit.Unit;

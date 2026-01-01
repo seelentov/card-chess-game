@@ -3,6 +3,7 @@ package ru.vladislavkomkov.model.entity.unit.impl.beast.second;
 import org.junit.jupiter.api.Test;
 import ru.vladislavkomkov.model.entity.unit.UnitTestCase;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
+import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.HalfShell;
 import ru.vladislavkomkov.model.fight.Fight;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,7 +28,7 @@ public class SewerRatTest extends UnitTestCase
     fight.doTurn();
     fight.doTurn();
     
-    assertEquals(new SewerRat.HalfShell().getName(), fight.getFightTable(player).get(0).getName());
+    assertEquals(new HalfShell().getName(), fight.getFightTable(player).get(0).getName());
   }
   
   @Test
@@ -46,7 +47,7 @@ public class SewerRatTest extends UnitTestCase
     fight.doTurn();
     fight.doTurn();
     
-    assertEquals(new SewerRat.HalfShell().getName(), fight.getFightTable(player).get(0).getName());
-    assertEquals(new SewerRat.HalfShell().buildGold().getAttack(), fight.getFightTable(player).get(0).getAttack());
+    assertEquals(new HalfShell().getName(), fight.getFightTable(player).get(0).getName());
+    assertEquals(new HalfShell().buildGold().getAttack(), fight.getFightTable(player).get(0).getAttack());
   }
 }

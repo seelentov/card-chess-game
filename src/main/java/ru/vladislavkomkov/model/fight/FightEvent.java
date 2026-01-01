@@ -92,6 +92,7 @@ public class FightEvent
     ON_RESET_TAVERN,
     ON_INC_TAVERN_LEVEL,
     ON_APPEAR,
+    ON_SUMMONED,
     ON_DISAPPEAR
   }
 }

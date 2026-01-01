@@ -775,10 +775,55 @@ public class FightTest extends GamePlayerTestCase
     
     Fight fight = new Fight(game, player, player2);
     fight.getFightTable(player).get(0).getBuffs().add(new Buff(buff2Description));
-
+    
     fight.doTurn();
     
     assertEquals(1, fight.getFightTable(player).get(0).getBuffs().size());
     assertEquals(buff1Description, fight.getFightTable(player).get(0).getBuffs().get(0).getDescription());
+  }
+  
+  @Test
+  void testOnDeadSummon()
+  {
+    player.addToTable(new IckyImp(player));
+    player.addToTable(new IckyImp(player));
+    player.addToTable(new IckyImp(player));
+    player.addToTable(new IckyImp(player));
+    player.addToTable(new IckyImp(player));
+    player.addToTable(new IckyImp(player));
+    
+    Unit unit21 = new Cat(player2);
+    unit21.setHealth(9999);
+    unit21.setBaseAttack(9999);
+    player2.addToTable(unit21);
+    
+    Fight fight = new Fight(game, player, player2);
+    
+    fight.doTurn();
+    
+    assertEquals(2, fight.getFightTable(player).stream().filter(unit -> unit.getName().equals(new Imp().getName())).count());
+  }
+  
+  @Test
+  void testOnDeadSummonOverflow()
+  {
+    player.addToTable(new IckyImp(player));
+    player.addToTable(new IckyImp(player));
+    player.addToTable(new IckyImp(player));
+    player.addToTable(new IckyImp(player));
+    player.addToTable(new IckyImp(player));
+    player.addToTable(new IckyImp(player));
+    player.addToTable(new IckyImp(player));
+    
+    Unit unit21 = new Cat(player2);
+    unit21.setHealth(9999);
+    unit21.setBaseAttack(9999);
+    player2.addToTable(unit21);
+    
+    Fight fight = new Fight(game, player, player2);
+    
+    fight.doTurn();
+    
+    assertEquals(1, fight.getFightTable(player).stream().filter(unit -> unit.getName().equals(new Imp().getName())).count());
   }
 }

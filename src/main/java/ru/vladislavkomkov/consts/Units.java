@@ -7,6 +7,7 @@ import ru.vladislavkomkov.enviroment.Config;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.impl.beast.first.Alleycat;
 import ru.vladislavkomkov.model.entity.unit.impl.beast.first.Manasaber;
+import ru.vladislavkomkov.model.entity.unit.impl.beast.fourth.MamaBear;
 import ru.vladislavkomkov.model.entity.unit.impl.beast.second.HummingBird;
 import ru.vladislavkomkov.model.entity.unit.impl.beast.second.HungrySnapjaw;
 import ru.vladislavkomkov.model.entity.unit.impl.beast.second.SewerRat;
@@ -70,6 +71,9 @@ public class Units
     units.add(MonstrousMacaw.class);
     units.add(SlyRaptor.class);
     units.add(SprightlyScarab.class);
+    
+    //4
+    units.add(MamaBear.class);
     
     // UNDEAD
     // 1

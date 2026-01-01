@@ -41,7 +41,7 @@ public class DeepBlueCroonerTest extends SpellCrafterTestCase
     player.addToHand(Card.of(new DeepBlueCrooner().buildGold()));
     player.playCard(0, 0);
     
-    assertEquals(new DeepBlues().getName(), player.getHand().get(1).getEntity().getName());
-    assertTrue(player.getHand().get(1).getEntity().isGold());
+    assertEquals(new DeepBlues().getName(), player.getHand().get(0).getEntity().getName());
+    assertTrue(player.getHand().get(0).getEntity().isGold());
   }
 }

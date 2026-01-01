@@ -5,6 +5,6 @@ import ru.vladislavkomkov.model.entity.Entity;
 import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.player.Player;
 
-public interface OnAppearAction extends OnAppearDisappearAction
+public interface OnAppearAction extends PrepareAction
 {
 }

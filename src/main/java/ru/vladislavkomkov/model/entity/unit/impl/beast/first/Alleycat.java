@@ -35,7 +35,7 @@ public class Alleycat extends Unit
         (game, fight, player1, entity, input, auto) -> {
           if (fight != null)
           {
-            fight.addToFightTable(player1, isGold ? new Cat(player1).buildGold() : new Cat(player1), (Unit) entity);
+            fight.addToFightTable(player1, isGold ? new Cat(player1).buildGold() : new Cat(player1), (Unit) entity, false);
           }
           else
           {

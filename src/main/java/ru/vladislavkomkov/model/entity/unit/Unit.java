@@ -448,11 +448,11 @@ public abstract class Unit extends Entity
         
         if (fight != null)
         {
-          fight.addToFightTable(player, reCreated, indexOfThis);
+          fight.addToFightTable(player, reCreated, indexOfThis, false);
         }
         else
         {
-          player.addToTable(this, indexOfThis);
+          player.addToTable(this, indexOfThis, false);
         }
       }
     }
@@ -466,8 +466,8 @@ public abstract class Unit extends Entity
   public void onDead(Game game, Fight fight, Player player, Player player2, Unit attacker, boolean processDead)
   {
     processListeners(
-        ListenerUtils.getPlayerListener(fight, player).onDeadListeners,
-        (action) -> action.process(game, fight, player, player2, this, attacker), player);
+            ListenerUtils.getPlayerListener(fight, player).onDeadListeners,
+            (action) -> action.process(game, fight, player, player2, this, attacker), player);
     
     listener.processOnDeadListeners(game, fight, player, player2, this, attacker);
     
@@ -485,15 +485,15 @@ public abstract class Unit extends Entity
     
     if (fight != null)
     {
-      fight.addToHistory(FightEvent.Type.ON_DEAD, player, List.of(this, attacker));
+      fight.addToHistory(FightEvent.Type.ON_DEAD, player, attacker != null ? List.of(this, attacker) : List.of(this));
     }
   }
   
   public void onAppear(Game game, Fight fight, Player player)
   {
     processListeners(
-        ListenerUtils.getPlayerListener(fight, player).onAppearListeners,
-        (action) -> action.process(game, fight, player, this, ), player);
+            ListenerUtils.getPlayerListener(fight, player).onAppearListeners,
+            (action) -> action.process(game, fight, player, this), player);
     
     listener.processOnAppearListeners(game, fight, player, this);
     
@@ -503,7 +503,21 @@ public abstract class Unit extends Entity
     }
   }
   
-  public void onDisappear(Game game, Fight fight, Player player, )
+  public void onSummoned(Game game, Fight fight, Player player)
+  {
+    processListeners(
+            ListenerUtils.getPlayerListener(fight, player).onSummonedListeners,
+            (action) -> action.process(game, fight, player, this), player);
+    
+    listener.processOnSummonedListeners(game, fight, player, this);
+    
+    if (fight != null)
+    {
+      fight.addToHistory(FightEvent.Type.ON_SUMMONED, player, List.of(this));
+    }
+  }
+  
+  public void onDisappear(Game game, Fight fight, Player player)
   {
     processListeners(
         ListenerUtils.getPlayerListener(fight, player).onDisappearListeners,

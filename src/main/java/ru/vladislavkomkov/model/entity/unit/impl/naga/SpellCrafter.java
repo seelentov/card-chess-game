@@ -47,9 +47,9 @@ public abstract class SpellCrafter extends Unit
   }
   
   @Override
-  public void onPlayed(Game game, Fight fight, Player player, List<Integer> input, boolean auto)
+  public void onSummoned(Game game, Fight fight, Player player)
   {
-    super.onPlayed(game, fight, player, input, auto);
+    super.onSummoned(game, fight, player);
     addSpellCraft(player);
   }
   

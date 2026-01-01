@@ -21,6 +21,7 @@ import ru.vladislavkomkov.model.action.OnResetTavernAction;
 import ru.vladislavkomkov.model.action.OnSellAction;
 import ru.vladislavkomkov.model.action.OnStartFightAction;
 import ru.vladislavkomkov.model.action.OnStartTurnAction;
+import ru.vladislavkomkov.model.action.OnSummonedAction;
 import ru.vladislavkomkov.model.action.PrepareAction;
 import ru.vladislavkomkov.model.entity.Entity;
 import ru.vladislavkomkov.model.entity.unit.Unit;
@@ -44,6 +45,7 @@ public class Listener implements Cloneable
   public Map<String, OnResetTavernAction> onResetTavernListeners = new HashMap<>();
   public Map<String, OnIncTavernLevel> onIncLevelListeners = new HashMap<>();
   public Map<String, OnAppearAction> onAppearListeners = new HashMap<>();
+  public Map<String, OnSummonedAction> onSummonedListeners = new HashMap<>();
   public Map<String, OnDisappearAction> onDisappearListeners = new HashMap<>();
   
   public List<Map> listeners = List.of(
@@ -60,6 +62,7 @@ public class Listener implements Cloneable
       onResetTavernListeners,
       onIncLevelListeners,
       onAppearListeners,
+      onSummonedListeners,
       onDisappearListeners);
   
   public Listener()
@@ -251,6 +254,11 @@ public class Listener implements Cloneable
   public void processOnAppearListeners(Game game, Fight fight, Player player, Unit entity)
   {
     processPrepareListeners(onAppearListeners, game, fight, player, entity);
+  }
+  
+  public void processOnSummonedListeners(Game game, Fight fight, Player player, Unit entity)
+  {
+    processPrepareListeners(onSummonedListeners, game, fight, player, entity);
   }
   
   public void processOnDisappearListeners(Game game, Fight fight, Player player, Unit entity)

@@ -11,6 +11,7 @@ import ru.vladislavkomkov.model.entity.spell.impl.spellcraft.SpellCraft;
 import ru.vladislavkomkov.model.entity.unit.Buff;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.player.Player;
+import ru.vladislavkomkov.util.RandUtils;
 
 public class DeepBlues extends SpellCraft
 {
@@ -49,23 +50,31 @@ public class DeepBlues extends SpellCraft
           int attackBonus = getAttackBoost(multi);
           int hpBonus = getHealthBoost(multi);
           
+          boolean isTavernIndex;
+          int index;
           if (input.size() < 2)
           {
-            return;
+            isTavernIndex = RandUtils.getRand(1) == 1;
+            
+            int unitsCount = fight != null ? fight.getFightTable(player).size() : player.getTable().size();
+            index = RandUtils.getRand(unitsCount);
           }
-          
-          boolean isTavernIndex = input.get(1) == 1;
+          else
+          {
+            isTavernIndex = input.get(1) == 1;
+            index = input.get(0);
+          }
           
           Unit unit;
           if (!isTavernIndex)
           {
             unit = fight != null
-                ? fight.getFightTable(player).get(input.get(0))
-                : player.getTable().get(input.get(0));
+                ? fight.getFightTable(player).get(index)
+                : player.getTable().get(index);
           }
           else
           {
-            unit = (Unit) player.getTavern().getCards().get(input.get(0)).getCard().getEntity();
+            unit = (Unit) player.getTavern().getCards().get(index).getCard().getEntity();
           }
           
           unit.addBuff(

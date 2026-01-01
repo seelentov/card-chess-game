@@ -39,7 +39,7 @@ public class HungrySnapjaw extends Unit
     
     getListener().onAppearListeners.put(
         KEY_CORE,
-        (g, f, p, e, isSetup) -> {
+        (g, f, p, e) -> {
           if(f == null){
             return;
           }
