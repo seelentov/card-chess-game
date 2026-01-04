@@ -1,0 +1,53 @@
+package ru.vladislavkomkov.model.entity.unit.impl;
+
+import ru.vladislavkomkov.model.entity.unit.Unit;
+import ru.vladislavkomkov.model.player.Player;
+
+public class Extra extends Unit
+{
+  protected Action onPlayed = new Action(0, 0);
+  protected Action onDead = new Action(0, 0);
+  protected Action onEndTurn = new Action(0, 0);
+  
+  public Extra(Player player)
+  {
+    super(player);
+  }
+  
+  public static class Action
+  {
+    private final int isExtra;
+    private final int isTwice;
+    
+    public Action(int isExtra, int isTwice)
+    {
+      this.isExtra = isExtra;
+      this.isTwice = isTwice;
+    }
+    
+    public int getIsExtra()
+    {
+      return isExtra;
+    }
+    
+    public int getIsTwice()
+    {
+      return isTwice;
+    }
+  }
+  
+  public Action getOnPlayed()
+  {
+    return onPlayed;
+  }
+  
+  public Action getOnDead()
+  {
+    return onDead;
+  }
+  
+  public Action getOnEndTurn()
+  {
+    return onEndTurn;
+  }
+}

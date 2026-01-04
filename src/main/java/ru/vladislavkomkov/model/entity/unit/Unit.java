@@ -3,8 +3,10 @@ package ru.vladislavkomkov.model.entity.unit;
 import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -14,6 +16,7 @@ import ru.vladislavkomkov.model.entity.Entity;
 import ru.vladislavkomkov.model.entity.PlayPair;
 import ru.vladislavkomkov.model.entity.PlayType;
 import ru.vladislavkomkov.model.entity.spell.impl.TripleReward;
+import ru.vladislavkomkov.model.entity.unit.impl.Extra;
 import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.fight.FightEvent;
 import ru.vladislavkomkov.model.player.Player;
@@ -335,10 +338,14 @@ public abstract class Unit extends Entity
         ListenerUtils.getPlayerListener(fight, player).onEndTurnListeners,
         (action) -> action.process(game, fight, player), player);
     
-    listener.processOnEndTurnListeners(game, fight, player);
-    if (fight != null)
+    int extra = calcExtraAction(unit -> ((Extra) unit).getOnEndTurn(), player);
+    for (int i = 0; i < extra + 1; i++)
     {
-      fight.addToHistory(FightEvent.Type.ON_END_TURN, player, List.of(this));
+      listener.processOnEndTurnListeners(game, fight, player);
+      if (fight != null)
+      {
+        fight.addToHistory(FightEvent.Type.ON_END_TURN, player, List.of(this));
+      }
     }
   }
   
@@ -466,10 +473,18 @@ public abstract class Unit extends Entity
   public void onDead(Game game, Fight fight, Player player, Player player2, Unit attacker, boolean processDead)
   {
     processListeners(
-            ListenerUtils.getPlayerListener(fight, player).onDeadListeners,
-            (action) -> action.process(game, fight, player, player2, this, attacker), player);
+        ListenerUtils.getPlayerListener(fight, player).onDeadListeners,
+        (action) -> action.process(game, fight, player, player2, this, attacker), player);
     
-    listener.processOnDeadListeners(game, fight, player, player2, this, attacker);
+    int extra = calcExtraAction(unit -> ((Extra) unit).getOnDead(), player);
+    for (int i = 0; i < extra + 1; i++)
+    {
+      listener.processOnDeadListeners(game, fight, player, player2, this, attacker);
+      if (fight != null)
+      {
+        fight.addToHistory(FightEvent.Type.ON_DEAD, player, attacker != null ? List.of(this, attacker) : List.of(this));
+      }
+    }
     
     if (processDead)
     {
@@ -482,18 +497,13 @@ public abstract class Unit extends Entity
         player.removeFromTable(this);
       }
     }
-    
-    if (fight != null)
-    {
-      fight.addToHistory(FightEvent.Type.ON_DEAD, player, attacker != null ? List.of(this, attacker) : List.of(this));
-    }
   }
   
   public void onAppear(Game game, Fight fight, Player player)
   {
     processListeners(
-            ListenerUtils.getPlayerListener(fight, player).onAppearListeners,
-            (action) -> action.process(game, fight, player, this), player);
+        ListenerUtils.getPlayerListener(fight, player).onAppearListeners,
+        (action) -> action.process(game, fight, player, this), player);
     
     listener.processOnAppearListeners(game, fight, player, this);
     
@@ -506,8 +516,8 @@ public abstract class Unit extends Entity
   public void onSummoned(Game game, Fight fight, Player player)
   {
     processListeners(
-            ListenerUtils.getPlayerListener(fight, player).onSummonedListeners,
-            (action) -> action.process(game, fight, player, this), player);
+        ListenerUtils.getPlayerListener(fight, player).onSummonedListeners,
+        (action) -> action.process(game, fight, player, this), player);
     
     listener.processOnSummonedListeners(game, fight, player, this);
     
@@ -534,7 +544,12 @@ public abstract class Unit extends Entity
   @Override
   public void onPlayed(Game game, Fight fight, Player player, List<Integer> input, boolean auto)
   {
-    super.onPlayed(game, fight, player, input, auto);
+    int extra = calcExtraAction(unit -> ((Extra) unit).getOnPlayed(), player);
+    for (int i = 0; i < extra + 1; i++)
+    {
+      super.onPlayed(game, fight, player, input, auto);
+    }
+    
     if (this.isGold())
     {
       player.addToHand(Card.of(new TripleReward(player, player.getLevel() + 1)), true);
@@ -640,5 +655,20 @@ public abstract class Unit extends Entity
   public String getDescription()
   {
     return "";
+  }
+  
+  private int calcExtraAction(Function<Unit, Extra.Action> function, Player player)
+  {
+    Optional<Integer> twiceTriple = player.getTable().stream()
+        .filter(unit -> unit instanceof Extra)
+        .map(unit -> function.apply(unit).getIsTwice())
+        .max(Comparator.naturalOrder());
+    
+    Optional<Integer> extra = player.getTable().stream()
+        .filter(unit -> unit instanceof Extra)
+        .map(unit -> function.apply(unit).getIsExtra())
+        .reduce(Integer::sum);
+    
+    return twiceTriple.orElse(0) + extra.orElse(0);
   }
 }

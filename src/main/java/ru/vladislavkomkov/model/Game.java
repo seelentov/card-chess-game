@@ -486,8 +486,8 @@ public class Game implements AutoCloseable
   {
     ListenerUtils.processGlobalActionListeners(
         player.getListener().onEndTurnListeners, this, null, player);
-    player.clearSpellCraft();
     player.doForAll(unit -> unit.onEndTurn(this, null, player));
+    player.clearSpellCraft();
   }
   
   public void processStartFight(Fight fight, Player player, Player player2)
