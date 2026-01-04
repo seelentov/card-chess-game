@@ -83,6 +83,6 @@ public class MamaBear extends Unit
           unit1.incHealth(HEALTH_BOOST * (isGold() ? 2 : 1));
         },
         null,
-        getDescription()));
+        getDescription(), getID()));
   }
 }

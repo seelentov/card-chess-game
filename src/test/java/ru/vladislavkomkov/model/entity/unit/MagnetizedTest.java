@@ -50,10 +50,10 @@ public class MagnetizedTest extends GamePlayerTestCase
     String buff2Name = "test2";
     
     Unit unit = new AccordoTron();
-    unit.addBuff(new Buff(u -> u.incBaseAttack(buffIncAttack), null, buff1Name));
+    unit.addBuff(new Buff(u -> u.incBaseAttack(buffIncAttack), null, buff1Name, null));
     
     Unit unit2 = new AccordoTron();
-    unit2.addBuff(new Buff(u -> u.incBaseAttack(buffIncAttack), null, buff2Name));
+    unit2.addBuff(new Buff(u -> u.incBaseAttack(buffIncAttack), null, buff2Name, null));
     
     player.addToHand(Card.of(unit));
     player.addToHand(Card.of(unit2));

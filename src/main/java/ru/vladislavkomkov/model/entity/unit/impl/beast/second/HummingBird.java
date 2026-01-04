@@ -65,6 +65,11 @@ public class HummingBird extends Unit
   
   private void addBuff(Unit unit, int attackBoost)
   {
+    if (unit.getBuffs().stream().anyMatch(buff -> buff.getCreator().equals(getID())))
+    {
+      return;
+    }
+    
     unit.addBuff(new Buff(
         unit1 -> {
           unit1.incBaseAttack(attackBoost);
@@ -72,6 +77,7 @@ public class HummingBird extends Unit
         unit1 -> {
           unit1.decBaseAttack(attackBoost);
         },
-        getDescription()));
+        getDescription(),
+        getID()));
   }
 }

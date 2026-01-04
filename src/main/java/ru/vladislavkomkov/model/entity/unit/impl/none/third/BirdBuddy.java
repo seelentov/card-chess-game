@@ -85,6 +85,7 @@ public class BirdBuddy extends Unit
           unit1.decBaseAttack(ATTACK_BOOST * (isGold() ? 2 : 1));
           unit1.decHealth(HEALTH_BOOST * (isGold() ? 2 : 1));
         },
-        getDescription()));
+        getDescription(),
+        getID()));
   }
 }

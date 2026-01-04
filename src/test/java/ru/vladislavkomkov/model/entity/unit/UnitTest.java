@@ -112,7 +112,7 @@ public class UnitTest extends GamePlayerTestCase
       @Override
       public void onAttacked(Game game, Fight fight, Player player, Player player2, Unit attacker, boolean processDamage)
       {
-        super.onAttacked(game, null, player, player2, attacker);
+        super.onAttacked(game, null, player, player2, attacker, processDamage);
         player.addMoney(moneyStep);
       }
     };

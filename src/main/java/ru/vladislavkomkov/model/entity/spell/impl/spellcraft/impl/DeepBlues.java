@@ -87,7 +87,9 @@ public class DeepBlues extends SpellCraft
                     unit1.decBaseAttack(attackBonus);
                     unit1.decHealth(hpBonus);
                   },
-                  getDescription()));
+                  getDescription(),
+                  getID(),
+                  true));
                   
           player.getStatistic().getPlayed().incOnlyBluesPlayed();
         });

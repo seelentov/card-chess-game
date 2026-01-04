@@ -143,7 +143,8 @@ public class SprightlyScarab extends Choicer
             u.setIsRebirth(true);
           },
           null,
-          getDescription()));
+          getDescription(),
+          getID()));
     }
     
     @Override
@@ -176,7 +177,8 @@ public class SprightlyScarab extends Choicer
             u.setAttacksCount(AttacksCount.DOUBLE);
           },
           null,
-          getDescription()));
+          getDescription(),
+          getID()));
     }
     
     @Override

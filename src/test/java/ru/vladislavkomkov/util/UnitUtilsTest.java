@@ -72,7 +72,9 @@ public class UnitUtilsTest
         unit1 -> {
           unit1.decBaseAttack(boost);
           unit1.decHealth(boost);
-        }, description));
+        },
+        description,
+        null));
     
     Unit gold = new Cat().buildGold(new Cat(), unit, new Cat());
     assertTrue(gold.isGold());

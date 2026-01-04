@@ -74,7 +74,8 @@ public class GrimscaleElegist extends Unit
           unit.incBaseAttack(attack);
         },
         null,
-        getDescription()));
+        getDescription(),
+        getID()));
   }
   
   @Override

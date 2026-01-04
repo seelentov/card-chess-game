@@ -85,7 +85,8 @@ public class ValiantTiger extends Unit
           unit1.incBaseAttack(ATTACK_BOOST * (isGold() ? 2 : 1));
         },
         null,
-        getDescription()));
+        getDescription(),
+        getID()));
   }
   
   @Override

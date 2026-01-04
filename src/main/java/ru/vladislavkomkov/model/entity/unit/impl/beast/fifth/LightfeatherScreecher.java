@@ -62,11 +62,12 @@ public class LightfeatherScreecher extends Unit
   {
     unit.addBuff(new Buff(
         unit1 -> {
-            unit1.setAttacksCount(AttacksCount.DOUBLE);
-            unit1.setIsBubbled(true);
+          unit1.setAttacksCount(AttacksCount.DOUBLE);
+          unit1.setIsBubbled(true);
         },
         null,
-        getDescription()));
+        getDescription(),
+        getID()));
   }
   
   @Override

@@ -40,7 +40,8 @@ public class HungrySnapjaw extends Unit
     getListener().onAppearListeners.put(
         KEY_CORE,
         (g, f, p, e) -> {
-          if(f == null){
+          if (f == null)
+          {
             return;
           }
           f.getFightPlayer(p).getListener().onDeadListeners.put(
@@ -92,6 +93,7 @@ public class HungrySnapjaw extends Unit
     unit.addBuff(new Buff(
         unit1 -> unit1.incHealth(HEALTH_BOOST * (isGold() ? 2 : 1)),
         null,
-        getDescription()));
+        getDescription(),
+        getID()));
   }
 }

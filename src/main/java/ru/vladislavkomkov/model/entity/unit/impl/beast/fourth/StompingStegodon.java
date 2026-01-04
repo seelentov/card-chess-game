@@ -86,7 +86,7 @@ public class StompingStegodon extends Unit
       
       for (Unit un : forBoost)
       {
-        un.addBuff(new Buff(unit1 -> unit1.incBaseAttack(ATTACK_BOOST * (isGold ? 2 : 1)), null, getDescription()));
+        un.addBuff(new Buff(unit1 -> unit1.incBaseAttack(ATTACK_BOOST * (isGold ? 2 : 1)), null, getDescription(), getID()));
       }
     };
   }
@@ -106,7 +106,8 @@ public class StompingStegodon extends Unit
               un.addBuff(new Buff(
                   unit1 -> unit1.getListener().onAttackListeners.put(key, entry.getValue()),
                   null,
-                  getDescription()));
+                  getDescription(),
+                  getID()));
             });
       }
     };
