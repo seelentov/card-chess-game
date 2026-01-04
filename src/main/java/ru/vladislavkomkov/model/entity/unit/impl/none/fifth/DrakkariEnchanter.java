@@ -5,26 +5,26 @@ import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
 import ru.vladislavkomkov.model.entity.unit.impl.Extra;
 import ru.vladislavkomkov.model.player.Player;
 
-public class BrannBronzebeard extends Extra
+public class DrakkariEnchanter extends Extra
 {
-  public BrannBronzebeard()
+  public DrakkariEnchanter()
   {
     this(DUMP_PLAYER);
   }
   
-  public BrannBronzebeard(Player playerLink)
+  public DrakkariEnchanter(Player playerLink)
   {
     super(playerLink);
     
-    attack = 2;
+    attack = 1;
     
     level = 5;
     
-    maxHealth = 4;
+    maxHealth = 5;
     
     isTavern = true;
     
-    onPlayedExtra = new Action(0, isGold() ? 2 : 1);
+    onEndTurnExtra = new Action(0, isGold() ? 2 : 1);
     
     actualHealth = getMaxHealth();
   }
@@ -32,6 +32,7 @@ public class BrannBronzebeard extends Extra
   @Override
   public String getDescription()
   {
-    return "Your Battlecries trigger " + (isGold() ? "three times" : "twice");
+    return "Your end of turn effects trigger " + (isGold() ? "three times" : "twice");
   }
+  
 }

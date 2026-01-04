@@ -54,6 +54,6 @@ public class SewerRat extends Unit
   public String getDescription()
   {
     Unit sub = isGold ? new HalfShell(playerLink).buildGold() : new HalfShell(playerLink);
-    return "Deathrattle: Summon a " + sub.getAttack() + "/" + sub.getHealth() + " Turtle with Taunt.";
+    return "Deathrattle: Summon a " + sub.getBaseAttack() + "/" + sub.getBaseHealth() + " "+sub.getName()+" with Taunt.";
   }
 }

@@ -58,6 +58,6 @@ public class IckyImp extends Unit
   public String getDescription()
   {
     Unit unit = isGold ? new Imp(playerLink).buildGold() : new Imp(playerLink);
-    return "Deathrattle: Summon two " + unit.getAttack() + "/" + unit.getHealth() + " Imps";
+    return "Deathrattle: Summon two " + unit.getBaseAttack() + "/" + unit.getBaseHealth() + " " + unit.getName() + "s";
   }
 }

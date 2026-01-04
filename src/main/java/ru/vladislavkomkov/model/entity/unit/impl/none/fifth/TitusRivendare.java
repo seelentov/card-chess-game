@@ -24,7 +24,7 @@ public class TitusRivendare extends Extra
     
     isTavern = true;
     
-    onDead = new Action(isGold() ? 2 : 1, 0);
+    onDeadExtra = new Action(isGold() ? 2 : 1, 0);
     
     actualHealth = getMaxHealth();
   }

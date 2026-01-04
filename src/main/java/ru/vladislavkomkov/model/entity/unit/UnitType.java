@@ -9,6 +9,7 @@ public enum UnitType
   DEMON("Demon"),
   MECH("Mech"),
   ELEMENTAL("Elemental"),
+  MURLOC("Murloc"),
   ALL("All");
   
   final String type;

@@ -5,9 +5,9 @@ import ru.vladislavkomkov.model.player.Player;
 
 public class Extra extends Unit
 {
-  protected Action onPlayed = new Action(0, 0);
-  protected Action onDead = new Action(0, 0);
-  protected Action onEndTurn = new Action(0, 0);
+  protected Action onPlayedExtra = new Action(0, 0);
+  protected Action onDeadExtra = new Action(0, 0);
+  protected Action onEndTurnExtra = new Action(0, 0);
   
   public Extra(Player player)
   {
@@ -36,18 +36,18 @@ public class Extra extends Unit
     }
   }
   
-  public Action getOnPlayed()
+  public Action getOnPlayedExtra()
   {
-    return onPlayed;
+    return onPlayedExtra;
   }
   
-  public Action getOnDead()
+  public Action getOnDeadExtra()
   {
-    return onDead;
+    return onDeadExtra;
   }
   
-  public Action getOnEndTurn()
+  public Action getOnEndTurnExtra()
   {
-    return onEndTurn;
+    return onEndTurnExtra;
   }
 }

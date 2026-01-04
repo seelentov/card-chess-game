@@ -338,7 +338,7 @@ public abstract class Unit extends Entity
         ListenerUtils.getPlayerListener(fight, player).onEndTurnListeners,
         (action) -> action.process(game, fight, player), player);
     
-    int extra = calcExtraAction(unit -> ((Extra) unit).getOnEndTurn(), player);
+    int extra = calcExtraAction(unit -> ((Extra) unit).getOnEndTurnExtra(), player);
     for (int i = 0; i < extra + 1; i++)
     {
       listener.processOnEndTurnListeners(game, fight, player);
@@ -377,14 +377,21 @@ public abstract class Unit extends Entity
   
   public void onAttacked(Game game, Fight fight, Player player, Player player2, Unit attacker)
   {
+    onAttacked(game, fight, player, player2, attacker, true);
+  }
+  
+  public void onAttacked(Game game, Fight fight, Player player, Player player2, Unit attacker, boolean processDamage)
+  {
     processListeners(
         ListenerUtils.getPlayerListener(fight, player).onAttackedListeners,
         (action) -> action.process(game, fight, player, player2, this, attacker), player);
     
+    listener.processOnAttackedListeners(game, fight, player, player2, this, attacker);
+    
     processDamage(attacker);
+    
     processOnDead(game, fight, player, player2, attacker);
     
-    listener.processOnAttackedListeners(game, fight, player, player2, this, attacker);
     if (fight != null)
     {
       fight.addToHistory(FightEvent.Type.ON_ATTACKED, player, List.of(this, attacker));
@@ -476,7 +483,7 @@ public abstract class Unit extends Entity
         ListenerUtils.getPlayerListener(fight, player).onDeadListeners,
         (action) -> action.process(game, fight, player, player2, this, attacker), player);
     
-    int extra = calcExtraAction(unit -> ((Extra) unit).getOnDead(), player);
+    int extra = calcExtraAction(unit -> ((Extra) unit).getOnDeadExtra(), player);
     for (int i = 0; i < extra + 1; i++)
     {
       listener.processOnDeadListeners(game, fight, player, player2, this, attacker);
@@ -544,7 +551,7 @@ public abstract class Unit extends Entity
   @Override
   public void onPlayed(Game game, Fight fight, Player player, List<Integer> input, boolean auto)
   {
-    int extra = calcExtraAction(unit -> ((Extra) unit).getOnPlayed(), player);
+    int extra = calcExtraAction(unit -> ((Extra) unit).getOnPlayedExtra(), player);
     for (int i = 0; i < extra + 1; i++)
     {
       super.onPlayed(game, fight, player, input, auto);

@@ -11,5 +11,6 @@ public abstract class TrashUnit extends Unit
     level = 1;
     attack = 1;
     maxHealth = 1;
+    isTavern = false;
   }
 }

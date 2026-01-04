@@ -110,7 +110,7 @@ public class UnitTest extends GamePlayerTestCase
     Unit unit = new Unit(player)
     {
       @Override
-      public void onAttacked(Game game, Fight fight, Player player, Player player2, Unit attacker)
+      public void onAttacked(Game game, Fight fight, Player player, Player player2, Unit attacker, boolean processDamage)
       {
         super.onAttacked(game, null, player, player2, attacker);
         player.addMoney(moneyStep);
