@@ -493,14 +493,15 @@ public class Game implements AutoCloseable
   {
     ListenerUtils.processFightActionListeners(
         ListenerUtils.getPlayerListener(fight, player).onStartFightListeners, this, fight, player, player2);
-    fight.getFightTable(player).forEach(unit -> unit.onStartFight(this, fight, player, player2));
+
+    new ArrayList<>(fight.getFightTable(player)).forEach(unit -> unit.onStartFight(this, fight, player, player2));
   }
   
   public void processEndFight(Fight fight, Player player, Player player2)
   {
     ListenerUtils.processFightActionListeners(
         ListenerUtils.getPlayerListener(fight, player).onEndFightListeners, this, fight, player, player2);
-    fight.getFightTable(player).forEach(unit -> unit.onEndFight(this, fight, player, player2));
+    new ArrayList<>(fight.getFightTable(player)).forEach(unit -> unit.onEndFight(this, fight, player, player2));
   }
   
   public void clearSenderWaiters()
