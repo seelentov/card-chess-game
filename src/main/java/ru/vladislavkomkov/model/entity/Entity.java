@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -13,7 +12,7 @@ import ru.vladislavkomkov.model.GObject;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.Listener;
 import ru.vladislavkomkov.model.fight.Fight;
-import ru.vladislavkomkov.model.fight.FightEvent;
+import ru.vladislavkomkov.model.ActionEvent;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.ListenerUtils;
 import ru.vladislavkomkov.util.ReflectUtils;
@@ -77,7 +76,7 @@ public abstract class Entity extends GObject
     listener.processOnHandledListeners(game, fight, player, this);
     if (fight != null)
     {
-      fight.addToHistory(FightEvent.Type.ON_HANDLED, player, List.of(this));
+      fight.addToHistory(ActionEvent.Type.ON_HANDLED, player, List.of(this));
     }
   }
   
@@ -116,7 +115,7 @@ public abstract class Entity extends GObject
     listener.processOnPlayedListeners(game, fight, player, this, input, auto);
     if (fight != null)
     {
-      fight.addToHistory(FightEvent.Type.ON_PLAYED, player, List.of(input, auto));
+      fight.addToHistory(ActionEvent.Type.ON_PLAYED, player, List.of(input, auto));
     }
   }
   

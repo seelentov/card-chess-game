@@ -1,12 +1,10 @@
 package ru.vladislavkomkov.controller.sender;
 
-import static ru.vladislavkomkov.model.fight.FightEvent.F_TYPE;
-
 import java.util.*;
 
 import ru.vladislavkomkov.model.event.Event;
 import ru.vladislavkomkov.model.event.data.SenderWaiterDataReq;
-import ru.vladislavkomkov.model.fight.FightEvent;
+import ru.vladislavkomkov.model.ActionEvent;
 import ru.vladislavkomkov.model.fight.FightInfo;
 import ru.vladislavkomkov.model.player.Player;
 
@@ -131,10 +129,10 @@ public class MockConsumer
       return Optional.empty();
     }
     
-    boolean isThisPlayer = ((Map<String, String>) ev.get(FightEvent.F_PLAYER)).get(Player.F_UUID).equals(UUID);
+    boolean isThisPlayer = ((Map<String, String>) ev.get(ActionEvent.F_PLAYER)).get(Player.F_UUID).equals(UUID);
     
-    List<Map> inFightTable = (List<Map>) ev.get(FightEvent.F_PLAYER_UNITS);
-    List<Map> inFightTableEnemy = (List<Map>) ev.get(FightEvent.F_ENEMY_UNITS);
+    List<Map> inFightTable = (List<Map>) ev.get(ActionEvent.F_PLAYER_UNITS);
+    List<Map> inFightTableEnemy = (List<Map>) ev.get(ActionEvent.F_ENEMY_UNITS);
     
     this.inFightTable = isThisPlayer ? inFightTable : inFightTableEnemy;
     this.inFightTableEnemy = isThisPlayer ? inFightTableEnemy : inFightTable;

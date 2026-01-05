@@ -18,7 +18,7 @@ import ru.vladislavkomkov.model.entity.PlayType;
 import ru.vladislavkomkov.model.entity.spell.impl.TripleReward;
 import ru.vladislavkomkov.model.entity.unit.impl.Extra;
 import ru.vladislavkomkov.model.fight.Fight;
-import ru.vladislavkomkov.model.fight.FightEvent;
+import ru.vladislavkomkov.model.ActionEvent;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.ListenerUtils;
 
@@ -291,7 +291,7 @@ public abstract class Unit extends Entity
   public void removeTempBuffs()
   {
     buffs.stream()
-        .filter(buff -> buff.getRollback() != null)
+        .filter(Buff::isTemp)
         .forEach(buff -> buff.getRollback().accept(this));
     
     buffs.removeIf(buff -> buff.getRollback() != null);
@@ -315,7 +315,7 @@ public abstract class Unit extends Entity
     listener.processOnSellListeners(game, fight, player, this);
     if (fight != null)
     {
-      fight.addToHistory(FightEvent.Type.ON_SELL, player, List.of(this));
+      fight.addToHistory(ActionEvent.Type.ON_SELL, player, List.of(this));
     }
   }
   
@@ -328,7 +328,7 @@ public abstract class Unit extends Entity
     listener.processOnStartTurnListeners(game, fight, player);
     if (fight != null)
     {
-      fight.addToHistory(FightEvent.Type.ON_START_TURN, player, List.of(this));
+      fight.addToHistory(ActionEvent.Type.ON_START_TURN, player, List.of(this));
     }
   }
   
@@ -344,7 +344,7 @@ public abstract class Unit extends Entity
       listener.processOnEndTurnListeners(game, fight, player);
       if (fight != null)
       {
-        fight.addToHistory(FightEvent.Type.ON_END_TURN, player, List.of(this));
+        fight.addToHistory(ActionEvent.Type.ON_END_TURN, player, List.of(this));
       }
     }
   }
@@ -358,7 +358,7 @@ public abstract class Unit extends Entity
     listener.processOnStartFightListeners(game, fight, player, player2);
     if (fight != null)
     {
-      fight.addToHistory(FightEvent.Type.ON_START_FIGHT, player, List.of(this));
+      fight.addToHistory(ActionEvent.Type.ON_START_FIGHT, player, List.of(this));
     }
   }
   
@@ -371,7 +371,7 @@ public abstract class Unit extends Entity
     listener.processOnEndFightListeners(game, fight, player, player2);
     if (fight != null)
     {
-      fight.addToHistory(FightEvent.Type.ON_END_FIGHT, player, List.of(this));
+      fight.addToHistory(ActionEvent.Type.ON_END_FIGHT, player, List.of(this));
     }
   }
   
@@ -394,7 +394,7 @@ public abstract class Unit extends Entity
     
     if (fight != null)
     {
-      fight.addToHistory(FightEvent.Type.ON_ATTACKED, player, List.of(this, attacker));
+      fight.addToHistory(ActionEvent.Type.ON_ATTACKED, player, List.of(this, attacker));
     }
   }
   
@@ -413,7 +413,7 @@ public abstract class Unit extends Entity
     
     if (fight != null)
     {
-      fight.addToHistory(FightEvent.Type.ON_ATTACK, player, List.of(this, attacked));
+      fight.addToHistory(ActionEvent.Type.ON_ATTACK, player, List.of(this, attacked));
     }
   }
   
@@ -489,7 +489,7 @@ public abstract class Unit extends Entity
       listener.processOnDeadListeners(game, fight, player, player2, this, attacker);
       if (fight != null)
       {
-        fight.addToHistory(FightEvent.Type.ON_DEAD, player, attacker != null ? List.of(this, attacker) : List.of(this));
+        fight.addToHistory(ActionEvent.Type.ON_DEAD, player, attacker != null ? List.of(this, attacker) : List.of(this));
       }
     }
     
@@ -516,7 +516,7 @@ public abstract class Unit extends Entity
     
     if (fight != null)
     {
-      fight.addToHistory(FightEvent.Type.ON_APPEAR, player, List.of(this));
+      fight.addToHistory(ActionEvent.Type.ON_APPEAR, player, List.of(this));
     }
   }
   
@@ -530,7 +530,7 @@ public abstract class Unit extends Entity
     
     if (fight != null)
     {
-      fight.addToHistory(FightEvent.Type.ON_SUMMONED, player, List.of(this));
+      fight.addToHistory(ActionEvent.Type.ON_SUMMONED, player, List.of(this));
     }
   }
   
@@ -544,7 +544,7 @@ public abstract class Unit extends Entity
     
     if (fight != null)
     {
-      fight.addToHistory(FightEvent.Type.ON_DISAPPEAR, player, List.of(this));
+      fight.addToHistory(ActionEvent.Type.ON_DISAPPEAR, player, List.of(this));
     }
   }
   

@@ -30,7 +30,7 @@ import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
 import ru.vladislavkomkov.model.event.Event;
 import ru.vladislavkomkov.model.event.data.SenderWaiterDataRes;
 import ru.vladislavkomkov.model.fight.Fight;
-import ru.vladislavkomkov.model.fight.FightEvent;
+import ru.vladislavkomkov.model.ActionEvent;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.model.player.Tavern;
 
@@ -418,7 +418,7 @@ public class GameProcessorTest
     cat2Expected.setHealth(1);
     cat2Expected.setMaxHealth(1);
     
-    FightEvent  evExpected = makeEvent(player1, FightEvent.Type.START, null,
+    ActionEvent evExpected = makeEvent(player1, ActionEvent.Type.START_FIGHT, null,
             List.of(catExpected),
             List.of(cat2Expected));
     
@@ -427,7 +427,7 @@ public class GameProcessorTest
      ev = consumer.processFight();
     assertTrue(ev.isPresent());
     
-    evExpected = makeEvent(player1, FightEvent.Type.ON_APPEAR, List.of(catExpected),
+    evExpected = makeEvent(player1, ActionEvent.Type.ON_APPEAR, List.of(catExpected),
             List.of(catExpected),
             List.of(cat2Expected));
     
@@ -436,7 +436,7 @@ public class GameProcessorTest
     ev = consumer.processFight();
     assertTrue(ev.isPresent());
     
-    evExpected = makeEvent(player2, FightEvent.Type.ON_APPEAR, List.of(cat2Expected),
+    evExpected = makeEvent(player2, ActionEvent.Type.ON_APPEAR, List.of(cat2Expected),
             List.of(cat2Expected),
             List.of(catExpected));
     
@@ -445,7 +445,7 @@ public class GameProcessorTest
     ev = consumer.processFight();
     assertTrue(ev.isPresent());
     
-    evExpected = makeEvent(player1, FightEvent.Type.ON_START_FIGHT, List.of(catExpected),
+    evExpected = makeEvent(player1, ActionEvent.Type.ON_START_FIGHT, List.of(catExpected),
             List.of(catExpected),
             List.of(cat2Expected));
     
@@ -454,7 +454,7 @@ public class GameProcessorTest
     ev = consumer.processFight();
     assertTrue(ev.isPresent());
     
-    evExpected = makeEvent(player2, FightEvent.Type.ON_START_FIGHT, List.of(cat2Expected),
+    evExpected = makeEvent(player2, ActionEvent.Type.ON_START_FIGHT, List.of(cat2Expected),
             List.of(cat2Expected),
             List.of(catExpected));
     
@@ -472,7 +472,7 @@ public class GameProcessorTest
     cat2Expected.setBaseAttack(1);
     cat2Expected.setHealth(-9);
     cat2Expected.setMaxHealth(1);
-    evExpected = makeEvent(player1, FightEvent.Type.ON_ATTACK, null,
+    evExpected = makeEvent(player1, ActionEvent.Type.ON_ATTACK, null,
         List.of(catExpected),
         List.of(cat2Expected));
     
@@ -481,7 +481,7 @@ public class GameProcessorTest
     ev = consumer.processFight();
     assertTrue(ev.isPresent());
 
-    evExpected = makeEvent(player2, FightEvent.Type.ON_DEAD, List.of(cat2Expected),
+    evExpected = makeEvent(player2, ActionEvent.Type.ON_DEAD, List.of(cat2Expected),
             List.of(cat2Expected),
             List.of());
 
@@ -490,7 +490,7 @@ public class GameProcessorTest
     ev = consumer.processFight();
     assertTrue(ev.isPresent());
     
-    evExpected = makeEvent(player2, FightEvent.Type.ON_DISAPPEAR, List.of(cat2Expected),
+    evExpected = makeEvent(player2, ActionEvent.Type.ON_DISAPPEAR, List.of(cat2Expected),
             List.of(cat2Expected),
             List.of());
     
@@ -499,7 +499,7 @@ public class GameProcessorTest
     ev = consumer.processFight();
     assertTrue(ev.isPresent());
 
-    evExpected = makeEvent(player2, FightEvent.Type.ON_ATTACKED, null,
+    evExpected = makeEvent(player2, ActionEvent.Type.ON_ATTACKED, null,
             List.of(cat2Expected),
             List.of(catExpected));
 
@@ -508,7 +508,7 @@ public class GameProcessorTest
     ev = consumer.processFight();
     assertTrue(ev.isPresent());
     
-    evExpected = makeEvent(player1, FightEvent.Type.ON_DISAPPEAR, List.of(catExpected),
+    evExpected = makeEvent(player1, ActionEvent.Type.ON_DISAPPEAR, List.of(catExpected),
             List.of(catExpected),
             List.of());
     
@@ -517,7 +517,7 @@ public class GameProcessorTest
     ev = consumer.processFight();
     assertTrue(ev.isPresent());
     
-    evExpected = makeEvent(player1, FightEvent.Type.ON_END_FIGHT, List.of(catExpected),
+    evExpected = makeEvent(player1, ActionEvent.Type.ON_END_FIGHT, List.of(catExpected),
             List.of(catExpected),
             List.of());
     
@@ -526,7 +526,7 @@ public class GameProcessorTest
     ev = consumer.processFight();
     assertTrue(ev.isPresent());
     
-    evExpected = makeEvent(player1, FightEvent.Type.END, null,
+    evExpected = makeEvent(player1, ActionEvent.Type.END_FIGHT, null,
             List.of(catExpected),
             List.of(cat2Expected));
     
@@ -536,9 +536,9 @@ public class GameProcessorTest
     assertFalse(ev.isPresent());
   }
   
-  private FightEvent makeEvent(Player player, FightEvent.Type type, List<Object> data, List list1, List list2)
+  private ActionEvent makeEvent(Player player, ActionEvent.Type type, List<Object> data, List list1, List list2)
   {
-    return new FightEvent(
+    return new ActionEvent(
         type,
         list1,
         list2,
@@ -546,15 +546,15 @@ public class GameProcessorTest
         player);
   }
   
-  private void assertEqualsEvents(Map ev, FightEvent evExpected)
+  private void assertEqualsEvents(Map ev, ActionEvent evExpected)
   {
-    assertEquals(ev.get(FightEvent.F_TYPE), evExpected.getType().toString());
-    assertEquals(((Map<String, String>) ev.get(FightEvent.F_PLAYER)).get(Player.F_UUID), evExpected.getPlayer().getUUID());
+    assertEquals(ev.get(ActionEvent.F_TYPE), evExpected.getType().toString());
+    assertEquals(((Map<String, String>) ev.get(ActionEvent.F_PLAYER)).get(Player.F_UUID), evExpected.getPlayer().getUUID());
     
-    for (int i = 0; i < ((List<Map<String, Object>>) ev.get(FightEvent.F_PLAYER_UNITS)).size(); i++)
+    for (int i = 0; i < ((List<Map<String, Object>>) ev.get(ActionEvent.F_PLAYER_UNITS)).size(); i++)
     {
       Unit unit = evExpected.getPlayerUnits().get(i);
-      Map<String, Object> unit2 = ((List<Map<String, Object>>) ev.get(FightEvent.F_PLAYER_UNITS)).get(0);
+      Map<String, Object> unit2 = ((List<Map<String, Object>>) ev.get(ActionEvent.F_PLAYER_UNITS)).get(0);
       
       assertEquals(unit.getName(), unit2.get(Unit.F_NAME));
       assertEquals(unit.getAttack(), unit2.get(Unit.F_ATTACK));

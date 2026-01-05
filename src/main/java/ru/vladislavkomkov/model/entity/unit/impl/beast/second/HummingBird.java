@@ -44,7 +44,7 @@ public class HummingBird extends Unit
           
           fight.getFightTable(player1).forEach(unit -> addBuff(unit, ATTACK_BOOST * (isGold ? 2 : 1)));
           
-          fight.getFightPlayer(player1).getListener().onAppearListeners.put(
+          fight.getFightPlayer(player1).getListener().onSummonedListeners.put(
               UUIDUtils.generateKey(),
               (game1, fight1, playeer, entity) -> {
                 if (entity instanceof Unit unit && unit.isType(UnitType.BEAST))
@@ -78,6 +78,7 @@ public class HummingBird extends Unit
           unit1.decBaseAttack(attackBoost);
         },
         getDescription(),
-        getID()));
+        getID(),
+        true));
   }
 }

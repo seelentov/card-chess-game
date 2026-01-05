@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import ru.vladislavkomkov.model.ActionEvent;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.player.Player;
@@ -22,7 +23,7 @@ public class Fight
   
   int turn = 0;
   
-  List<FightEvent> history = new ArrayList<>();
+  List<ActionEvent> history = new ArrayList<>();
   
   public Fight(Game game, Player player1, Player player2)
   {
@@ -41,12 +42,12 @@ public class Fight
     }
   }
   
-  public void addToHistory(FightEvent.Type event, Player player, List<Object> data)
+  public void addToHistory(ActionEvent.Type event, Player player, List<Object> data)
   {
     List<Unit> playerUnits = fightPlayer1.player == player ? fightPlayer1.units : fightPlayer2.units;
     List<Unit> enemyUnits = fightPlayer1.player == player ? fightPlayer2.units : fightPlayer1.units;
     
-    history.add(new FightEvent(
+    history.add(new ActionEvent(
         event,
         playerUnits.stream()
             .filter(Objects::nonNull)
@@ -144,7 +145,7 @@ public class Fight
     fightPlayer1.units.clear();
     fightPlayer2.units.clear();
     
-    addToHistory(FightEvent.Type.START, fightPlayer1.player, null);
+    addToHistory(ActionEvent.Type.START_FIGHT, fightPlayer1.player, null);
     
     for (Unit item : fightPlayer1.player.cloneTable())
     {

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import ru.vladislavkomkov.model.ActionEvent;
 import ru.vladislavkomkov.model.player.Player;
 
 public class FightInfo
@@ -19,7 +20,7 @@ public class FightInfo
   public final Player player2;
   public final Result result;
   public final int damage;
-  public final List<FightEvent> history;
+  public final List<ActionEvent> history;
   
   public FightInfo()
   {
@@ -30,7 +31,7 @@ public class FightInfo
     this.history = null;
   }
   
-  public FightInfo(Player player1, Player player2, Result result, int damage, List<FightEvent> history)
+  public FightInfo(Player player1, Player player2, Result result, int damage, List<ActionEvent> history)
   {
     this.player1 = player1;
     this.player2 = player2;
@@ -52,7 +53,7 @@ public class FightInfo
   }
   
   @JsonProperty(F_HISTORY)
-  public List<FightEvent> getHistory()
+  public List<ActionEvent> getHistory()
   {
     return history;
   }

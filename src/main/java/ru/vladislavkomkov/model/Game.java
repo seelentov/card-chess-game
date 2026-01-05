@@ -20,7 +20,6 @@ import ru.vladislavkomkov.controller.GameProcessor;
 import ru.vladislavkomkov.controller.sender.Sender;
 import ru.vladislavkomkov.model.event.Event;
 import ru.vladislavkomkov.model.fight.Fight;
-import ru.vladislavkomkov.model.fight.FightEvent;
 import ru.vladislavkomkov.model.fight.FightInfo;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.ListenerUtils;
@@ -294,7 +293,7 @@ public class Game implements AutoCloseable
           processEndFight(fight, player, player2);
           processEndFight(fight, player2, player);
           
-          fight.addToHistory(FightEvent.Type.END, player, null);
+          fight.addToHistory(ActionEvent.Type.END_FIGHT, player, null);
           fightHistory.add(result.get());
           
           FightInfo info = result.get();

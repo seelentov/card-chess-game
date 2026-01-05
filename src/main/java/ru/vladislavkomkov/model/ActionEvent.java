@@ -1,4 +1,4 @@
-package ru.vladislavkomkov.model.fight;
+package ru.vladislavkomkov.model;
 
 import java.util.List;
 
@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.player.Player;
 
-public class FightEvent
+public class ActionEvent
 {
   public final static String F_TYPE = "type";
   public final static String F_PLAYER = "player";
@@ -23,7 +23,7 @@ public class FightEvent
   public final List<Unit> enemyUnits;
   public final List<Object> data;
   
-  public FightEvent()
+  public ActionEvent()
   {
     type = null;
     player = null;
@@ -34,7 +34,7 @@ public class FightEvent
     
   }
   
-  public FightEvent(Type type, List<Unit> playerUnits, List<Unit> enemyUnits, List<Object> data, Player player)
+  public ActionEvent(Type type, List<Unit> playerUnits, List<Unit> enemyUnits, List<Object> data, Player player)
   {
     this.type = type;
     
@@ -77,8 +77,8 @@ public class FightEvent
   
   public enum Type
   {
-    START,
-    END,
+    START_FIGHT,
+    END_FIGHT,
     ON_PLAYED,
     ON_HANDLED,
     ON_ATTACK,
