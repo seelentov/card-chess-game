@@ -46,7 +46,7 @@ public class TripleReward extends Spell
           
           if (allUnits.isEmpty())
           {
-            throw new RuntimeException("Units list for reward is empty");
+              return;
           }
           
           while (allUnits.size() < 3)
