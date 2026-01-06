@@ -62,7 +62,7 @@ public class Tavern
   
   public List<Unit> getUnits()
   {
-    return cards.stream().filter(card -> card.getEntity() instanceof Spell).map(card -> (Unit) card.getEntity()).toList();
+    return cards.stream().filter(card -> card.getEntity() instanceof Unit).map(card -> (Unit) card.getEntity()).toList();
   }
   
   public List<Spell> getSpells()
@@ -93,10 +93,20 @@ public class Tavern
   
   public void reset(int level)
   {
-    reset(level, true);
+    reset(level, true, spellsPool, unitsPool);
   }
   
   public void reset(int level, boolean saveFreezed)
+  {
+    reset(level, true, spellsPool, unitsPool);
+  }
+  
+  public void reset(int level, boolean saveFreezed, List<Class<? extends Unit>> unitsPool)
+  {
+    reset(level, true, spellsPool, unitsPool);
+  }
+  
+  public void reset(int level, boolean saveFreezed, List<Class<? extends Spell>> spellsPool, List<Class<? extends Unit>> unitsPool)
   {
     boolean isLastCardSpellAndFreezed = false;
     if (!cards.isEmpty() && saveFreezed)
@@ -120,54 +130,66 @@ public class Tavern
     int unitsCount = (int) cards.stream().filter(card -> card.getEntity() instanceof Unit).count();
     
     int count = getCountByLevel(level) - unitsCount;
-    fillWithUnits(level, count);
     
-    if (saveFreezed)
+    if (!unitsPool.isEmpty())
     {
-      if (!isLastCardSpellAndFreezed)
-      {
-        addRandomSpell(level);
-      }
+      fillWithUnits(level, count, unitsPool);
     }
-    else
+    
+    if (!spellsPool.isEmpty())
     {
-      addRandomSpell(level);
+      
+      if (saveFreezed)
+      {
+        if (!isLastCardSpellAndFreezed)
+        {
+          addRandomSpell(level, spellsPool);
+        }
+      }
+      else
+      {
+        addRandomSpell(level, spellsPool);
+      }
     }
     
     freeze = false;
     cards.forEach(slot -> slot.setFreezed(false));
   }
   
-  void fillWithUnits(int level, int count)
+  void fillWithUnits(int level, int count, List<Class<? extends Unit>> unitsPool)
   {
     for (int i = 0; i < count; i++)
     {
-      Card unitCard = generateUnitCard(level);
+      Card unitCard = generateUnitCard(level, unitsPool);
       add(unitCard);
     }
   }
   
-  Card generateUnitCard(int level)
+  Card generateUnitCard(int level, List<Class<? extends Unit>> unitsPool)
   {
     int targetLevel = RandUtils.getRandLvl(level);
-    List<Class<? extends Unit>> units = getAvailableUnitsWithFallback(targetLevel, level);
+    List<Class<? extends Unit>> units = getAvailableUnitsWithFallback(targetLevel, level, unitsPool);
     
     Class<? extends Unit> unit = units.get(RandUtils.getRand(units.size() - 1));
     
     return new Card(ReflectUtils.getInstance(unit, player));
   }
-  
-  void addRandomSpell(int level)
+
+  public void addRandomSpell(int level){
+    addRandomSpell(level, spellsPool);
+  }
+
+  public void addRandomSpell(int level, List<Class<? extends Spell>> spellsPool)
   {
     int targetLevel = RandUtils.getRandLvl(level);
-    List<Class<? extends Spell>> spells = getAvailableSpellsWithFallback(targetLevel, level);
+    List<Class<? extends Spell>> spells = getAvailableSpellsWithFallback(targetLevel, level, spellsPool);
     
     Class<? extends Spell> spell = spells.get(RandUtils.getRand(spells.size() - 1));
     
     add(new Card(ReflectUtils.getInstance(spell, player)));
   }
   
-  List<Class<? extends Unit>> getAvailableUnitsWithFallback(int targetLevel, int maxLevel)
+  List<Class<? extends Unit>> getAvailableUnitsWithFallback(int targetLevel, int maxLevel, List<Class<? extends Unit>> unitsPool)
   {
     List<Class<? extends Unit>> units = UnitUtils.getByTavern(targetLevel, unitsPool);
     
@@ -180,7 +202,7 @@ public class Tavern
     return units;
   }
   
-  List<Class<? extends Spell>> getAvailableSpellsWithFallback(int targetLevel, int maxLevel)
+  List<Class<? extends Spell>> getAvailableSpellsWithFallback(int targetLevel, int maxLevel, List<Class<? extends Spell>> spellsPool)
   {
     List<Class<? extends Spell>> spells = SpellUtils.getByTavern(targetLevel, spellsPool);
     

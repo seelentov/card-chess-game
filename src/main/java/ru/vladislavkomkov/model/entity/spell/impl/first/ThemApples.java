@@ -5,8 +5,6 @@ import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
 
 import java.util.List;
 
-import ru.vladislavkomkov.model.entity.PlayPair;
-import ru.vladislavkomkov.model.entity.PlayType;
 import ru.vladislavkomkov.model.entity.spell.Spell;
 import ru.vladislavkomkov.model.entity.unit.Buff;
 import ru.vladislavkomkov.model.player.Player;
@@ -31,7 +29,7 @@ public class ThemApples extends Spell
     super(playerLink, isGold);
     isTavern = true;
     
-    playType = List.of(new PlayPair(PlayType.TAVERN_FRIENDLY));
+    playType = List.of();
   }
   
   @Override

@@ -3,6 +3,8 @@ package ru.vladislavkomkov.model.entity.spell.impl.second;
 import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
 import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
 
+import java.util.List;
+
 import ru.vladislavkomkov.model.entity.spell.Spell;
 import ru.vladislavkomkov.model.player.Player;
 
@@ -22,6 +24,8 @@ public class StrikeOil extends Spell
   {
     super(playerLink, isGold);
     isTavern = true;
+    
+    playType = List.of();
   }
   
   @Override

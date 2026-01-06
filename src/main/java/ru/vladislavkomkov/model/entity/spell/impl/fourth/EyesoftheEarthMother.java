@@ -42,7 +42,7 @@ public class EyesoftheEarthMother extends Spell
     listener.onPlayedListeners.put(
         KEY_CORE,
         (game, fight, player, entity, input, auto) -> {
-          Optional<Unit> unit = getUnitFromTavernFriendlyInput(fight, player, input);
+          Optional<Unit> unit = getUnitFromTavernFriendlyInput(fight, player, input, true);
           if (unit.isEmpty())
           {
             return;

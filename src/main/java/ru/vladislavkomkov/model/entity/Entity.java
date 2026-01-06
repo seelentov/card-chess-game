@@ -171,6 +171,11 @@ public abstract class Entity extends GObject
   
   protected Optional<Unit> getUnitFromTavernFriendlyInput(Fight fight, Player player, List<Integer> input)
   {
+    return getUnitFromTavernFriendlyInput(fight, player, input, false);
+  }
+  
+  protected Optional<Unit> getUnitFromTavernFriendlyInput(Fight fight, Player player, List<Integer> input, boolean onlyFriends)
+  {
     boolean isTavernIndex;
     int index;
     if (input.size() < 2)
@@ -184,6 +189,11 @@ public abstract class Entity extends GObject
     {
       isTavernIndex = input.get(1) == 1;
       index = input.get(0);
+    }
+    
+    if (onlyFriends)
+    {
+      isTavernIndex = false;
     }
     
     Unit unit = null;
