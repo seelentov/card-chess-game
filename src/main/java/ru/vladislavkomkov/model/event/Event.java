@@ -198,6 +198,7 @@ public class Event
     TABLE,
     FIGHT,
     HAND,
-    TAVERN
+    TAVERN,
+    CREATE_CARD
   }
 }

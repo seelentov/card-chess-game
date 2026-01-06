@@ -8,15 +8,21 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import ru.vladislavkomkov.consts.Spells;
+import ru.vladislavkomkov.consts.Units;
 import ru.vladislavkomkov.controller.GameProcessor;
 import ru.vladislavkomkov.controller.sender.Sender;
+import ru.vladislavkomkov.model.card.Card;
+import ru.vladislavkomkov.model.entity.Entity;
 import ru.vladislavkomkov.model.event.Event;
 import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.fight.FightInfo;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.ListenerUtils;
 import ru.vladislavkomkov.util.RandUtils;
+import ru.vladislavkomkov.util.ReflectUtils;
 import ru.vladislavkomkov.util.UUIDUtils;
 
 public class Game implements AutoCloseable
@@ -92,7 +98,7 @@ public class Game implements AutoCloseable
       playersLock.writeLock().unlock();
     }
   }
-  
+
   public void addPlayer(String UUID, Player player)
   {
     playersLock.writeLock().lock();
@@ -434,6 +440,25 @@ public class Game implements AutoCloseable
     if (player != null)
       player.sellCard(index);
   }
+
+  public void addToHand(String uuid, String cardName) {
+    Player player = getPlayer(uuid);
+    if (player == null){
+      return;
+    }
+
+    Optional<Class<? extends Entity>> aClass = Stream.concat(Units.units.stream(), Spells.spells.stream())
+            .filter(clazz -> clazz.getName().equals(cardName))
+            .findFirst();
+
+    if(aClass.isEmpty()){
+      return;
+    }
+
+    Entity entity = ReflectUtils.getInstance(aClass.get(), player);
+
+    player.addToHand(Card.of(entity));
+  }
   
   public void lvlUp(String uuid)
   {
@@ -605,7 +630,7 @@ public class Game implements AutoCloseable
   {
     executor.shutdown();
   }
-  
+
   public enum State
   {
     FIGHT,

@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
+import ru.vladislavkomkov.enviroment.Config;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.event.Event;
 import ru.vladislavkomkov.model.event.data.SenderWaiterDataRes;
@@ -118,6 +119,14 @@ public class EventDispatcher implements AutoCloseable
         }
         case RESET_TAVERN -> {
           game.resetTavern(playerUUID);
+        }
+        case CREATE_CARD -> {
+          if (!Config.getInstance().isDebug())
+          {
+            break;
+          }
+          String cardName = event.getDataAsString();
+          game.addToHand(playerUUID, cardName);
         }
         case RES -> {
           SenderWaiterDataRes data = event.getData(SenderWaiterDataRes.class);
