@@ -16,7 +16,7 @@ public class HawkstriderHeraldTest extends UnitTestCase
   @Test
   void testDefault()
   {
-    super.testDefault(new SewerRat());
+    super.testDefault(new HawkstriderHerald());
   }
 
   @Test

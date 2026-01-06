@@ -60,30 +60,39 @@ public class Fight
         data,
         player));
   }
-  public void addToFightTable(Player player, Unit unit, Unit parent, boolean withoutOne) {
+  
+  public void addToFightTable(Player player, Unit unit, Unit parent, boolean withoutOne)
+  {
     int index = -1;
     List<Unit> table = getFightTable(player);
     int parentIndex = table.indexOf(parent);
-    if (parentIndex != -1) {
+    if (parentIndex != -1)
+    {
       index = parentIndex + 1;
     }
     addToFightTableInternal(player, unit, index, withoutOne);
   }
   
-  public void addToFightTable(Player player, Unit unit, int index, boolean withoutOne) {
+  public void addToFightTable(Player player, Unit unit, int index, boolean withoutOne)
+  {
     addToFightTableInternal(player, unit, index, withoutOne);
   }
   
-  private void addToFightTableInternal(Player player, Unit unit, int index, boolean withoutOne) {
+  private void addToFightTableInternal(Player player, Unit unit, int index, boolean withoutOne)
+  {
     List<Unit> table = getFightTable(player);
     
-    if ((table.size() - (withoutOne ? 1 : 0)) == Player.TABLE_LIMIT) {
+    if ((table.size() - (withoutOne ? 1 : 0)) == Player.TABLE_LIMIT)
+    {
       return;
     }
     
-    if (index >= table.size() || index == -1) {
+    if (index >= table.size() || index == -1)
+    {
       table.add(unit);
-    } else {
+    }
+    else
+    {
       table.add(index, unit);
     }
     
@@ -102,11 +111,12 @@ public class Fight
     Unit unit = getFightTable(player).get(index);
     removeFromFightTable(player, unit);
   }
-
-  public Optional<Unit> getFightUnit(Player player, String ID){
+  
+  public Optional<Unit> getFightUnit(Player player, String ID)
+  {
     return getFightTable(player).stream().filter(unit -> unit.getID().equals(ID)).findFirst();
   }
-
+  
   public List<Unit> getFightTable(Player player)
   {
     if (player == fightPlayer1.player)
@@ -207,7 +217,7 @@ public class Fight
   Optional<FightInfo> processTurn(boolean isPlayer1Turn)
   {
     Optional<Unit> attackerOpt = findAttacker(isPlayer1Turn);
-    Optional<Unit> attackedOpt = getRandAttackedUnit(isPlayer1Turn ? fightPlayer2.units : fightPlayer1.units);
+    Optional<Unit> attackedOpt = getRandAttackedUnit(isPlayer1Turn);
     
     if (attackerOpt.isPresent() && attackedOpt.isPresent())
     {
@@ -345,6 +355,16 @@ public class Fight
     return units.stream()
         .mapToInt(Unit::getAttack)
         .sum();
+  }
+
+  public Optional<Unit> getRandAttackedUnit(Player attacker)
+  {
+    return getRandAttackedUnit(fightPlayer1.player == attacker);
+  }
+
+  Optional<Unit> getRandAttackedUnit(boolean isPlayer1Turn)
+  {
+    return getRandAttackedUnit(isPlayer1Turn ? fightPlayer2.units : fightPlayer1.units);
   }
   
   Optional<Unit> getRandAttackedUnit(List<Unit> units)

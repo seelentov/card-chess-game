@@ -60,6 +60,13 @@ public class MamaBearTest extends UnitTestCase
     
     assertEquals(new Cat().getAttack() + MamaBear.ATTACK_BOOST, player.getTable().get(1).getAttack());
     assertEquals(new Cat().getHealth() + MamaBear.HEALTH_BOOST, player.getTable().get(1).getHealth());
+
+    player.removeFromTable(0);
+
+    player.addToTable(new Cat(player));
+
+    assertEquals(new Cat().getAttack(), player.getTable().get(1).getAttack());
+    assertEquals(new Cat().getHealth(), player.getTable().get(1).getHealth());
   }
   
   @Test

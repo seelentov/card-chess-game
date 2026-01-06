@@ -179,7 +179,7 @@ public abstract class Unit extends Entity
   @JsonProperty(F_IS_DISGUISE)
   public boolean isDisguise()
   {
-    return isDisguise;
+    return !isTaunt && isDisguise;
   }
   
   public void setIsDisguise(boolean disguise)

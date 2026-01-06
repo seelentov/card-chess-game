@@ -38,7 +38,10 @@ application {
     mainClass.set("ru.vladislavkomkov.controller.ServerDev")
 }
 
-//tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
-//    archiveClassifier.set("")
-//    mergeServiceFiles()
-//}
+tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
+    archiveClassifier.set("")
+    mergeServiceFiles()
+    manifest {
+        attributes["Main-Class"] = "ru.vladislavkomkov.controller.ServerDev"
+    }
+}

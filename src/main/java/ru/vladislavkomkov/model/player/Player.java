@@ -307,22 +307,21 @@ public class Player
     units.forEach(unit -> addToTable(unit, index));
   }
   
+  public void removeFromTable(int index)
+  {
+    if (index >= 0 && index < table.size())
+    {
+      Unit unit = table.get(index);
+      removeFromTable(unit);
+    }
+  }
+  
   public void removeFromTable(Unit unit)
   {
     if (game != null)
     {
       table.removeIf(unit1 -> unit1 == unit);
       unit.onDisappear(game, null, this);
-      sendTable();
-    }
-  }
-  
-  public void removeFromTable(int index)
-  {
-    if (index >= 0 && index < table.size())
-    {
-      table.remove(index);
-      table.get(index).onDisappear(game, null, this);
       sendTable();
     }
   }
@@ -779,12 +778,12 @@ public class Player
   {
     return new ArrayList<>(hand);
   }
-
+  
   public List<Unit> getTable()
   {
     return table;
   }
-
+  
   public Optional<Unit> getTableUnit(String ID)
   {
     return table.stream().filter(unit -> unit.getID().equals(ID)).findFirst();

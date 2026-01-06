@@ -3,7 +3,6 @@ package ru.vladislavkomkov.model.entity.unit.impl.beast.sixth;
 import org.junit.jupiter.api.Test;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.UnitTestCase;
-import ru.vladislavkomkov.model.entity.unit.impl.beast.second.SewerRat;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
 import ru.vladislavkomkov.model.fight.Fight;
 
@@ -16,7 +15,7 @@ public class GoldrinnTheGreatWolfTest extends UnitTestCase
   @Test
   void testDefault()
   {
-    super.testDefault(new SewerRat());
+    super.testDefault(new GoldrinnTheGreatWolf());
   }
   
   @Test

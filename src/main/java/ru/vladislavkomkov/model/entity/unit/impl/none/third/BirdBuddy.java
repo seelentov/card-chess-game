@@ -3,11 +3,14 @@ package ru.vladislavkomkov.model.entity.unit.impl.none.third;
 import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
 import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
 
+import ru.vladislavkomkov.model.Listener;
 import ru.vladislavkomkov.model.entity.unit.Buff;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.UnitType;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.UUIDUtils;
+
+import java.util.List;
 
 public class BirdBuddy extends Unit
 {
@@ -37,31 +40,26 @@ public class BirdBuddy extends Unit
     getListener().onAppearListeners.put(
         KEY_CORE,
         (g, f, p, e) -> {
-          if (f == null)
-          {
-            return;
-          }
-          f.getFightPlayer(p).getListener().onDeadListeners.put(
+          Listener listener = f != null ? f.getFightPlayer(p).getListener() : p.getListener();
+          
+          listener.onDeadListeners.put(
               tempKey,
               (game, fight, player1, player2, unit, attacker) -> {
-                if (unit.isType(UnitType.BEAST) && !unit.getID().equals(getID()))
+                if (unit.getID().equals(getID()))
                 {
-                  if (fight != null)
-                  {
-                    fight.getFightTable(player1).forEach(this::addBuff);
-                  }
+                  return;
                 }
+
+                List<Unit> units = fight != null ? fight.getFightTable(player1) : player1.getTable();
+                units.stream().filter(unit1 -> unit1.isType(UnitType.BEAST)).forEach(this::addBuff);
               });
         });
     
     getListener().onDisappearListeners.put(
         KEY_CORE,
         (g, f, p, e) -> {
-          if (f == null)
-          {
-            return;
-          }
-          f.getFightPlayer(p).getListener().onDeadListeners.remove(tempKey);
+          Listener listener = f != null ? f.getFightPlayer(p).getListener() : p.getListener();
+          listener.onDeadListeners.remove(tempKey);
         });
   }
   
