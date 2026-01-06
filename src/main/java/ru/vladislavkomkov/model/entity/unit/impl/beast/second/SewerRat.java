@@ -1,14 +1,14 @@
 package ru.vladislavkomkov.model.entity.unit.impl.beast.second;
 
+import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
+import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
+
+import java.util.List;
+
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.UnitType;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.HalfShell;
 import ru.vladislavkomkov.model.player.Player;
-
-import java.util.List;
-
-import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
-import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
 
 public class SewerRat extends Unit
 {
@@ -54,6 +54,6 @@ public class SewerRat extends Unit
   public String getDescription()
   {
     Unit sub = isGold ? new HalfShell(playerLink).buildGold() : new HalfShell(playerLink);
-    return "Deathrattle: Summon a " + sub.getBaseAttack() + "/" + sub.getBaseHealth() + " "+sub.getName()+" with Taunt.";
+    return "Deathrattle: Summon a " + sub.getBaseAttack() + "/" + sub.getBaseHealth() + " " + sub.getName() + " with Taunt.";
   }
 }

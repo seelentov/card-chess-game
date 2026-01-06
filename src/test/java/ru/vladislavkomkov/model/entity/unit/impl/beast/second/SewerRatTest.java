@@ -1,12 +1,13 @@
 package ru.vladislavkomkov.model.entity.unit.impl.beast.second;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
+
 import ru.vladislavkomkov.model.entity.unit.UnitTestCase;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.HalfShell;
 import ru.vladislavkomkov.model.fight.Fight;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SewerRatTest extends UnitTestCase
 {

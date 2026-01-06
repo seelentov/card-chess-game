@@ -2,16 +2,12 @@ package ru.vladislavkomkov.model.entity.unit.impl.dragon.fourth;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.List;
-
 import org.junit.jupiter.api.Test;
 
-import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.UnitTestCase;
 import ru.vladislavkomkov.model.entity.unit.impl.beast.first.Alleycat;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
-import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.UUIDUtils;
 
@@ -35,11 +31,12 @@ public class GreenskeeperTest extends UnitTestCase
     for (int i = 1; i < Player.TABLE_LIMIT; i++)
     {
       int finalI = i;
-      Unit unit = new Unit(player) {};
+      Unit unit = new Unit(player)
+      {
+      };
       unit.getListener().onPlayedListeners.put(
-              UUIDUtils.generateKey(),
-              ((game1, fight, player1, entity, input, auto)
-                      -> player1.addMoney(finalI * moneyStep)));
+          UUIDUtils.generateKey(),
+          ((game1, fight, player1, entity, input, auto) -> player1.addMoney(finalI * moneyStep)));
       player.addToTable(unit);
     }
     

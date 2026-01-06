@@ -1,13 +1,6 @@
 package ru.vladislavkomkov.model;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
@@ -33,13 +26,11 @@ public class Game implements AutoCloseable
   
   final String uuid;
   final ExecutorService executor = Executors.newFixedThreadPool(FIGHTS_COUNT);
-  List<Fight> fights = new ArrayList<>();
   final List<FightInfo> fightHistory = new CopyOnWriteArrayList<>();
-  
   final Map<String, Player> players;
   private final ReadWriteLock playersLock = new ReentrantReadWriteLock();
   private final boolean acceptingNewPlayers;
-  
+  List<Fight> fights = new ArrayList<>();
   State state = State.LOBBY;
   int turn = 1;
   
@@ -493,7 +484,7 @@ public class Game implements AutoCloseable
   {
     ListenerUtils.processFightActionListeners(
         ListenerUtils.getPlayerListener(fight, player).onStartFightListeners, this, fight, player, player2);
-
+    
     new ArrayList<>(fight.getFightTable(player)).forEach(unit -> unit.onStartFight(this, fight, player, player2));
   }
   

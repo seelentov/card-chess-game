@@ -1,16 +1,11 @@
 package ru.vladislavkomkov.model.entity.unit;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Optional;
 
 import ru.vladislavkomkov.GamePlayerTestCase;
 import ru.vladislavkomkov.model.card.Card;
-import ru.vladislavkomkov.model.entity.spell.impl.TripleReward;
-import ru.vladislavkomkov.model.entity.unit.impl.naga.fourth.DeepBlueCrooner;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
 import ru.vladislavkomkov.model.fight.Fight;
 
@@ -78,8 +73,8 @@ public abstract class UnitTestCase extends GamePlayerTestCase
     assertEquals(0, player.getUnitsCount());
     
     assertEquals(unit.getName(), gold.get().getEntity().getName());
-    assertEquals(unit.getAttack() * 2, ((Unit)gold.get().getEntity()).getAttack());
-    assertEquals(unit.getHealth() * 2, ((Unit)gold.get().getEntity()).getHealth());
+    assertEquals(unit.getAttack() * 2, ((Unit) gold.get().getEntity()).getAttack());
+    assertEquals(unit.getHealth() * 2, ((Unit) gold.get().getEntity()).getHealth());
     
     tearDown();
   }

@@ -1,15 +1,15 @@
 package ru.vladislavkomkov.model.entity.unit.impl.beast.sixth;
 
+import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
+import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
+
+import java.util.List;
+
 import ru.vladislavkomkov.model.entity.unit.Buff;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.UnitType;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.UUIDUtils;
-
-import java.util.List;
-
-import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
-import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
 
 public class GoldrinnTheGreatWolf extends Unit
 {
@@ -48,23 +48,23 @@ public class GoldrinnTheGreatWolf extends Unit
             {
               return;
             }
-              int attack = ATTACK_BOOST * (isGold() ? 2 : 1);
-              int health = HEALTH_BOOST * (isGold() ? 2 : 1);
-
-              addBuff(unit1, attack, health);
+            int attack = ATTACK_BOOST * (isGold() ? 2 : 1);
+            int health = HEALTH_BOOST * (isGold() ? 2 : 1);
+            
+            addBuff(unit1, attack, health);
           });
-
-            fight.getFightPlayer(player1).getListener().onSummonedListeners.put(
-                    UUIDUtils.generateKey(),
-                    (game1, fight1, playeer, entity) -> {
-                        int attack = ATTACK_BOOST * (isGold() ? 2 : 1);
-                        int health = HEALTH_BOOST * (isGold() ? 2 : 1);
-                        
-                        if (entity instanceof Unit unit1 && unit.isType(UnitType.BEAST))
-                        {
-                            addBuff(unit1, attack, health);
-                        }
-                    });
+          
+          fight.getFightPlayer(player1).getListener().onSummonedListeners.put(
+              UUIDUtils.generateKey(),
+              (game1, fight1, playeer, entity) -> {
+                int attack = ATTACK_BOOST * (isGold() ? 2 : 1);
+                int health = HEALTH_BOOST * (isGold() ? 2 : 1);
+                
+                if (entity instanceof Unit unit1 && unit.isType(UnitType.BEAST))
+                {
+                  addBuff(unit1, attack, health);
+                }
+              });
         });
     
     actualHealth = getMaxHealth();

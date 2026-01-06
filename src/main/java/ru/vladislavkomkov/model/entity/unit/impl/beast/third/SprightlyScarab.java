@@ -11,11 +11,7 @@ import ru.vladislavkomkov.model.entity.Choice;
 import ru.vladislavkomkov.model.entity.Entity;
 import ru.vladislavkomkov.model.entity.PlayPair;
 import ru.vladislavkomkov.model.entity.PlayType;
-import ru.vladislavkomkov.model.entity.unit.AttacksCount;
-import ru.vladislavkomkov.model.entity.unit.Buff;
-import ru.vladislavkomkov.model.entity.unit.Choicer;
-import ru.vladislavkomkov.model.entity.unit.Unit;
-import ru.vladislavkomkov.model.entity.unit.UnitType;
+import ru.vladislavkomkov.model.entity.unit.*;
 import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.model.player.Tavern;
@@ -69,21 +65,12 @@ public class SprightlyScarab extends Choicer
     actualHealth = getMaxHealth();
   }
   
-  @Override
-  public String getDescription()
-  {
-    return "Choose One: "
-        + new SprightlySprucing(playerLink, isGold).getDescription()
-        + "; or "
-        + new SprightlySupport(playerLink, isGold).getDescription();
-  }
-  
   private static Optional<Unit> findUnit(Fight fight, Player player, List<Integer> input)
   {
     boolean isTavernIndex = input.size() >= 4 && input.get(3) == 1;
-    
+
     Unit unit = null;
-    
+
     if (isTavernIndex)
     {
       List<Entity> units = player.getTavern().getCards().stream().map(Tavern.Slot::getEntity).toList();
@@ -99,12 +86,12 @@ public class SprightlyScarab extends Choicer
       int index = SprightlyScarab.calcIndex(input, units);
       unit = units.get(index);
     }
-    
+
     if (unit != null && unit.isType(UnitType.BEAST))
     {
       return Optional.of(unit);
     }
-    
+
     return Optional.empty();
   }
   
@@ -119,18 +106,27 @@ public class SprightlyScarab extends Choicer
     {
       index = RandUtils.getRand(units.size() - 1);
     }
-    
+
     if (input.get(0) <= index)
     {
       index += 1;
     }
-    
+
     if (index >= units.size())
     {
       index = 0;
     }
-    
+
     return index;
+  }
+  
+  @Override
+  public String getDescription()
+  {
+    return "Choose One: "
+        + new SprightlySprucing(playerLink, isGold).getDescription()
+        + "; or "
+        + new SprightlySupport(playerLink, isGold).getDescription();
   }
   
   public static class SprightlySprucing extends Choice
@@ -146,11 +142,12 @@ public class SprightlyScarab extends Choicer
     public void process(Game game, Fight fight, Player player, Entity entity, List<Integer> input, boolean auto)
     {
       Optional<Unit> unit = SprightlyScarab.findUnit(fight, player, input);
-
-      if(unit.isEmpty()){
+      
+      if (unit.isEmpty())
+      {
         return;
       }
-
+      
       unit.get().addBuff(new Buff(
           u -> {
             u.incBaseAttack(ATTACK_BOOST * (this.isGold ? 2 : 1));
@@ -186,11 +183,12 @@ public class SprightlyScarab extends Choicer
     public void process(Game game, Fight fight, Player player, Entity entity, List<Integer> input, boolean auto)
     {
       Optional<Unit> unit = SprightlyScarab.findUnit(fight, player, input);
-
-      if(unit.isEmpty()){
+      
+      if (unit.isEmpty())
+      {
         return;
       }
-
+      
       unit.get().addBuff(new Buff(
           u -> {
             u.incBaseAttack(ATTACK_BOOST * (this.isGold ? 2 : 1));

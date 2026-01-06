@@ -46,8 +46,9 @@ public class Mechorse extends TrashUnit
   }
   
   @Override
-    public String getDescription() {
-        Unit sub = isGold() ? new Mechapony(playerLink).buildGold() : new Mechapony(playerLink);
-        return "Deathrattle: Summon a "+sub.getBaseAttack()+"/"+sub.getBaseHealth()+" "+sub.getName();
-    }
+  public String getDescription()
+  {
+    Unit sub = isGold() ? new Mechapony(playerLink).buildGold() : new Mechapony(playerLink);
+    return "Deathrattle: Summon a " + sub.getBaseAttack() + "/" + sub.getBaseHealth() + " " + sub.getName();
+  }
 }

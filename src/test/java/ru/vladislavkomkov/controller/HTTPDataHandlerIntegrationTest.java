@@ -1,10 +1,6 @@
 package ru.vladislavkomkov.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -132,17 +128,20 @@ public class HTTPDataHandlerIntegrationTest extends IntegrationTestCase
   }
   
   @Test
-  void testCreateGame() throws Exception {
+  void testCreateGame() throws Exception
+  {
     HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create("http://localhost:" + port + "/games"))
-            .POST(HttpRequest.BodyPublishers.noBody())
-            .build();
+        .uri(URI.create("http://localhost:" + port + "/games"))
+        .POST(HttpRequest.BodyPublishers.noBody())
+        .build();
     
     HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
     
     assertEquals(201, response.statusCode(), response.toString());
     
-    Map<String, Object> responseBody = objectMapper.readValue(response.body(), new TypeReference<>() {});
+    Map<String, Object> responseBody = objectMapper.readValue(response.body(), new TypeReference<>()
+    {
+    });
     assertTrue(responseBody.containsKey("key"));
     assertNotNull(responseBody.get("key"));
     assertFalse(((String) responseBody.get("key")).isBlank());
@@ -151,16 +150,19 @@ public class HTTPDataHandlerIntegrationTest extends IntegrationTestCase
   }
   
   @Test
-  void testStartGame() throws Exception {
+  void testStartGame() throws Exception
+  {
     HttpRequest createRequest = HttpRequest.newBuilder()
-            .uri(URI.create("http://localhost:" + port + "/games"))
-            .POST(HttpRequest.BodyPublishers.noBody())
-            .build();
+        .uri(URI.create("http://localhost:" + port + "/games"))
+        .POST(HttpRequest.BodyPublishers.noBody())
+        .build();
     
     HttpResponse<String> createResponse = client.send(createRequest, HttpResponse.BodyHandlers.ofString());
     assertEquals(201, createResponse.statusCode());
     
-    Map<String, Object> createResponseBody = objectMapper.readValue(createResponse.body(), new TypeReference<>() {});
+    Map<String, Object> createResponseBody = objectMapper.readValue(createResponse.body(), new TypeReference<>()
+    {
+    });
     String key = (String) createResponseBody.get("key");
     
     String gameUUID = (String) JWTUtils.extractClaim(key, HTTPDataHandler.UUID_KEY);
@@ -175,36 +177,45 @@ public class HTTPDataHandlerIntegrationTest extends IntegrationTestCase
     String jsonBody = objectMapper.writeValueAsString(requestBody);
     
     HttpRequest startRequest = HttpRequest.newBuilder()
-            .uri(URI.create("http://localhost:" + port + "/games/" + gameUUID + "/start"))
+        .uri(URI.create("http://localhost:" + port + "/games/" + gameUUID + "/start"))
         .header("Content-UnitType", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
-            .build();
+        .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+        .build();
     
     HttpResponse<String> startResponse = client.send(startRequest, HttpResponse.BodyHandlers.ofString());
     
     assertEquals(201, startResponse.statusCode());
-    assertTrue(waitForCondition(()->game.getState() != Game.State.LOBBY, 10000));
+    assertTrue(waitForCondition(() -> game.getState() != Game.State.LOBBY, 10000));
   }
   
   @Test
-  void testStartGameIfCant() {
+  void testStartGameIfCant()
+  {
     HttpRequest createRequest = HttpRequest.newBuilder()
-            .uri(URI.create("http://localhost:" + port + "/games"))
-            .POST(HttpRequest.BodyPublishers.noBody())
-            .build();
+        .uri(URI.create("http://localhost:" + port + "/games"))
+        .POST(HttpRequest.BodyPublishers.noBody())
+        .build();
     
     HttpResponse<String> createResponse;
-    try {
+    try
+    {
       createResponse = client.send(createRequest, HttpResponse.BodyHandlers.ofString());
-    } catch (Exception e) {
+    }
+    catch (Exception e)
+    {
       throw new RuntimeException(e);
     }
     assertEquals(201, createResponse.statusCode());
     
     Map<String, Object> createResponseBody = null;
-    try {
-      createResponseBody = objectMapper.readValue(createResponse.body(), new TypeReference<>() {});
-    } catch (Exception e) {
+    try
+    {
+      createResponseBody = objectMapper.readValue(createResponse.body(), new TypeReference<>()
+      {
+      });
+    }
+    catch (Exception e)
+    {
       throw new RuntimeException(e);
     }
     String key = (String) createResponseBody.get("key");
@@ -216,22 +227,28 @@ public class HTTPDataHandlerIntegrationTest extends IntegrationTestCase
     
     Map<String, String> requestBody = Map.of("key", key);
     String jsonBody = null;
-    try {
+    try
+    {
       jsonBody = objectMapper.writeValueAsString(requestBody);
-    } catch (Exception e) {
+    }
+    catch (Exception e)
+    {
       throw new RuntimeException(e);
     }
     
     HttpRequest startRequest = HttpRequest.newBuilder()
-            .uri(URI.create("http://localhost:" + port + "/games/" + gameUUID + "/start"))
+        .uri(URI.create("http://localhost:" + port + "/games/" + gameUUID + "/start"))
         .header("Content-UnitType", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
-            .build();
+        .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+        .build();
     
     HttpResponse<String> startResponse;
-    try {
+    try
+    {
       startResponse = client.send(startRequest, HttpResponse.BodyHandlers.ofString());
-    } catch (Exception e) {
+    }
+    catch (Exception e)
+    {
       return;
     }
     

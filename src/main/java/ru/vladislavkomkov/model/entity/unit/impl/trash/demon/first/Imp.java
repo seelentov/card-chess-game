@@ -18,7 +18,7 @@ public class Imp extends TrashUnit
   public Imp(Player playerLink)
   {
     super(playerLink);
-
+    
     unitType = List.of(UnitType.DEMON);
     
     actualHealth = getMaxHealth();

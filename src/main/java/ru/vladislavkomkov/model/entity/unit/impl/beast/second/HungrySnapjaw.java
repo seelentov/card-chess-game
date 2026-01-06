@@ -1,16 +1,16 @@
 package ru.vladislavkomkov.model.entity.unit.impl.beast.second;
 
+import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
+import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
+
+import java.util.List;
+import java.util.Optional;
+
 import ru.vladislavkomkov.model.entity.unit.Buff;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.UnitType;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.UUIDUtils;
-
-import java.util.List;
-import java.util.Optional;
-
-import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
-import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
 
 public class HungrySnapjaw extends Unit
 {

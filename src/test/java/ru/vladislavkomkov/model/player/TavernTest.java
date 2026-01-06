@@ -1,9 +1,6 @@
 package ru.vladislavkomkov.model.player;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +15,6 @@ import ru.vladislavkomkov.model.entity.unit.impl.beast.first.Alleycat;
 import ru.vladislavkomkov.model.entity.unit.impl.mech.fourth.AccordoTron;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cubling;
-import ru.vladislavkomkov.util.SpellUtils;
 
 public class TavernTest
 {

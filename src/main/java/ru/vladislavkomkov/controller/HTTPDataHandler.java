@@ -1,7 +1,6 @@
 package ru.vladislavkomkov.controller;
 
 import java.util.Map;
-import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,9 +99,8 @@ public class HTTPDataHandler implements AutoCloseable
     
     context.status(201);
     context.json(Map.of(
-            "key", key,
-            "uuid", uuid
-    ));
+        "key", key,
+        "uuid", uuid));
   }
   
   void startGame(Context context)

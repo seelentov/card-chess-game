@@ -10,6 +10,7 @@ import java.util.function.Function;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import ru.vladislavkomkov.model.ActionEvent;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.Entity;
@@ -18,7 +19,6 @@ import ru.vladislavkomkov.model.entity.PlayType;
 import ru.vladislavkomkov.model.entity.spell.impl.TripleReward;
 import ru.vladislavkomkov.model.entity.unit.impl.Extra;
 import ru.vladislavkomkov.model.fight.Fight;
-import ru.vladislavkomkov.model.ActionEvent;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.ListenerUtils;
 
@@ -38,24 +38,20 @@ public abstract class Unit extends Entity
   
   public final static String F_BUFFS = "buffs";
   public final static String F_TYPE = "type";
-  
-  List<Buff> buffs = new ArrayList<>();
   protected List<UnitType> unitType = new ArrayList<>();
-  
   protected int attack = 0;
   protected AttacksCount attacksCount = AttacksCount.DEFAULT;
   protected int maxHealth = 1;
   protected int actualHealth;
-  
   protected boolean isBubbled = false;
   protected boolean isTaunt = false;
   protected boolean isRebirth = false;
   protected boolean isMagnet = false;
   protected boolean isDisguise = false;
-  
   protected boolean isAnswerOnPlayed = true;
   protected boolean isAnswerOnStartTurn = true;
   protected boolean isAnswerOnDead = true;
+  List<Buff> buffs = new ArrayList<>();
   
   public Unit()
   {
@@ -85,17 +81,17 @@ public abstract class Unit extends Entity
     return attack;
   }
   
+  public void setBaseAttack(int i)
+  {
+    attack = i;
+  }
+  
   @JsonProperty(F_ATTACK)
   public int getAttack()
   {
     return attack
         + playerLink.getStatistic().getBoosts().getAttackByUnitType(unitType)
         + playerLink.getStatistic().getBoosts().getAttackUnit();
-  }
-  
-  public void setBaseAttack(int i)
-  {
-    attack = i;
   }
   
   public void incBaseAttack(int i)

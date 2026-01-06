@@ -167,7 +167,7 @@ public class Event
         "gameUUID='" + gameUUID + '\'' +
         ", playerUUID='" + playerUUID + '\'' +
         ", unitType=" + type +
-        ", data=" + new String(data, StandardCharsets.UTF_8)+
+        ", data=" + new String(data, StandardCharsets.UTF_8) +
         '}';
   }
   

@@ -1,12 +1,13 @@
 package ru.vladislavkomkov.model.entity.unit.impl.beast.sixth;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
+
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.UnitTestCase;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
 import ru.vladislavkomkov.model.fight.Fight;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class P0ULTR0NTest extends UnitTestCase
 {
@@ -41,7 +42,7 @@ public class P0ULTR0NTest extends UnitTestCase
     for (int i = 0; i < 4; i++)
     {
       fight.doTurn();
-
+      
     }
     
     Unit unit21FromBattle = fight.getFightTable(player2).get(0);

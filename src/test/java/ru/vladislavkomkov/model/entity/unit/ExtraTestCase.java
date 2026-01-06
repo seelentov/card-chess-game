@@ -6,7 +6,6 @@ import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.unit.impl.Extra;
 import ru.vladislavkomkov.model.entity.unit.impl.beast.first.Alleycat;
 import ru.vladislavkomkov.model.entity.unit.impl.beast.second.SewerRat;
-import ru.vladislavkomkov.model.entity.unit.impl.mech.fourth.AccordoTron;
 import ru.vladislavkomkov.model.entity.unit.impl.murloc.secord.GrimscaleElegist;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.HalfShell;

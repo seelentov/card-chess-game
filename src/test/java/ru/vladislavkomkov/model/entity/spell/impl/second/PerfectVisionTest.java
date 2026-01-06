@@ -1,15 +1,15 @@
 package ru.vladislavkomkov.model.entity.spell.impl.second;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
+
 import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.spell.SpellTestCase;
 import ru.vladislavkomkov.model.entity.unit.Buff;
 import ru.vladislavkomkov.model.entity.unit.Unit;
-import ru.vladislavkomkov.model.entity.unit.impl.demon.first.IckyImp;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
 import ru.vladislavkomkov.model.entity.unit.impl.undead.first.RisenRider;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PerfectVisionTest extends SpellTestCase
 {
@@ -69,13 +69,13 @@ public class PerfectVisionTest extends SpellTestCase
     
     Unit unit12 = new RisenRider(player);
     unit12.addBuff(new Buff(
-            unit -> {
-              unit.incBaseAttack(attackBoostTest);
-              unit.incHealth(healthBoostTest);
-            },
-            null,
-            null));
-
+        unit -> {
+          unit.incBaseAttack(attackBoostTest);
+          unit.incHealth(healthBoostTest);
+        },
+        null,
+        null));
+    
     player.addToTable(unit11);
     player.addToTable(unit12);
     player.addToHand(Card.of(new PerfectVision(player)));

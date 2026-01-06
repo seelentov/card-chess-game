@@ -1,14 +1,15 @@
 package ru.vladislavkomkov.model.entity.unit.impl.beast.sixth;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
+
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.UnitTestCase;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
 import ru.vladislavkomkov.model.fight.Fight;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class GoldrinnTheGreatWolfTest extends UnitTestCase
 {
@@ -35,7 +36,7 @@ public class GoldrinnTheGreatWolfTest extends UnitTestCase
     fight.doTurn();
     
     List<Unit> units = fight.getFightTable(player);
-
+    
     assertEquals(GoldrinnTheGreatWolf.ATTACK_BOOST + new Cat().getAttack(), units.get(0).getAttack());
     assertEquals(GoldrinnTheGreatWolf.ATTACK_BOOST + new Cat().getAttack(), units.get(1).getAttack());
     assertEquals(GoldrinnTheGreatWolf.ATTACK_BOOST + new Cat().getAttack(), units.get(2).getAttack());

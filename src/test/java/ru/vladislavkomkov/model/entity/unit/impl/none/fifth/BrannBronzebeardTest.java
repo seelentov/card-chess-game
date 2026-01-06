@@ -3,7 +3,6 @@ package ru.vladislavkomkov.model.entity.unit.impl.none.fifth;
 import org.junit.jupiter.api.Test;
 
 import ru.vladislavkomkov.model.entity.unit.ExtraTestCase;
-import ru.vladislavkomkov.model.entity.unit.UnitTestCase;
 
 public class BrannBronzebeardTest extends ExtraTestCase
 {

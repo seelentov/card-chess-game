@@ -5,8 +5,6 @@ import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
 
 import java.util.List;
 
-import ru.vladislavkomkov.model.card.Card;
-import ru.vladislavkomkov.model.entity.Entity;
 import ru.vladislavkomkov.model.entity.unit.Buff;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.UnitType;

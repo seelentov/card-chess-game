@@ -17,7 +17,7 @@ public abstract class SpellCrafter extends Unit
   public SpellCrafter(Player playerLink, SpellCraft spellcraft)
   {
     super(playerLink);
-
+    
     this.spellcraft = spellcraft;
     
     unitType = List.of(UnitType.NAGA);

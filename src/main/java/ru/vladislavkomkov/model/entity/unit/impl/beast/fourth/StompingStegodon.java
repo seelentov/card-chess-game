@@ -1,16 +1,11 @@
 package ru.vladislavkomkov.model.entity.unit.impl.beast.fourth;
 
-import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
 import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 
 import ru.vladislavkomkov.model.action.OnAttackAction;
-import ru.vladislavkomkov.model.entity.Entity;
 import ru.vladislavkomkov.model.entity.unit.Buff;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.UnitType;

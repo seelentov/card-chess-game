@@ -7,7 +7,6 @@ public class SenderWaiterDataRes
   public final static String F_KEY = "key";
   public final static String F_PARAM = "param";
   
-  
   String key;
   int param;
   

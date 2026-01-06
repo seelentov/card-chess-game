@@ -1,16 +1,16 @@
 package ru.vladislavkomkov.model.event.data;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.Entity;
-
-import java.util.List;
 
 public class SenderWaiterDataReq<T extends Entity>
 {
   public final static String F_KEY = "key";
   public final static String F_DATA = "data";
-  
   
   String key;
   List<Card<T>> data;
@@ -18,7 +18,7 @@ public class SenderWaiterDataReq<T extends Entity>
   public SenderWaiterDataReq()
   {
   }
-
+  
   public SenderWaiterDataReq(String key, List<Card<T>> data)
   {
     this.key = key;

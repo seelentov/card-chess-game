@@ -7,13 +7,13 @@ import ru.vladislavkomkov.model.player.Player;
 
 public class DumpSecond extends Dump
 {
-    public DumpSecond()
-    {
-      this(DUMP_PLAYER);
-    }
-    
-    public DumpSecond(Player playerLink)
-    {
-      super(playerLink, 2);
-    }
+  public DumpSecond()
+  {
+    this(DUMP_PLAYER);
+  }
+  
+  public DumpSecond(Player playerLink)
+  {
+    super(playerLink, 2);
+  }
 }

@@ -2,10 +2,9 @@ package ru.vladislavkomkov.model.action;
 
 import java.util.List;
 
-import ru.vladislavkomkov.model.entity.unit.Unit;
-import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.entity.Entity;
+import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.player.Player;
 
 public interface OnPlayedAction extends Action

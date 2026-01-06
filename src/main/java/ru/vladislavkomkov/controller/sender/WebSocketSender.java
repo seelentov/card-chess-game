@@ -1,10 +1,10 @@
 package ru.vladislavkomkov.controller.sender;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.java_websocket.WebSocket;
 
 import ru.vladislavkomkov.model.event.Event;
-
-import java.util.concurrent.CompletableFuture;
 
 public class WebSocketSender implements Sender
 {

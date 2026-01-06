@@ -1,13 +1,14 @@
 package ru.vladislavkomkov.model.entity.spell.impl.fourth;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.Test;
+
 import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.spell.SpellTestCase;
 import ru.vladislavkomkov.model.entity.unit.impl.beast.sixth.GoldrinnTheGreatWolf;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EyesoftheEarthMotherTest extends SpellTestCase
 {

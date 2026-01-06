@@ -56,7 +56,7 @@ public class Statistic
     
     int attackSpell = 0;
     int tavernAttackSpell = 0;
-
+    
     int healthSpell = 0;
     int tavernHealthSpell = 0;
     

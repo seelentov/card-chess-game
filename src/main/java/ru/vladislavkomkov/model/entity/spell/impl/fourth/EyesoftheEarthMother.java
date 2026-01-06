@@ -1,17 +1,16 @@
 package ru.vladislavkomkov.model.entity.spell.impl.fourth;
 
-import ru.vladislavkomkov.model.entity.PlayPair;
-import ru.vladislavkomkov.model.entity.PlayType;
-import ru.vladislavkomkov.model.entity.spell.Spell;
-import ru.vladislavkomkov.model.entity.unit.Buff;
-import ru.vladislavkomkov.model.entity.unit.Unit;
-import ru.vladislavkomkov.model.player.Player;
+import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
+import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
 
 import java.util.List;
 import java.util.Optional;
 
-import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
-import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
+import ru.vladislavkomkov.model.entity.PlayPair;
+import ru.vladislavkomkov.model.entity.PlayType;
+import ru.vladislavkomkov.model.entity.spell.Spell;
+import ru.vladislavkomkov.model.entity.unit.Unit;
+import ru.vladislavkomkov.model.player.Player;
 
 public class EyesoftheEarthMother extends Spell
 {
@@ -44,14 +43,16 @@ public class EyesoftheEarthMother extends Spell
         KEY_CORE,
         (game, fight, player, entity, input, auto) -> {
           Optional<Unit> unit = getUnitFromTavernFriendlyInput(fight, player, input);
-          if(unit.isEmpty()){
-              return;
+          if (unit.isEmpty())
+          {
+            return;
           }
-
-          if(unit.get().getLevel() > MAX_LEVEL){
-              return;
+          
+          if (unit.get().getLevel() > MAX_LEVEL)
+          {
+            return;
           }
-
+          
           unit.get().setIsGold(true);
         });
   }
@@ -59,6 +60,6 @@ public class EyesoftheEarthMother extends Spell
   @Override
   public String getDescription()
   {
-    return "Choose a friendly minion from Tier "+MAX_LEVEL+" or below. Make it Golden.";
+    return "Choose a friendly minion from Tier " + MAX_LEVEL + " or below. Make it Golden.";
   }
 }

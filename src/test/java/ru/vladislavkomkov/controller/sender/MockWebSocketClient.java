@@ -1,7 +1,6 @@
 package ru.vladislavkomkov.controller.sender;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 
 import org.java_websocket.client.WebSocketClient;

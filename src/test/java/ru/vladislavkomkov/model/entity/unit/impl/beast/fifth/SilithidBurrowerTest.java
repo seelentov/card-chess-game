@@ -1,12 +1,13 @@
 package ru.vladislavkomkov.model.entity.unit.impl.beast.fifth;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
+
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.UnitTestCase;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
 import ru.vladislavkomkov.model.fight.Fight;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SilithidBurrowerTest extends UnitTestCase
 {
@@ -81,33 +82,33 @@ public class SilithidBurrowerTest extends UnitTestCase
     player.addToTable(new Cat(player));
     player.addToTable(new Cat(player));
     player.addToTable(new SilithidBurrower(player));
-
+    
     player.getTable().stream().filter(unit -> unit instanceof Cat).forEach(unit -> {
       unit.setIsTaunt(true);
     });
-
+    
     player.addToTable(new Cat(player));
     player.addToTable(new Cat(player));
-
+    
     Unit unit21 = new Cat(player);
     unit21.setBaseAttack(9999);
     unit21.setHealth(99999);
     player2.addToTable(unit21);
-
+    
     Fight fight = new Fight(game, player, player2);
-
+    
     for (int i = 0; i < 4; i++)
     {
       fight.doTurn();
     }
-
-    assertEquals(4, ((SilithidBurrower)player.getTable().get(3)).stacks);
-
+    
+    assertEquals(4, ((SilithidBurrower) player.getTable().get(3)).stacks);
+    
     for (int i = 0; i < 2; i++)
     {
       fight.doTurn();
     }
-
-    assertEquals(4, ((SilithidBurrower)player.getTable().get(3)).stacks);
+    
+    assertEquals(4, ((SilithidBurrower) player.getTable().get(3)).stacks);
   }
 }

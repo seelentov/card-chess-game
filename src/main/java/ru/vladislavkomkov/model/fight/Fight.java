@@ -356,12 +356,12 @@ public class Fight
         .mapToInt(Unit::getAttack)
         .sum();
   }
-
+  
   public Optional<Unit> getRandAttackedUnit(Player attacker)
   {
     return getRandAttackedUnit(fightPlayer1.player == attacker);
   }
-
+  
   Optional<Unit> getRandAttackedUnit(boolean isPlayer1Turn)
   {
     return getRandAttackedUnit(isPlayer1Turn ? fightPlayer2.units : fightPlayer1.units);

@@ -1,7 +1,5 @@
 package ru.vladislavkomkov.util;
 
-import java.lang.reflect.InvocationTargetException;
-
 import ru.vladislavkomkov.model.player.Player;
 
 public class ReflectUtils

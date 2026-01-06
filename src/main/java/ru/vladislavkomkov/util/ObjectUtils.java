@@ -25,7 +25,8 @@ public class ObjectUtils
   
   public static byte[] writeValue(Object object)
   {
-    if(object == null){
+    if (object == null)
+    {
       return null;
     }
     

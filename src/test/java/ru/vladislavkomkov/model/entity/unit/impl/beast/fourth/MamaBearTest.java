@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.UnitTestCase;
-import ru.vladislavkomkov.model.entity.unit.impl.beast.first.Manasaber;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
 import ru.vladislavkomkov.model.fight.Fight;
 
@@ -35,21 +34,21 @@ public class MamaBearTest extends UnitTestCase
   @Test
   void testOnSummonedFightDisappear()
   {
-      Unit unit = new MamaBear(player);
-      player.addToTable(unit);
-      
-      player2.addToTable(new Cat());
-      
-      Fight fight = new Fight(game, player, player2);
-      
-      fight.addToFightTable(player, new Cat(), 1, false);
-      
-      fight.removeFromFightTable(player, 0);
-      
-      fight.addToFightTable(player, new Cat(), 1, false);
-      
-      assertEquals(new Cat().getAttack() + MamaBear.ATTACK_BOOST, fight.getFightTable(player).get(0).getAttack());
-      assertEquals(new Cat().getAttack(), fight.getFightTable(player).get(1).getAttack());
+    Unit unit = new MamaBear(player);
+    player.addToTable(unit);
+    
+    player2.addToTable(new Cat());
+    
+    Fight fight = new Fight(game, player, player2);
+    
+    fight.addToFightTable(player, new Cat(), 1, false);
+    
+    fight.removeFromFightTable(player, 0);
+    
+    fight.addToFightTable(player, new Cat(), 1, false);
+    
+    assertEquals(new Cat().getAttack() + MamaBear.ATTACK_BOOST, fight.getFightTable(player).get(0).getAttack());
+    assertEquals(new Cat().getAttack(), fight.getFightTable(player).get(1).getAttack());
   }
   
   @Test
@@ -60,11 +59,11 @@ public class MamaBearTest extends UnitTestCase
     
     assertEquals(new Cat().getAttack() + MamaBear.ATTACK_BOOST, player.getTable().get(1).getAttack());
     assertEquals(new Cat().getHealth() + MamaBear.HEALTH_BOOST, player.getTable().get(1).getHealth());
-
+    
     player.removeFromTable(0);
-
+    
     player.addToTable(new Cat(player));
-
+    
     assertEquals(new Cat().getAttack(), player.getTable().get(1).getAttack());
     assertEquals(new Cat().getHealth(), player.getTable().get(1).getHealth());
   }

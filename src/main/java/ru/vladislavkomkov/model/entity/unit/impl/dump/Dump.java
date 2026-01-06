@@ -8,7 +8,7 @@ public abstract class Dump extends Unit
   public Dump(Player playerLink, int lvl)
   {
     super(playerLink);
-
+    
     level = lvl;
     isTavern = true;
     

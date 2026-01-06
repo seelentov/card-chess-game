@@ -9,12 +9,12 @@ import java.util.function.Consumer;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import ru.vladislavkomkov.consts.Listeners;
+import ru.vladislavkomkov.model.ActionEvent;
 import ru.vladislavkomkov.model.GObject;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.Listener;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.fight.Fight;
-import ru.vladislavkomkov.model.ActionEvent;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.ListenerUtils;
 import ru.vladislavkomkov.util.RandUtils;

@@ -1,17 +1,17 @@
 package ru.vladislavkomkov.model.fight;
 
+import java.util.List;
+
 import ru.vladislavkomkov.model.Listener;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.player.Player;
-
-import java.util.List;
 
 public class FightPlayer
 {
   final Player player;
   final List<Unit> units;
-  int turn;
   final Listener listener;
+  int turn;
   
   public FightPlayer(Player player, List<Unit> units)
   {

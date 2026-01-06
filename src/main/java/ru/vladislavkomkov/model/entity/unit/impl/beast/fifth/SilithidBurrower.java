@@ -1,5 +1,11 @@
 package ru.vladislavkomkov.model.entity.unit.impl.beast.fifth;
 
+import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
+import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
+
+import java.util.List;
+import java.util.Optional;
+
 import ru.vladislavkomkov.model.Listener;
 import ru.vladislavkomkov.model.entity.unit.Buff;
 import ru.vladislavkomkov.model.entity.unit.Unit;
@@ -7,14 +13,9 @@ import ru.vladislavkomkov.model.entity.unit.UnitType;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.UUIDUtils;
 
-import java.util.List;
-import java.util.Optional;
-
-import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
-import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
-
-public class SilithidBurrower extends Unit{
-
+public class SilithidBurrower extends Unit
+{
+  
   public static final int ATTACK_BOOST = 1;
   public static final int HEALTH_BOOST = 1;
   

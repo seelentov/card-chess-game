@@ -1,4 +1,5 @@
 package ru.vladislavkomkov.model.action;
 
-public interface OnSummonedAction extends OnAppearAction{
+public interface OnSummonedAction extends OnAppearAction
+{
 }

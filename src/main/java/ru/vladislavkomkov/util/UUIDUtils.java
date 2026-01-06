@@ -1,8 +1,6 @@
 package ru.vladislavkomkov.util;
 
-import static ru.vladislavkomkov.consts.Listeners.KEY_CORE_PREFIX;
-import static ru.vladislavkomkov.consts.Listeners.KEY_ONCE_PREFIX;
-import static ru.vladislavkomkov.consts.Listeners.KEY_TEMP_PREFIX;
+import static ru.vladislavkomkov.consts.Listeners.*;
 
 import java.util.UUID;
 

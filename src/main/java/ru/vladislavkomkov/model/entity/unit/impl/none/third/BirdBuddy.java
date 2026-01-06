@@ -3,14 +3,14 @@ package ru.vladislavkomkov.model.entity.unit.impl.none.third;
 import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
 import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
 
+import java.util.List;
+
 import ru.vladislavkomkov.model.Listener;
 import ru.vladislavkomkov.model.entity.unit.Buff;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.UnitType;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.UUIDUtils;
-
-import java.util.List;
 
 public class BirdBuddy extends Unit
 {
@@ -49,7 +49,7 @@ public class BirdBuddy extends Unit
                 {
                   return;
                 }
-
+                
                 List<Unit> units = fight != null ? fight.getFightTable(player1) : player1.getTable();
                 units.stream().filter(unit1 -> unit1.isType(UnitType.BEAST)).forEach(this::addBuff);
               });

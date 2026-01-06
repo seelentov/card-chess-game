@@ -6,12 +6,10 @@ import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
 import java.util.List;
 import java.util.Optional;
 
-import ru.vladislavkomkov.model.action.OnAttackAction;
 import ru.vladislavkomkov.model.entity.unit.Buff;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.UnitType;
 import ru.vladislavkomkov.model.player.Player;
-import ru.vladislavkomkov.util.UUIDUtils;
 
 public class ValiantTiger extends Unit
 {

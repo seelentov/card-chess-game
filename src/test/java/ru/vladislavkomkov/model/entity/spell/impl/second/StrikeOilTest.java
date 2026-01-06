@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
 import ru.vladislavkomkov.model.entity.spell.SpellTestCase;
-import ru.vladislavkomkov.model.entity.spell.impl.first.TavernCoin;
 import ru.vladislavkomkov.model.player.Player;
 
 public class StrikeOilTest extends SpellTestCase
@@ -28,7 +27,7 @@ public class StrikeOilTest extends SpellTestCase
   protected void testOnPlayedIfMax()
   {
     player.setMaxMoney(Player.MAX_MONEY);
-    new StrikeOil().onPlayed(game,null,  player, 0);
+    new StrikeOil().onPlayed(game, null, player, 0);
     assertEquals(Player.MAX_MONEY + 1, player.getMaxMoney());
   }
 }

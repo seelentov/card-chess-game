@@ -2,9 +2,9 @@ package ru.vladislavkomkov.controller.sender;
 
 import java.util.*;
 
+import ru.vladislavkomkov.model.ActionEvent;
 import ru.vladislavkomkov.model.event.Event;
 import ru.vladislavkomkov.model.event.data.SenderWaiterDataReq;
-import ru.vladislavkomkov.model.ActionEvent;
 import ru.vladislavkomkov.model.fight.FightInfo;
 import ru.vladislavkomkov.model.player.Player;
 

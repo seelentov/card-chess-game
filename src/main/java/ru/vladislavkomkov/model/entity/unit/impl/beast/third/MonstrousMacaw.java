@@ -8,7 +8,6 @@ import java.util.List;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.UnitType;
 import ru.vladislavkomkov.model.player.Player;
-import ru.vladislavkomkov.util.RandUtils;
 
 public class MonstrousMacaw extends Unit
 {

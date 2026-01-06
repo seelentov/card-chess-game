@@ -5,11 +5,11 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import ru.vladislavkomkov.consts.Listeners;
-import ru.vladislavkomkov.model.Listener;
-import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.Game;
+import ru.vladislavkomkov.model.Listener;
 import ru.vladislavkomkov.model.action.FightAction;
 import ru.vladislavkomkov.model.action.GlobalAction;
+import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.player.Player;
 
 public class ListenerUtils
@@ -30,16 +30,16 @@ public class ListenerUtils
     new HashMap<>(listeners).forEach((k, v) -> processFightAction(game, k, v, fight, player, player2));
   }
   
-  public static void processGlobalActionListeners(Map<String, ? extends GlobalAction> listeners, Game game, Fight fight,Player player)
+  public static void processGlobalActionListeners(Map<String, ? extends GlobalAction> listeners, Game game, Fight fight, Player player)
   {
     new HashMap<>(listeners).forEach((k, v) -> processStartEndAction(game, k, v, fight, player));
   }
-
+  
   public static Listener getPlayerListener(Fight fight, Player player)
   {
     return fight != null ? fight.getFightPlayer(player).getListener() : player.getListener();
   }
-
+  
   static void processFightAction(Game game, String key, FightAction action, Fight fight, Player player, Player player2)
   {
     action.process(game, fight, player, player2);

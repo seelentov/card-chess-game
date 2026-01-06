@@ -1,11 +1,6 @@
 package ru.vladislavkomkov.model.player;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -55,7 +50,7 @@ public class Player
   
   final List<Unit> table = new ArrayList<>(TABLE_LIMIT);
   final List<Card> hand = new ArrayList<>();
-  
+  final Map<String, Consumer<Integer>> senderWaiters = new HashMap<>();
   int health = START_HEALTH;
   int maxHealth = START_HEALTH;
   int armor = START_ARMOR;
@@ -64,9 +59,7 @@ public class Player
   int level = 1;
   int buyPrice = 3;
   int resetTavernPrice = 1;
-  
   Game game;
-  final Map<String, Consumer<Integer>> senderWaiters = new HashMap<>();
   Sender sender;
   
   public Player()
@@ -691,15 +684,15 @@ public class Player
     return maxMoney;
   }
   
-  public int getMaxMoneyBase()
-  {
-    return maxMoney;
-  }
-  
   public void setMaxMoney(int maxMoney)
   {
     this.maxMoney = maxMoney;
     sendMaxMoney();
+  }
+  
+  public int getMaxMoneyBase()
+  {
+    return maxMoney;
   }
   
   public void incMaxMoney()

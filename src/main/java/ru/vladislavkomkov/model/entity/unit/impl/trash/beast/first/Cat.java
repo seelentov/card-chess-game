@@ -18,7 +18,7 @@ public class Cat extends TrashUnit
   public Cat(Player playerLink)
   {
     super(playerLink);
-
+    
     unitType = List.of(UnitType.BEAST);
     
     actualHealth = getMaxHealth();

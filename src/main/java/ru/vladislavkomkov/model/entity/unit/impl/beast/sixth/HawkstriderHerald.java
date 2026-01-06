@@ -1,15 +1,14 @@
 package ru.vladislavkomkov.model.entity.unit.impl.beast.sixth;
 
+import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
+import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.UnitType;
 import ru.vladislavkomkov.model.player.Player;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-
-import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
-import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
 
 public class HawkstriderHerald extends Unit
 {

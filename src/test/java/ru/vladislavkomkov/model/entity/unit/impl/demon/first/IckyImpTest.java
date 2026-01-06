@@ -22,7 +22,7 @@ public class IckyImpTest extends UnitTestCase
   {
     Unit unit = new IckyImp();
     player.addToTable(unit, -1);
-    unit.onDead(game, null,player, player2, new Cat());
+    unit.onDead(game, null, player, player2, new Cat());
     
     assertEquals(2, player.getUnitsCount());
     assertEquals(new Imp().getName(), player.cloneTable().get(0).getName());
@@ -34,7 +34,7 @@ public class IckyImpTest extends UnitTestCase
   {
     Unit unit = new IckyImp().buildGold();
     player.addToTable(unit, -1);
-    unit.onDead(game, null,player, player2, new Cat());
+    unit.onDead(game, null, player, player2, new Cat());
     
     assertEquals(2, player.getUnitsCount());
     assertEquals(new Imp().getName(), player.cloneTable().get(0).getName());
@@ -42,7 +42,7 @@ public class IckyImpTest extends UnitTestCase
     
     assertEquals(new Imp().getAttack() * 2, player.cloneTable().get(0).getAttack());
     assertEquals(new Imp().getHealth() * 2, player.cloneTable().get(0).getHealth());
-
+    
     assertEquals(new Imp().getAttack() * 2, player.cloneTable().get(1).getAttack());
     assertEquals(new Imp().getHealth() * 2, player.cloneTable().get(1).getHealth());
   }
@@ -60,7 +60,7 @@ public class IckyImpTest extends UnitTestCase
       player.addToTable(new Cat());
     }
     
-    unit.onDead(game, null,player, player2, new Cat());
+    unit.onDead(game, null, player, player2, new Cat());
     player.getTable().removeIf(unit1 -> unit1 == unit);
     
     assertEquals(new Cat().getName(), player.cloneTable().get(0).getName());
@@ -86,7 +86,7 @@ public class IckyImpTest extends UnitTestCase
       player.addToTable(new Cat());
     }
     
-    unit.onDead(game, null,player, player2, new Cat());
+    unit.onDead(game, null, player, player2, new Cat());
     player.getTable().removeIf(unit1 -> unit1 == unit);
     
     assertEquals(new Cat().getName(), player.cloneTable().get(0).getName());

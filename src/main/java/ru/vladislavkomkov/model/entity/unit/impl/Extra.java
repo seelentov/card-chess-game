@@ -14,28 +14,6 @@ public class Extra extends Unit
     super(player);
   }
   
-  public static class Action
-  {
-    private final int isExtra;
-    private final int isTwice;
-    
-    public Action(int isExtra, int isTwice)
-    {
-      this.isExtra = isExtra;
-      this.isTwice = isTwice;
-    }
-    
-    public int getIsExtra()
-    {
-      return isExtra;
-    }
-    
-    public int getIsTwice()
-    {
-      return isTwice;
-    }
-  }
-  
   public Action getOnPlayedExtra()
   {
     return onPlayedExtra;
@@ -49,5 +27,27 @@ public class Extra extends Unit
   public Action getOnEndTurnExtra()
   {
     return onEndTurnExtra;
+  }
+  
+  public static class Action
+  {
+    private final int isExtra;
+    private final int isTwice;
+
+    public Action(int isExtra, int isTwice)
+    {
+      this.isExtra = isExtra;
+      this.isTwice = isTwice;
+    }
+
+    public int getIsExtra()
+    {
+      return isExtra;
+    }
+
+    public int getIsTwice()
+    {
+      return isTwice;
+    }
   }
 }

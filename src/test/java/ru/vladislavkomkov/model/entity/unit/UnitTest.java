@@ -1,8 +1,6 @@
 package ru.vladislavkomkov.model.entity.unit;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +22,7 @@ public class UnitTest extends GamePlayerTestCase
       @Override
       public void onStartTurn(Game game, Fight fight, Player player)
       {
-        super.onStartTurn(game,null,  player);
+        super.onStartTurn(game, null, player);
         player.addMoney(moneyStep);
       }
     };
@@ -74,7 +72,7 @@ public class UnitTest extends GamePlayerTestCase
     };
     
     player.addToTable(unit, 0);
-    game.processStartFight(new Fight(game, player,player2), player, player2);
+    game.processStartFight(new Fight(game, player, player2), player, player2);
     
     assertEquals(moneyStart + (moneyStep), player.getMoney());
   }
@@ -96,7 +94,7 @@ public class UnitTest extends GamePlayerTestCase
     };
     
     player.addToTable(unit, 0);
-    game.processEndFight(new Fight(game, player,player2), player, player2);
+    game.processEndFight(new Fight(game, player, player2), player, player2);
     
     assertEquals(moneyStart + (moneyStep), player.getMoney());
   }
@@ -138,7 +136,7 @@ public class UnitTest extends GamePlayerTestCase
       @Override
       public void onAttack(Game game, Fight fight, Player player, Player player2, Unit attacked)
       {
-        super.onAttack(game,null, player, player2, attacked);
+        super.onAttack(game, null, player, player2, attacked);
         player.addMoney(moneyStep);
       }
     };

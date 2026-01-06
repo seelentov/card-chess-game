@@ -76,20 +76,20 @@ public class RylakMetalheadTest extends UnitTestCase
   @Test
   void testOnDeadBoth()
   {
-      player.addToTable(new IckyImp(player));
-      player.addToTable(new RylakMetalhead(player).buildGold());
-      player.addToTable(new IckyImp(player));
-      
-      Unit unit21 = new Cat(player2);
-      unit21.setBaseAttack(10000);
-      player2.addToTable(unit21);
-      
-      Fight fight = new Fight(game, player, player2);
-      fight.doTurn();
-      
-      assertEquals(new Imp().getName(), fight.getFightTable(player).get(1).getName());
-      assertEquals(new Imp().getName(), fight.getFightTable(player).get(2).getName());
-      assertEquals(new Imp().getName(), fight.getFightTable(player).get(4).getName());
-      assertEquals(new Imp().getName(), fight.getFightTable(player).get(5).getName());
+    player.addToTable(new IckyImp(player));
+    player.addToTable(new RylakMetalhead(player).buildGold());
+    player.addToTable(new IckyImp(player));
+    
+    Unit unit21 = new Cat(player2);
+    unit21.setBaseAttack(10000);
+    player2.addToTable(unit21);
+    
+    Fight fight = new Fight(game, player, player2);
+    fight.doTurn();
+    
+    assertEquals(new Imp().getName(), fight.getFightTable(player).get(1).getName());
+    assertEquals(new Imp().getName(), fight.getFightTable(player).get(2).getName());
+    assertEquals(new Imp().getName(), fight.getFightTable(player).get(4).getName());
+    assertEquals(new Imp().getName(), fight.getFightTable(player).get(5).getName());
   }
 }

@@ -1,9 +1,6 @@
 package ru.vladislavkomkov.model.player;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 import java.util.Objects;
@@ -11,7 +8,6 @@ import java.util.Objects;
 import org.junit.jupiter.api.Test;
 
 import ru.vladislavkomkov.GamePlayerTestCase;
-import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.spell.Spell;
@@ -20,6 +16,7 @@ import ru.vladislavkomkov.model.entity.spell.impl.spellcraft.impl.DeepBlues;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.impl.beast.first.Alleycat;
 import ru.vladislavkomkov.model.entity.unit.impl.trash.beast.first.Cat;
+import ru.vladislavkomkov.model.fight.Fight;
 
 public class PlayerTest extends GamePlayerTestCase
 {
@@ -54,11 +51,12 @@ public class PlayerTest extends GamePlayerTestCase
       @Override
       public void build()
       {
-      
+        
       }
       
       @Override
-      public void onPlayed(Game game, Fight fight, Player player, List<Integer> input, boolean auto) {
+      public void onPlayed(Game game, Fight fight, Player player, List<Integer> input, boolean auto)
+      {
         player.addMoney(moneyTest);
       }
     }));
@@ -364,7 +362,8 @@ public class PlayerTest extends GamePlayerTestCase
         game.doTurnBegin();
         game.incTurn();
         
-        if(i == (price / 2)){
+        if (i == (price / 2))
+        {
           break;
         }
       }

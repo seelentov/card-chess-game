@@ -17,10 +17,10 @@ public class EventTest
   {
     String i = "111";
     Event event = new Event(
-            null,
-            null,
-            Event.Type.ERROR,
-            i);
+        null,
+        null,
+        Event.Type.ERROR,
+        i);
     
     byte[] bytes = event.getBytes();
     
@@ -34,10 +34,10 @@ public class EventTest
   {
     int i = 111;
     Event event = new Event(
-            null,
-            null,
-            Event.Type.ERROR,
-            i);
+        null,
+        null,
+        Event.Type.ERROR,
+        i);
     
     byte[] bytes = event.getBytes();
     
@@ -60,10 +60,10 @@ public class EventTest
     unit.setIsBubbled(true);
     
     Event event = new Event(
-            null,
-            null,
-            Event.Type.ERROR,
-            unit);
+        null,
+        null,
+        Event.Type.ERROR,
+        unit);
     
     byte[] bytes = event.getBytes();
     
