@@ -18,6 +18,7 @@ import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.entity.unit.UnitType;
 import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.player.Player;
+import ru.vladislavkomkov.model.player.Tavern;
 import ru.vladislavkomkov.util.RandUtils;
 
 public class SprightlyScarab extends Choicer
@@ -46,7 +47,7 @@ public class SprightlyScarab extends Choicer
         new PlayPair(PlayType.CHOICE, List.of(
             new SprightlySprucing(playerLink, isGold()),
             new SprightlySupport(playerLink, isGold()))),
-        new PlayPair(PlayType.TAVERN_FRENDLY, List.of(UnitType.BEAST)));
+        new PlayPair(PlayType.TAVERN_FRIENDLY, List.of(UnitType.BEAST)));
     
     isAnswerOnPlayed = false;
     listener.onPlayedListeners.put(
@@ -77,28 +78,37 @@ public class SprightlyScarab extends Choicer
         + new SprightlySupport(playerLink, isGold).getDescription();
   }
   
-  private static Unit findUnit(Fight fight, Player player, List<Integer> input)
+  private static Optional<Unit> findUnit(Fight fight, Player player, List<Integer> input)
   {
-    boolean isTavernIndex = input.get(3) == 1;
+    boolean isTavernIndex = input.size() >= 4 && input.get(3) == 1;
     
-    List<Unit> units = isTavernIndex ? player.getTavern().getUnits() : fight != null ? fight.getFightTable(player) : player.getTable();
-    int index = SprightlyScarab.calcIndex(input, units);
+    Unit unit = null;
     
-    Unit unit = units.get(index);
-    
-    if (!unit.isType(UnitType.BEAST))
+    if (isTavernIndex)
     {
-      Optional<Unit> unitOptional = units.stream().filter(u -> u.isType(UnitType.BEAST)).findFirst();
-      if (unitOptional.isPresent())
+      List<Entity> units = player.getTavern().getCards().stream().map(Tavern.Slot::getEntity).toList();
+      int index = SprightlyScarab.calcIndex(input, units);
+      if (units.get(index) instanceof Unit)
       {
-        unit = unitOptional.get();
+        unit = (Unit) units.get(index);
       }
     }
+    else
+    {
+      List<Unit> units = (fight != null ? fight.getFightTable(player) : player.getTable());
+      int index = SprightlyScarab.calcIndex(input, units);
+      unit = units.get(index);
+    }
     
-    return unit;
+    if (unit != null && unit.isType(UnitType.BEAST))
+    {
+      return Optional.of(unit);
+    }
+    
+    return Optional.empty();
   }
   
-  private static int calcIndex(List<Integer> input, List<Unit> units)
+  private static int calcIndex(List<Integer> input, List units)
   {
     int index;
     if (input.size() > 2)
@@ -135,8 +145,13 @@ public class SprightlyScarab extends Choicer
     
     public void process(Game game, Fight fight, Player player, Entity entity, List<Integer> input, boolean auto)
     {
-      Unit unit = SprightlyScarab.findUnit(fight, player, input);
-      unit.addBuff(new Buff(
+      Optional<Unit> unit = SprightlyScarab.findUnit(fight, player, input);
+
+      if(unit.isEmpty()){
+        return;
+      }
+
+      unit.get().addBuff(new Buff(
           u -> {
             u.incBaseAttack(ATTACK_BOOST * (this.isGold ? 2 : 1));
             u.incHealth(HEALTH_BOOST * (this.isGold ? 2 : 1));
@@ -170,8 +185,13 @@ public class SprightlyScarab extends Choicer
     
     public void process(Game game, Fight fight, Player player, Entity entity, List<Integer> input, boolean auto)
     {
-      Unit unit = SprightlyScarab.findUnit(fight, player, input);
-      unit.addBuff(new Buff(
+      Optional<Unit> unit = SprightlyScarab.findUnit(fight, player, input);
+
+      if(unit.isEmpty()){
+        return;
+      }
+
+      unit.get().addBuff(new Buff(
           u -> {
             u.incBaseAttack(ATTACK_BOOST * (this.isGold ? 2 : 1));
             u.setAttacksCount(AttacksCount.DOUBLE);

@@ -37,8 +37,13 @@ public class SlyRaptor extends Unit
     listener.onDeadListeners.put(
         KEY_CORE,
         (game, fight, player1, player2, unit, attacker) -> {
-          List<Class<? extends Unit>> pool = player1.getTavern().getUnitsPool().stream().filter(u -> ReflectUtils.getInstance(u).isType(UnitType.BEAST)).toList();
-          
+          List<Class<? extends Unit>> pool = player1.getTavern().getUnitsPool().stream()
+              .filter(u -> {
+                Unit un = ReflectUtils.getInstance(u);
+                return un.isType(UnitType.BEAST) && un.getLevel() <= player1.getLevel();
+              })
+              .toList();
+              
           if (pool.isEmpty())
           {
             return;

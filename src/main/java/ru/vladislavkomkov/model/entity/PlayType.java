@@ -3,8 +3,8 @@ package ru.vladislavkomkov.model.entity;
 public enum PlayType
 {
   TABLE,
-  FRENDLY,
+  FRIENDLY,
   TAVERN,
-  TAVERN_FRENDLY,
+  TAVERN_FRIENDLY,
   CHOICE,
 }

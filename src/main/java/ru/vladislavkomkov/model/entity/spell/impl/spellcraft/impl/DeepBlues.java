@@ -4,6 +4,7 @@ import static ru.vladislavkomkov.consts.Listeners.KEY_CORE;
 import static ru.vladislavkomkov.consts.PlayerConst.DUMP_PLAYER;
 
 import java.util.List;
+import java.util.Optional;
 
 import ru.vladislavkomkov.model.entity.PlayPair;
 import ru.vladislavkomkov.model.entity.PlayType;
@@ -11,7 +12,6 @@ import ru.vladislavkomkov.model.entity.spell.impl.spellcraft.SpellCraft;
 import ru.vladislavkomkov.model.entity.unit.Buff;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.player.Player;
-import ru.vladislavkomkov.util.RandUtils;
 
 public class DeepBlues extends SpellCraft
 {
@@ -36,7 +36,7 @@ public class DeepBlues extends SpellCraft
     super(playerLink, isGold);
     build();
     
-    playType = List.of(new PlayPair(PlayType.TAVERN_FRENDLY));
+    playType = List.of(new PlayPair(PlayType.TAVERN_FRIENDLY));
   }
   
   @Override
@@ -50,34 +50,9 @@ public class DeepBlues extends SpellCraft
           int attackBonus = getAttackBoost(multi);
           int hpBonus = getHealthBoost(multi);
           
-          boolean isTavernIndex;
-          int index;
-          if (input.size() < 2)
-          {
-            isTavernIndex = RandUtils.getRand(1) == 1;
-            
-            int unitsCount = fight != null ? fight.getFightTable(player).size() : player.getTable().size();
-            index = RandUtils.getRand(unitsCount);
-          }
-          else
-          {
-            isTavernIndex = input.get(1) == 1;
-            index = input.get(0);
-          }
+          Optional<Unit> unit = getUnitFromTavernFriendlyInput(fight, player, input);
           
-          Unit unit;
-          if (!isTavernIndex)
-          {
-            unit = fight != null
-                ? fight.getFightTable(player).get(index)
-                : player.getTable().get(index);
-          }
-          else
-          {
-            unit = (Unit) player.getTavern().getCards().get(index).getCard().getEntity();
-          }
-          
-          unit.addBuff(
+          unit.ifPresent(value -> value.addBuff(
               new Buff(
                   unit1 -> {
                     unit1.incBaseAttack(attackBonus);
@@ -89,7 +64,7 @@ public class DeepBlues extends SpellCraft
                   },
                   getDescription(),
                   getID(),
-                  true));
+                  true)));
                   
           player.getStatistic().getPlayed().incOnlyBluesPlayed();
         });
@@ -111,11 +86,11 @@ public class DeepBlues extends SpellCraft
   
   int getAttackBoost(int multi)
   {
-    return (isGold ? ATTACK_BOOST_GOLD : ATTACK_BOOST) * multi;
+    return ((isGold ? ATTACK_BOOST_GOLD : ATTACK_BOOST) + playerLink.getStatistic().getBoosts().getAttackSpell()) * multi;
   }
   
   int getHealthBoost(int multi)
   {
-    return (isGold ? HEALTH_BOOST_GOLD : HEALTH_BOOST) * multi;
+    return ((isGold ? HEALTH_BOOST_GOLD : HEALTH_BOOST) + playerLink.getStatistic().getBoosts().getHealthSpell()) * multi;
   }
 }

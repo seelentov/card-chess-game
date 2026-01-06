@@ -46,4 +46,14 @@ public abstract class Spell extends Entity
   {
     return "";
   }
+
+  protected int getAttackBoost()
+  {
+    return playerLink.getStatistic().getBoosts().getAttackSpell() + (isTavern() ? playerLink.getStatistic().getBoosts().getTavernAttackSpell() : 0);
+  }
+
+  protected int getHealthBoost()
+  {
+    return playerLink.getStatistic().getBoosts().getHealthSpell() + (isTavern() ? playerLink.getStatistic().getBoosts().getTavernHealthSpell() : 0);
+  }
 }

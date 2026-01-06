@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.unit.UnitType;
 
 public class PlayPair
@@ -57,7 +56,7 @@ public class PlayPair
   {
     return switch (type)
     {
-      case TAVERN_FRENDLY -> 2;
+      case TAVERN_FRIENDLY -> 2;
       default -> 1;
     };
   }

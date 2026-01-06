@@ -3,6 +3,7 @@ package ru.vladislavkomkov.model.entity;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,10 +12,12 @@ import ru.vladislavkomkov.consts.Listeners;
 import ru.vladislavkomkov.model.GObject;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.Listener;
+import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.ActionEvent;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.ListenerUtils;
+import ru.vladislavkomkov.util.RandUtils;
 import ru.vladislavkomkov.util.ReflectUtils;
 import ru.vladislavkomkov.util.UUIDUtils;
 
@@ -165,4 +168,40 @@ public abstract class Entity extends GObject
   
   @JsonProperty(F_IS_SPELL)
   public abstract boolean isSpell();
+  
+  protected Optional<Unit> getUnitFromTavernFriendlyInput(Fight fight, Player player, List<Integer> input)
+  {
+    boolean isTavernIndex;
+    int index;
+    if (input.size() < 2)
+    {
+      isTavernIndex = false;
+      
+      int unitsCount = fight != null ? fight.getFightTable(player).size() : player.getTable().size();
+      index = RandUtils.getRand(unitsCount);
+    }
+    else
+    {
+      isTavernIndex = input.get(1) == 1;
+      index = input.get(0);
+    }
+    
+    Unit unit = null;
+    if (!isTavernIndex)
+    {
+      unit = fight != null
+          ? fight.getFightTable(player).get(index)
+          : player.getTable().get(index);
+    }
+    else
+    {
+      Entity entity1 = player.getTavern().getCards().get(index).getEntity();
+      if (entity1 instanceof Unit unit1)
+      {
+        unit = unit1;
+      }
+    }
+    
+    return Optional.ofNullable(unit);
+  }
 }

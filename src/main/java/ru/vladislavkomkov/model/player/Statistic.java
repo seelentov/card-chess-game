@@ -55,7 +55,10 @@ public class Statistic
     int healthUnit = 0;
     
     int attackSpell = 0;
+    int tavernAttackSpell = 0;
+
     int healthSpell = 0;
+    int tavernHealthSpell = 0;
     
     public void incAttackByUnitType(UnitType type, int i)
     {
@@ -139,6 +142,16 @@ public class Statistic
       attackSpell += i;
     }
     
+    public int getTavernAttackSpell()
+    {
+      return tavernAttackSpell;
+    }
+    
+    public void incTavernAttackSpell(int i)
+    {
+      tavernAttackSpell += i;
+    }
+    
     public int getHealthSpell()
     {
       return healthSpell;
@@ -147,6 +160,16 @@ public class Statistic
     public void incHealthSpell(int i)
     {
       healthSpell += i;
+    }
+    
+    public int getTavernHealthSpell()
+    {
+      return tavernHealthSpell;
+    }
+    
+    public void incTavernHealthSpell(int i)
+    {
+      tavernHealthSpell += i;
     }
   }
   
