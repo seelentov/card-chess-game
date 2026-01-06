@@ -25,6 +25,7 @@ public class Tavern
   List<Slot> cards = new ArrayList<>();
   boolean freeze = false;
   private Player player;
+  
   public Tavern()
   {
     this(DUMP_PLAYER);
@@ -106,7 +107,7 @@ public class Tavern
         isLastCardSpellAndFreezed = true;
       }
     }
-
+    
     if (saveFreezed)
     {
       cards.removeIf(card -> !card.isFreezed());
@@ -115,12 +116,12 @@ public class Tavern
     {
       cards.clear();
     }
-
+    
     int unitsCount = (int) cards.stream().filter(card -> card.getEntity() instanceof Unit).count();
-
+    
     int count = getCountByLevel(level) - unitsCount;
     fillWithUnits(level, count);
-
+    
     if (saveFreezed)
     {
       if (!isLastCardSpellAndFreezed)
@@ -132,7 +133,7 @@ public class Tavern
     {
       addRandomSpell(level);
     }
-
+    
     freeze = false;
     cards.forEach(slot -> slot.setFreezed(false));
   }
@@ -150,9 +151,9 @@ public class Tavern
   {
     int targetLevel = RandUtils.getRandLvl(level);
     List<Class<? extends Unit>> units = getAvailableUnitsWithFallback(targetLevel, level);
-
+    
     Class<? extends Unit> unit = units.get(RandUtils.getRand(units.size() - 1));
-
+    
     return new Card(ReflectUtils.getInstance(unit, player));
   }
   
@@ -160,35 +161,35 @@ public class Tavern
   {
     int targetLevel = RandUtils.getRandLvl(level);
     List<Class<? extends Spell>> spells = getAvailableSpellsWithFallback(targetLevel, level);
-
+    
     Class<? extends Spell> spell = spells.get(RandUtils.getRand(spells.size() - 1));
-
+    
     add(new Card(ReflectUtils.getInstance(spell, player)));
   }
   
   List<Class<? extends Unit>> getAvailableUnitsWithFallback(int targetLevel, int maxLevel)
   {
     List<Class<? extends Unit>> units = UnitUtils.getByTavern(targetLevel, unitsPool);
-
+    
     while (units.isEmpty())
     {
       targetLevel = getNextFallbackLevel(targetLevel, maxLevel);
       units = UnitUtils.getByTavern(targetLevel, unitsPool);
     }
-
+    
     return units;
   }
   
   List<Class<? extends Spell>> getAvailableSpellsWithFallback(int targetLevel, int maxLevel)
   {
     List<Class<? extends Spell>> spells = SpellUtils.getByTavern(targetLevel, spellsPool);
-
+    
     while (spells.isEmpty())
     {
       targetLevel = getNextFallbackLevel(targetLevel, maxLevel);
       spells = SpellUtils.getByTavern(targetLevel, spellsPool);
     }
-
+    
     return spells;
   }
   
@@ -219,39 +220,39 @@ public class Tavern
     public final static String F_CARD = "card";
     public final static String F_ENTITY = "entity";
     public final static String F_IS_FREEZED = "is_freezed";
-
+    
     private final Card<T> card;
     private boolean isFreezed;
-
+    
     public Slot(Card<T> card)
     {
       this(card, false);
     }
-
+    
     public Slot(Card<T> card, boolean freezed)
     {
       this.card = card;
       this.isFreezed = freezed;
     }
-
+    
     @JsonProperty(F_CARD)
     public Card<T> getCard()
     {
       return card;
     }
-
+    
     @JsonProperty(F_ENTITY)
     public T getEntity()
     {
       return card.getEntity();
     }
-
+    
     @JsonProperty(F_IS_FREEZED)
     public boolean isFreezed()
     {
       return isFreezed;
     }
-
+    
     public void setFreezed(boolean freezed)
     {
       this.isFreezed = freezed;

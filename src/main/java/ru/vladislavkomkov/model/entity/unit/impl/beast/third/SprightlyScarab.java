@@ -68,9 +68,9 @@ public class SprightlyScarab extends Choicer
   private static Optional<Unit> findUnit(Fight fight, Player player, List<Integer> input)
   {
     boolean isTavernIndex = input.size() >= 4 && input.get(3) == 1;
-
+    
     Unit unit = null;
-
+    
     if (isTavernIndex)
     {
       List<Entity> units = player.getTavern().getCards().stream().map(Tavern.Slot::getEntity).toList();
@@ -86,12 +86,12 @@ public class SprightlyScarab extends Choicer
       int index = SprightlyScarab.calcIndex(input, units);
       unit = units.get(index);
     }
-
+    
     if (unit != null && unit.isType(UnitType.BEAST))
     {
       return Optional.of(unit);
     }
-
+    
     return Optional.empty();
   }
   
@@ -106,17 +106,17 @@ public class SprightlyScarab extends Choicer
     {
       index = RandUtils.getRand(units.size() - 1);
     }
-
+    
     if (input.get(0) <= index)
     {
       index += 1;
     }
-
+    
     if (index >= units.size())
     {
       index = 0;
     }
-
+    
     return index;
   }
   

@@ -98,7 +98,7 @@ public class Game implements AutoCloseable
       playersLock.writeLock().unlock();
     }
   }
-
+  
   public void addPlayer(String UUID, Player player)
   {
     playersLock.writeLock().lock();
@@ -440,23 +440,26 @@ public class Game implements AutoCloseable
     if (player != null)
       player.sellCard(index);
   }
-
-  public void addToHand(String uuid, String cardName) {
+  
+  public void addToHand(String uuid, String cardName)
+  {
     Player player = getPlayer(uuid);
-    if (player == null){
+    if (player == null)
+    {
       return;
     }
-
+    
     Optional<Class<? extends Entity>> aClass = Stream.concat(Units.units.stream(), Spells.spells.stream())
-            .filter(clazz -> clazz.getName().equals(cardName))
-            .findFirst();
-
-    if(aClass.isEmpty()){
+        .filter(clazz -> clazz.getName().equals(cardName))
+        .findFirst();
+    
+    if (aClass.isEmpty())
+    {
       return;
     }
-
+    
     Entity entity = ReflectUtils.getInstance(aClass.get(), player);
-
+    
     player.addToHand(Card.of(entity));
   }
   
@@ -630,7 +633,7 @@ public class Game implements AutoCloseable
   {
     executor.shutdown();
   }
-
+  
   public enum State
   {
     FIGHT,

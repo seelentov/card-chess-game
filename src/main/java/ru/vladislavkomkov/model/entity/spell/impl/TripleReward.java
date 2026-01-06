@@ -46,7 +46,7 @@ public class TripleReward extends Spell
           
           if (allUnits.isEmpty())
           {
-              return;
+            return;
           }
           
           while (allUnits.size() < 3)

@@ -33,18 +33,18 @@ public class Extra extends Unit
   {
     private final int isExtra;
     private final int isTwice;
-
+    
     public Action(int isExtra, int isTwice)
     {
       this.isExtra = isExtra;
       this.isTwice = isTwice;
     }
-
+    
     public int getIsExtra()
     {
       return isExtra;
     }
-
+    
     public int getIsTwice()
     {
       return isTwice;
