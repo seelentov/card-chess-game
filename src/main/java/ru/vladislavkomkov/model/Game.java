@@ -310,11 +310,25 @@ public class Game implements AutoCloseable
     this.fights = fights;
   }
   
+  private int getDamageCap()
+  {
+    if (players.values().stream()
+        .filter(Player::isAlive)
+        .count() < 5)
+    {
+      return Integer.MAX_VALUE;
+    }
+    
+    return turn <= 2 ? 5 : turn <= 4 ? 10 : 15;
+  }
+  
   public boolean calcFights()
   {
     playersLock.readLock().lock();
     try
     {
+      int damageCap = getDamageCap();
+      
       Queue<Player> alive = newPlayerQueue(true);
       Queue<Player> dead = newPlayerQueue(false);
       
@@ -350,10 +364,9 @@ public class Game implements AutoCloseable
       List<Player> availablePlayers = new ArrayList<>(playersList);
       Collections.shuffle(availablePlayers);
       
-      // Если нечётное число живых — добавляем одного мёртвого (если есть)
       if (availablePlayers.size() % 2 != 0 && !dead.isEmpty())
       {
-        Player dummyOpponent = dead.poll(); // берём любого мёртвого
+        Player dummyOpponent = dead.poll();
         availablePlayers.add(dummyOpponent);
       }
       
@@ -365,23 +378,23 @@ public class Game implements AutoCloseable
         if (player2 != null)
         {
           availablePlayers.remove(player2);
-          fights.add(new Fight(this, player1, player2, false));
+          fights.add(new Fight(this, player1, player2, false, damageCap));
         }
         else if (!availablePlayers.isEmpty())
         {
           player2 = availablePlayers.remove(0);
-          fights.add(new Fight(this, player1, player2, false));
+          fights.add(new Fight(this, player1, player2, false, damageCap));
         }
       }
       
       long aliveCount = players.values().stream().filter(Player::isAlive).count();
       if (aliveCount <= 1)
       {
-        Player winner = players.values().stream().filter(Player::isAlive).findFirst().orElse(null);
-        if (winner != null)
-        {
-          winner.sendMessage(Event.Type.WIN);
-        }
+        players.values().stream()
+            .filter(Player::isAlive)
+            .findFirst()
+            .ifPresent(winner -> winner.sendMessage(Event.Type.WIN));
+        
         state = State.END;
         return true;
       }

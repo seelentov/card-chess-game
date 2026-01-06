@@ -49,7 +49,6 @@ public class PointyArrow extends Spell
               null,
               getDescription(),
               getID())));
-              
         });
   }
   

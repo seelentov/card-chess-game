@@ -9,6 +9,7 @@ public abstract class GObject implements Cloneable
   public final static String F_ID = "id";
   
   public final static String F_NAME = "name";
+  public final static String F_VIEW_NAME = "view_name";
   public final static String F_DESCRIPTION = "description";
   
   public final static String F_IS_GOLD = "is_gold";
@@ -17,6 +18,7 @@ public abstract class GObject implements Cloneable
   
   protected String ID = UUIDUtils.generateKey();
   protected String name = this.getClass().getSimpleName();
+  protected String viewName = name;
   
   public GObject()
   {
@@ -31,6 +33,12 @@ public abstract class GObject implements Cloneable
   public String getName()
   {
     return name;
+  }
+  
+  @JsonProperty(F_VIEW_NAME)
+  public String getViewName()
+  {
+    return viewName;
   }
   
   @JsonProperty(F_ID)

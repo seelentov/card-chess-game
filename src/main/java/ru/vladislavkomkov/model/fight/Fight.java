@@ -15,7 +15,9 @@ import ru.vladislavkomkov.util.RandUtils;
 public class Fight
 {
   public static final int TURN_LIMIT = 10000;
-  
+
+  int damageCap = Integer.MAX_VALUE;
+
   final Game game;
   
   final FightPlayer fightPlayer1;
@@ -24,18 +26,29 @@ public class Fight
   int turn = 0;
   
   List<ActionEvent> history = new ArrayList<>();
-  
+
   public Fight(Game game, Player player1, Player player2)
   {
-    this(game, player1, player2, true);
+    this(game, player1, player2, true, Integer.MAX_VALUE);
+  }
+
+  public Fight(Game game, Player player1, Player player2, int damageCap)
+  {
+    this(game, player1, player2, true, damageCap);
+  }
+
+  public Fight(Game game, Player player1, Player player2, boolean isSetup)
+  {
+    this(game, player1, player2, isSetup, Integer.MAX_VALUE);
   }
   
-  public Fight(Game game, Player player1, Player player2, boolean isSetup)
+  public Fight(Game game, Player player1, Player player2, boolean isSetup, int damageCap)
   {
     this.game = game;
     this.fightPlayer1 = new FightPlayer(player1, new ArrayList<>());
     this.fightPlayer2 = new FightPlayer(player2, new ArrayList<>());
-    
+    this.damageCap = damageCap;
+
     if (isSetup)
     {
       setup();
@@ -425,7 +438,7 @@ public class Fight
         .mapToInt(Unit::getLevel)
         .sum();
     int playerDamage = player.getLevel();
-    return playerDamage + unitsDamage;
+    return Math.min(damageCap, playerDamage + unitsDamage);
   }
   
   void afterFight()
