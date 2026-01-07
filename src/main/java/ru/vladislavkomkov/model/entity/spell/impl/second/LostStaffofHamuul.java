@@ -11,6 +11,7 @@ import java.util.Optional;
 import ru.vladislavkomkov.model.entity.PlayPair;
 import ru.vladislavkomkov.model.entity.spell.Spell;
 import ru.vladislavkomkov.model.entity.unit.Unit;
+import ru.vladislavkomkov.model.entity.unit.UnitType;
 import ru.vladislavkomkov.model.player.Player;
 import ru.vladislavkomkov.util.ReflectUtils;
 
@@ -31,7 +32,7 @@ public class LostStaffofHamuul extends Spell
     super(playerLink, isGold);
     isTavern = true;
     
-    playType = of(new PlayPair(TAVERN_FRIENDLY));
+    playType = of(new PlayPair(TAVERN_FRIENDLY, List.of(UnitType.values())));
   }
   
   @Override

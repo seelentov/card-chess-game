@@ -1,9 +1,6 @@
 package ru.vladislavkomkov.model.entity;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -13,6 +10,7 @@ import ru.vladislavkomkov.model.ActionEvent;
 import ru.vladislavkomkov.model.GObject;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.Listener;
+import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.unit.Unit;
 import ru.vladislavkomkov.model.fight.Fight;
 import ru.vladislavkomkov.model.player.Player;
@@ -213,5 +211,59 @@ public abstract class Entity extends GObject
     }
     
     return Optional.ofNullable(unit);
+  }
+  
+  private static final int EXCAVATION_LIMIT = 3;
+  
+  protected void excavation(Player player, List<Class<? extends Unit>> allUnits)
+  {
+    if (allUnits.isEmpty())
+    {
+      return;
+    }
+    
+    List<Class<? extends Unit>> classes;
+    
+    if (allUnits.size() < EXCAVATION_LIMIT)
+    {
+      classes = allUnits;
+    }
+    else
+    {
+      Set<Integer> setInts = new HashSet<>();
+      
+      while (setInts.size() < EXCAVATION_LIMIT)
+      {
+        setInts.add(RandUtils.getRand(allUnits.size()));
+      }
+      
+      List<Integer> ints = setInts.stream().toList();
+      
+      classes = List.of(
+          allUnits.get(ints.get(0)),
+          allUnits.get(ints.get(1)),
+          allUnits.get(ints.get(2)));
+    }
+    
+    List<Card> units = classes.stream()
+        .map(unitClass -> ReflectUtils.getInstance(unitClass, playerLink))
+        .map(unit -> (Card) Card.of(unit))
+        .toList();
+    
+    player.putSenderWaiter((param) -> {
+      if (param < 0 || param > 3)
+      {
+        param = RandUtils.getRand(1, 3);
+      }
+      
+      try
+      {
+        player.addToHand(units.get(param));
+      }
+      catch (Exception e)
+      {
+        throw new RuntimeException(e);
+      }
+    }, units);
   }
 }

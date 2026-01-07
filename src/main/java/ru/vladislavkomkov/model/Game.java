@@ -506,6 +506,7 @@ public class Game implements AutoCloseable
   
   public void processStartTurn(Player player)
   {
+    player.clearOnStartFightActionsView();
     ListenerUtils.processGlobalActionListeners(
         player.getListener().onStartTurnListeners, this, null, player);
     player.doForAll(unit -> unit.onStartTurn(this, null, player));
@@ -527,6 +528,11 @@ public class Game implements AutoCloseable
         ListenerUtils.getPlayerListener(fight, player).onStartFightListeners, this, fight, player, player2);
     
     new ArrayList<>(fight.getFightTable(player)).forEach(unit -> unit.onStartFight(this, fight, player, player2));
+    
+    if (fight != null)
+    {
+      fight.addToHistory(ActionEvent.Type.ON_START_FIGHT, player, List.of(player.getOnStartFightActionsView()));
+    }
   }
   
   public void processEndFight(Fight fight, Player player, Player player2)

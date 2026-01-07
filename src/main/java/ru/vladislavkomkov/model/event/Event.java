@@ -199,6 +199,6 @@ public class Event
     FIGHT,
     HAND,
     TAVERN,
-    CREATE_CARD
+      ON_START_FIGHT_ACTIONS, CREATE_CARD
   }
 }

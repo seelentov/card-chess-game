@@ -12,6 +12,7 @@ import ru.vladislavkomkov.controller.sender.Sender;
 import ru.vladislavkomkov.enviroment.Config;
 import ru.vladislavkomkov.model.Game;
 import ru.vladislavkomkov.model.Listener;
+import ru.vladislavkomkov.model.View;
 import ru.vladislavkomkov.model.card.Card;
 import ru.vladislavkomkov.model.entity.Entity;
 import ru.vladislavkomkov.model.entity.spell.Spell;
@@ -90,9 +91,29 @@ public class Player
     this.tavern = new Tavern(unitsPool, spellsPool, this);
   }
   
+  final List<View> onStartFightActionsView = new ArrayList<>();
+  
+  public List<View> getOnStartFightActionsView()
+  {
+    return onStartFightActionsView;
+  }
+  
+  public void addOnStartFightActionsView(View view)
+  {
+    onStartFightActionsView.add(view);
+    sendOnStartFightActions();
+  }
+  
+  public void clearOnStartFightActionsView()
+  {
+    onStartFightActionsView.clear();
+    sendOnStartFightActions();
+  }
+  
   public void sendFullStat()
   {
     sendArmorHealth();
+    sendOnStartFightActions();
     sendMaxMoney();
     sendMoney();
     sendFreeze();
@@ -107,6 +128,11 @@ public class Player
   {
     sendHealth();
     sendArmor();
+  }
+  
+  public void sendOnStartFightActions()
+  {
+    sendMessage(Event.Type.ON_START_FIGHT_ACTIONS, getOnStartFightActionsView());
   }
   
   public void sendMaxMoney()
@@ -220,6 +246,11 @@ public class Player
   {
     senderWaiters.forEach((key, action) -> action.accept(RandUtils.getRand()));
     senderWaiters.clear();
+  }
+  
+  public Map<String, Consumer<Integer>> getSenderWaiters()
+  {
+    return senderWaiters;
   }
   
   @JsonProperty(F_UUID)
